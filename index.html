@@ -5,10 +5,382 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#07111f" />
   <title>English on the Road</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+<style>
+:root{
+  --bg:#07111f;
+  --panel:#0d1a2a;
+  --panel2:#112238;
+  --card:#ffffff;
+  --muted:#728197;
+  --line:#dfe7ef;
+  --accent:#f7b731;
+  --accent2:#ffce58;
+  --success:#31c48d;
+  --danger:#ff6b6b;
+  --text:#0e1b2b;
+  --white:#fff;
+  --shadow:0 18px 50px rgba(7,17,31,.14);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,system-ui,sans-serif;background:#eef3f8;color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+#app{min-height:100vh}
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:270px;background:var(--bg);color:#fff;padding:26px 18px;
+  display:flex;flex-direction:column;z-index:50;box-shadow:10px 0 30px rgba(0,0,0,.08)
+}
+.brand{display:flex;gap:12px;align-items:center;padding:0 8px 26px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand-mark{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#ff8c2d);display:grid;place-items:center;font-family:Arial,Helvetica,sans-serif;font-size:22px;color:#07111f}
+.brand-mark span{color:#fff}
+.brand strong{display:block;font-size:15px}
+.brand small{display:block;color:#8fa0b6;font-size:10px;margin-top:4px}
+.main-nav{display:grid;gap:8px;margin-top:24px}
+.nav-item{border:0;background:transparent;color:#9fb0c4;border-radius:12px;padding:14px 16px;text-align:left;font-weight:600;display:flex;gap:12px;align-items:center}
+.nav-item span{width:22px;text-align:center}
+.nav-item:hover,.nav-item.active{background:rgba(247,183,49,.12);color:var(--accent2)}
+.sidebar-footer{margin-top:auto;display:grid;gap:12px}
+.role-switch{padding:12px;border-radius:12px;background:rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#8fa0b6}
+.role-switch select{background:#122338;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px}
+.ghost-btn{background:transparent;border:1px solid rgba(255,255,255,.15);color:#9fb0c4;border-radius:10px;padding:10px}
+.main{margin-left:270px;min-height:100vh;padding:0 32px 60px}
+.topbar{height:92px;display:flex;align-items:center;justify-content:space-between}
+.topbar h1{margin:2px 0 0;font-size:26px}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;color:#8290a4;margin:0 0 8px}
+.eyebrow.light{color:#bfd0e2}
+.top-actions{display:flex;align-items:center;gap:14px}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid #dbe4ee;background:#fff;box-shadow:0 8px 20px rgba(10,30,50,.06)}
+.driver-mini{display:flex;align-items:center;gap:10px;background:#fff;padding:8px 12px;border-radius:14px;border:1px solid #e1e8f0}
+.driver-mini strong,.driver-mini small{display:block}
+.driver-mini small{color:var(--muted);font-size:11px;margin-top:2px}
+.avatar{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#18324f,#07111f);color:#fff;display:grid;place-items:center;font-weight:800}
+.avatar.large{width:70px;height:70px;border-radius:20px;font-size:22px;background:linear-gradient(135deg,var(--accent),#ff8c2d);color:#07111f}
+.view{display:none}
+.view.active{display:block;animation:fade .24s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.hero-grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(240px,.8fr);gap:20px}
+.hero-card{position:relative;min-height:390px;border-radius:28px;overflow:hidden;background:linear-gradient(135deg,#0c2035,#0a1523 72%);box-shadow:var(--shadow)}
+.hero-overlay{position:absolute;inset:0;background:radial-gradient(circle at 72% 28%,rgba(247,183,49,.17),transparent 27%),linear-gradient(90deg,rgba(7,17,31,.96),rgba(7,17,31,.58) 58%,rgba(7,17,31,.2))}
+.hero-content{position:relative;z-index:3;color:#fff;padding:48px;max-width:540px}
+.hero-content h2{font-family:Arial,Helvetica,sans-serif;font-size:50px;line-height:1;margin:0 0 16px;text-transform:uppercase}
+.hero-content p{color:#c8d4e2;line-height:1.6}
+.hero-progress{margin:26px 0;display:flex;gap:14px;align-items:center;font-size:12px;color:#c8d4e2}
+.progress-bar{width:220px;height:8px;border-radius:999px;background:rgba(255,255,255,.13);overflow:hidden}
+.progress-bar span,.lesson-progress span,.license-progress span,.metric-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff8c2d);border-radius:999px}
+.primary-btn,.secondary-btn{border:0;border-radius:12px;padding:14px 18px;font-weight:800}
+.primary-btn{background:linear-gradient(135deg,var(--accent),#ff9b2f);color:#07111f;box-shadow:0 10px 24px rgba(247,183,49,.24)}
+.secondary-btn{background:#fff;border:1px solid #d7e0ea;color:#18324f}
+.primary-btn.full,.secondary-btn.full{width:100%}
+.truck-visual{position:absolute;right:-20px;bottom:18px;width:52%;height:210px;opacity:.94}
+.road-line{position:absolute;bottom:30px;width:100%;height:4px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.38) 0 34px,transparent 34px 62px)}
+.truck{position:absolute;right:40px;bottom:42px;width:360px;height:100px}
+.cab{position:absolute;right:0;bottom:0;width:95px;height:75px;background:linear-gradient(135deg,#f7b731,#ff9b2f);clip-path:polygon(0 24%,68% 24%,100% 58%,100% 100%,0 100%)}
+.trailer{position:absolute;right:93px;bottom:0;width:250px;height:96px;border-radius:8px 3px 3px 8px;background:linear-gradient(180deg,#edf2f7,#aab7c5)}
+.wheel{position:absolute;bottom:-13px;width:28px;height:28px;border-radius:50%;background:#06101c;border:5px solid #4f6072}
+.w1{right:30px}.w2{right:120px}.w3{right:150px}
+.daily-card{background:#fff;border-radius:28px;padding:30px;box-shadow:var(--shadow);text-align:center}
+.daily-card h3{font-size:20px}
+.daily-icon{width:56px;height:56px;border-radius:18px;background:#fff7df;display:grid;place-items:center;margin:0 auto 18px;font-size:25px}
+.ring{width:150px;height:150px;border-radius:50%;margin:22px auto;display:grid;place-items:center;background:conic-gradient(var(--accent) 0deg,#e6edf4 0deg);position:relative}
+.ring:before{content:"";position:absolute;width:118px;height:118px;background:#fff;border-radius:50%}
+.ring span,.ring small{position:relative;z-index:2}
+.ring span{font-size:38px;font-weight:800}
+.ring small{display:block;color:var(--muted)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:22px 0 34px}
+.stat-card{background:#fff;border:1px solid #e1e8f0;border-radius:18px;padding:20px;display:flex;align-items:center;gap:14px}
+.stat-icon{width:48px;height:48px;border-radius:14px;background:#f4f7fa;display:grid;place-items:center;font-size:22px}
+.stat-card strong,.stat-card small{display:block}.stat-card strong{font-size:23px}.stat-card small{color:var(--muted);margin-top:4px}
+.section-heading{display:flex;justify-content:space-between;align-items:end;margin:26px 0 16px}
+.section-heading h2{margin:0}
+.text-btn{border:0;background:transparent;color:#214c79;font-weight:700}
+.mission-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mission-card{background:#fff;border-radius:20px;border:1px solid #e0e7ef;overflow:hidden}
+.mission-cover{height:130px;background:linear-gradient(135deg,#153552,#07111f);position:relative;display:flex;align-items:end;padding:18px;color:#fff}
+.mission-cover span{font-size:40px;position:absolute;right:18px;top:18px}
+.mission-body{padding:18px}
+.mission-body h3{margin:0 0 8px}.mission-body p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.mission-meta{display:flex;justify-content:space-between;margin-top:16px;color:#708197;font-size:12px}
+.route-layout{display:grid;grid-template-columns:minmax(0,2fr) 340px;gap:20px}
+.route-panel,.info-card,.performance-card,.table-card,.teacher-notes{background:#fff;border-radius:24px;border:1px solid #e0e7ef;box-shadow:0 10px 30px rgba(7,17,31,.06)}
+.route-panel{padding:30px}
+.route-header{display:flex;justify-content:space-between}
+.route-header h2{font-size:34px;margin:0 0 8px}
+.route-header p{color:var(--muted)}
+.route-badge{width:90px;height:90px;border-radius:50%;background:#0b1c2f;color:#fff;display:grid;place-items:center;text-align:center}
+.route-badge strong,.route-badge small{display:block}
+.roadmap{margin-top:24px;padding:18px 0}
+.route-stop{display:grid;grid-template-columns:70px 1fr;gap:16px;position:relative;min-height:118px}
+.route-stop:after{content:"";position:absolute;left:34px;top:58px;bottom:-10px;width:4px;background:#dfe6ee}
+.route-stop:last-child:after{display:none}
+.stop-node{width:70px;height:70px;border-radius:22px;background:#e9eef4;display:grid;place-items:center;font-size:28px;border:6px solid #f6f8fa;z-index:2}
+.route-stop.completed .stop-node{background:var(--success);color:#fff}
+.route-stop.current .stop-node{background:var(--accent);box-shadow:0 0 0 8px rgba(247,183,49,.13)}
+.stop-content{padding-top:6px}.stop-content h3{margin:0 0 6px}.stop-content p{margin:0;color:var(--muted);font-size:13px}
+.stop-content button{margin-top:12px}
+.route-side{display:grid;align-content:start;gap:18px}
+.info-card{padding:24px}.info-card h3{font-size:24px;margin:0 0 10px}.info-card p{color:var(--muted);line-height:1.55}
+.info-card.dark{background:#0b1c2f;color:#fff;border:0}
+.info-card.dark p{color:#b6c6d7}
+.license-progress{height:8px;background:rgba(255,255,255,.13);border-radius:999px;margin-top:20px;overflow:hidden}
+.practice-shell{max-width:900px;margin:auto}
+.lesson-top{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;margin-bottom:20px}
+.back-btn{border:0;background:transparent;font-weight:700;color:#466078}
+.lesson-progress{height:8px;background:#dfe7ef;border-radius:999px;overflow:hidden}
+.lesson-card{background:#fff;border-radius:28px;border:1px solid #dfe7ef;box-shadow:var(--shadow);overflow:hidden}
+.lesson-scene{min-height:240px;background:linear-gradient(135deg,#0b1d30,#173d5d);color:#fff;padding:38px;display:flex;justify-content:space-between;align-items:center}
+.lesson-scene h2{font-family:Arial,Helvetica,sans-serif;font-size:42px;margin:0 0 12px;text-transform:uppercase}
+.scene-art{font-size:80px}
+.lesson-body{padding:36px}
+.lesson-body.center{text-align:center}
+.big-phrase{font-size:32px;font-weight:800;margin:22px 0}
+.audio-btn,.mic-btn{border:0;border-radius:18px;width:76px;height:76px;font-size:30px;background:#0b1c2f;color:#fff;box-shadow:0 12px 26px rgba(7,17,31,.2)}
+.audio-btn.playing{animation:pulse 1s infinite}
+@keyframes pulse{50%{transform:scale(1.06);box-shadow:0 0 0 12px rgba(247,183,49,.15)}}
+.options{display:grid;gap:12px;margin:26px auto;max-width:600px}
+.option{border:2px solid #dde5ee;background:#fff;border-radius:16px;padding:17px;text-align:left;font-weight:700}
+.option:hover{border-color:#9ab0c8}.option.correct{border-color:var(--success);background:#ecfbf5}.option.soft-wrong{border-color:#f4c56b;background:#fff9ec}
+.feedback{border-radius:16px;padding:16px 18px;margin:20px auto;max-width:600px;display:none}
+.feedback.show{display:block}.feedback.good{background:#eafaf4;color:#167453}.feedback.retry{background:#fff7e6;color:#8a5a00}
+.fragment-list{display:grid;gap:12px;margin:24px 0}
+.fragment{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;padding:16px;border:1px solid #dfe7ef;border-radius:16px}
+.fragment strong{font-size:20px}
+.mini-btn{width:44px;height:44px;border:0;border-radius:12px;background:#eff3f7}
+.mic-zone{margin:26px auto;text-align:center}
+.listening{display:none;margin-top:14px;color:#ef5b5b;font-weight:700}.listening.active{display:block}
+.simulation-bubble{background:#f1f5f8;border-radius:18px 18px 18px 4px;padding:20px;max-width:580px;margin:20px auto;text-align:left}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0}
+.result-grid div{background:#f3f6f9;border-radius:16px;padding:18px}
+.result-grid strong{font-size:26px;display:block}
+.review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.review-card{background:#fff;border-radius:20px;padding:22px;border:1px solid #dfe7ef}
+.review-card h3{margin:0 0 8px}.review-card p{color:var(--muted)}
+.pill{background:#e9eef4;border-radius:999px;padding:8px 12px;font-size:12px}
+.driver-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:20px}
+.driver-card-large{min-height:310px;border-radius:26px;padding:30px;color:#fff;background:linear-gradient(135deg,#0b1c2f,#163c5f);position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.card-stripe{position:absolute;right:-70px;top:0;width:190px;height:100%;background:linear-gradient(135deg,var(--accent),#ff8c2d);transform:skewX(-18deg);opacity:.9}
+.driver-head{display:flex;gap:18px;align-items:center;position:relative;z-index:2}
+.driver-head h2{font-size:30px;margin:0 0 6px}.driver-head span{color:#b9cadb;font-size:12px}
+.driver-code{margin-top:70px;letter-spacing:.2em;color:#b9cadb;font-size:12px}
+.driver-card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;position:relative;z-index:2}
+.driver-card-stats div{background:rgba(255,255,255,.09);padding:14px;border-radius:14px}.driver-card-stats strong,.driver-card-stats small{display:block}.driver-card-stats strong{font-size:22px}.driver-card-stats small{color:#c5d3e2}
+.performance-card{padding:28px}.performance-card h2{margin-top:0}
+.metric{margin:26px 0}.metric>div:first-child{display:flex;justify-content:space-between;margin-bottom:10px}
+.metric-bar{height:9px;background:#e5ebf1;border-radius:999px;overflow:hidden}
+.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.badge-item{background:#fff;border:1px solid #dfe7ef;border-radius:18px;padding:20px;text-align:center}
+.badge-item.locked{opacity:.45}.badge-icon{font-size:42px}.badge-item h3{font-size:15px}
+.teacher-toolbar{display:flex;justify-content:space-between;align-items:end;margin-bottom:20px}.teacher-toolbar h2{font-size:32px;margin:0 0 8px}.teacher-toolbar p{color:var(--muted)}
+.toolbar-actions{display:flex;gap:10px}
+.teacher-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.teacher-stats article{background:#fff;border:1px solid #dfe7ef;border-radius:18px;padding:20px}
+.teacher-stats span,.teacher-stats strong{display:block}.teacher-stats span{color:var(--muted);font-size:12px}.teacher-stats strong{font-size:24px;margin-top:8px}
+.table-card{overflow:hidden}.table-head{padding:22px;display:flex;justify-content:space-between;align-items:center}.table-head h3{margin:0 0 6px}.table-head p{margin:0;color:var(--muted);font-size:12px}.table-head input{border:1px solid #d7e0ea;border-radius:10px;padding:10px 12px}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:15px 18px;border-top:1px solid #e7edf3;text-align:left;font-size:13px}th{color:#6b7b8f;background:#f8fafc}.status{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:11px}.status.done{background:#e7f9f1;color:#14805a}.status.pending{background:#eef2f6;color:#617186}
+.teacher-notes{padding:24px;margin-top:20px}.teacher-notes textarea{width:100%;min-height:120px;border:1px solid #d9e2eb;border-radius:14px;padding:14px;margin:14px 0;resize:vertical}
+.modal{position:fixed;inset:0;background:rgba(7,17,31,.68);display:none;place-items:center;z-index:100}.modal.show{display:grid}.modal-card{width:min(480px,92vw);background:#fff;border-radius:24px;padding:28px;position:relative}.modal-close{position:absolute;right:16px;top:14px;border:0;background:transparent;font-size:28px}.modal-card label{display:grid;gap:7px;margin:16px 0;font-weight:700;font-size:13px}.modal-card input,.modal-card select,.modal-card textarea{border:1px solid #d9e2eb;border-radius:11px;padding:12px}.modal-card textarea{min-height:90px}
+.toast{position:fixed;right:24px;bottom:24px;background:#0b1c2f;color:#fff;padding:14px 18px;border-radius:12px;opacity:0;transform:translateY(10px);transition:.25s;z-index:120}.toast.show{opacity:1;transform:none}
+.mobile-menu{display:none}
+@media(max-width:1050px){
+  .sidebar{transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}
+  .main{margin-left:0}.mobile-menu{display:inline-grid;place-items:center}
+  .hero-grid,.route-layout,.driver-layout{grid-template-columns:1fr}
+  .stats-grid,.teacher-stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+  .main{padding:0 16px 40px}.topbar{height:78px}.topbar h1{font-size:20px}.driver-mini div:last-child{display:none}
+  .hero-content{padding:32px 24px}.hero-content h2{font-size:38px}.truck-visual{opacity:.35;width:75%}
+  .stats-grid,.mission-row,.review-grid,.badge-grid,.teacher-stats{grid-template-columns:1fr}
+  .result-grid{grid-template-columns:1fr}.lesson-body{padding:24px}.lesson-scene{padding:26px;min-height:200px}.lesson-scene h2{font-size:32px}
+  .fragment{grid-template-columns:1fr auto}.fragment .mini-btn:last-child{grid-column:2}
+  .teacher-toolbar,.table-head{align-items:stretch;flex-direction:column;gap:14px}.toolbar-actions{width:100%}.toolbar-actions button{flex:1}
+}
+
+
+/* Experiencia autodidacta */
+.learning-guide{
+  display:grid;
+  gap:12px;
+  padding:20px;
+  margin-bottom:24px;
+  border-radius:18px;
+  background:#f3f7fb;
+  border:1px solid #dce6ef;
+}
+.learning-guide strong{font-size:17px}
+.learning-guide span{color:#52657a;line-height:1.45}
+.lesson-help{color:var(--muted);line-height:1.6}
+.transcript-toggle{
+  display:block;
+  margin:16px auto 0;
+  border:0;
+  background:transparent;
+  color:#214c79;
+  font-weight:800;
+}
+.transcript-box{
+  display:none;
+  max-width:560px;
+  margin:18px auto 0;
+  padding:18px;
+  border-radius:16px;
+  background:#f4f7fa;
+  border:1px solid #dce5ee;
+}
+.transcript-box.show{display:grid;gap:6px}
+.transcript-box strong{font-size:21px}
+.transcript-box span{color:var(--muted)}
+.conversation-study{display:grid;gap:16px;margin:24px 0}
+.speech{
+  position:relative;
+  padding:20px;
+  border-radius:18px;
+  display:grid;
+  gap:8px;
+}
+.speech small{font-weight:800;letter-spacing:.12em}
+.speech strong{font-size:23px}
+.speech span{color:#627287}
+.speech .mini-btn{position:absolute;right:16px;top:16px}
+.speech.officer{background:#eef3f7;border-radius:18px 18px 18px 5px}
+.speech.driver{background:#fff6dc;border:1px solid #f0d78b;border-radius:18px 18px 5px 18px}
+.response-explainer{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.response-explainer div{
+  display:grid;
+  gap:7px;
+  padding:18px;
+  background:#fff;
+  border:1px solid #dce5ee;
+  border-radius:16px;
+}
+.response-explainer span{color:var(--muted);line-height:1.5}
+.tip-box{
+  margin:18px 0 24px;
+  padding:16px 18px;
+  border-radius:14px;
+  background:#eafaf4;
+  color:#176b50;
+}
+.practice-complete{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:16px;
+  align-items:center;
+  margin:24px 0;
+  padding:20px;
+  border-radius:18px;
+  background:#0d1a2a;
+  color:#fff;
+}
+.practice-complete strong,.practice-complete span{display:block}
+.practice-complete strong{font-size:21px}
+.practice-complete span{margin-top:6px;color:#b7c7d8;font-size:13px}
+.mic-btn.compact{width:58px;height:58px;font-size:22px}
+.self-study-reminder{
+  max-width:620px;
+  margin:18px auto;
+  padding:16px;
+  border-radius:16px;
+  background:#fff8e6;
+  border:1px solid #f2d991;
+}
+.self-study-reminder span,.self-study-reminder strong{display:block}
+.self-study-reminder strong{font-size:22px;margin:6px 0}
+@media(max-width:700px){
+  .response-explainer{grid-template-columns:1fr}
+  .practice-complete{grid-template-columns:auto 1fr}
+  .practice-complete .mic-btn{grid-column:1/-1;justify-self:center}
+}
+
+.route-panel{max-height:none}
+.roadmap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.route-stop{min-height:145px;border:1px solid #e1e8f0;border-radius:18px;padding:14px}
+.route-stop:after{display:none}
+.stop-node{width:58px;height:58px}
+.stop-content button{margin-top:10px}
+@media(max-width:800px){.roadmap{grid-template-columns:1fr}}
+
+.section-subtitle{margin:4px 0 0;color:var(--muted);max-width:700px}
+.personal-data-card{
+  margin:0 0 24px;padding:20px;border-radius:18px;background:#fff8e8;border:1px solid #efd58c;
+}
+.personal-data-card h3{margin:0 0 8px}
+.personal-data-card p{color:#6f6041}
+.personal-data-card label{display:grid;gap:7px;margin-top:14px;font-weight:700}
+.personal-data-card input{
+  width:100%;border:1px solid #d9c47f;background:#fff;border-radius:12px;padding:13px;
+}
+.glossary-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.practice-mode{
+  border:1px solid #d7e0ea;background:#fff;color:#40566e;border-radius:999px;padding:11px 15px;font-weight:800;
+}
+.practice-mode.active{background:#0b1c2f;color:#fff;border-color:#0b1c2f}
+.glossary-workspace{
+  min-height:460px;background:#fff;border:1px solid #dfe7ef;border-radius:24px;padding:26px;box-shadow:0 10px 30px rgba(7,17,31,.06)
+}
+.glossary-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.vocab-card{position:relative;border:1px solid #dfe7ef;border-radius:18px;padding:20px;background:#fff}
+.vocab-number{position:absolute;right:14px;top:12px;width:30px;height:30px;border-radius:9px;background:#f2f5f8;display:grid;place-items:center;font-weight:800}
+.vocab-card h3{font-size:23px;margin:0 0 8px}
+.vocab-card>strong{color:#174a70}
+.vocab-card p{color:var(--muted);line-height:1.5}
+.vocab-example{padding:12px;border-radius:12px;background:#f5f8fa;font-weight:700}
+.vocab-actions{display:flex;gap:8px;margin-top:14px}
+.single-practice{max-width:700px;margin:auto;text-align:center;padding:24px}
+.single-practice h2{font-size:34px;margin-bottom:10px}
+.translation{font-size:20px;color:#65768b}
+.large-actions{display:flex;justify-content:center;gap:18px;margin:30px 0}
+.practice-nav{display:flex;justify-content:space-between;gap:12px;margin-top:28px}
+.spanish-prompt{font-size:30px;font-weight:800;padding:24px;margin:20px 0;border-radius:18px;background:#fff5d9}
+.writing-input{display:block;width:100%;max-width:520px;margin:22px auto 14px;border:2px solid #d7e0ea;border-radius:14px;padding:16px;font-size:20px;text-align:center}
+.hidden-answer{display:none;align-items:center;justify-content:center;gap:12px;margin:20px auto;padding:16px;border-radius:14px;background:#f2f6f9}
+.hidden-answer.show{display:flex}
+@media(max-width:1000px){.glossary-card-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){
+  .glossary-card-grid{grid-template-columns:1fr}
+  .glossary-workspace{padding:16px}
+  .practice-nav{flex-direction:column}
+  .spanish-prompt{font-size:24px}
+}
+
+.glossary-mission-selector{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:0 0 14px;
+  padding:14px 16px;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid #dfe7ef;
+}
+.glossary-mission-selector label{font-weight:800;color:#334b63}
+.glossary-mission-selector select{
+  flex:1;
+  border:1px solid #d7e0ea;
+  border-radius:10px;
+  padding:11px 12px;
+  background:#f8fafc;
+  color:#13263a;
+  font-weight:700;
+}
+.glossary-unlock-banner{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+  margin-bottom:18px;
+  padding:14px 16px;
+  border-radius:14px;
+  background:#eef8f4;
+  border:1px solid #c9e9dc;
+}
+.glossary-unlock-banner strong{color:#176b50}
+.glossary-unlock-banner span{color:#557266;font-size:13px}
+@media(max-width:650px){
+  .glossary-mission-selector{align-items:stretch;flex-direction:column}
+  .glossary-unlock-banner{align-items:flex-start;flex-direction:column}
+}
+
+</style>
 </head>
 <body>
   <div id="app">
@@ -26,6 +398,7 @@
         <button class="nav-item" data-view="route"><span>⌁</span> Mi ruta</button>
         <button class="nav-item" data-view="practice"><span>🎙</span> Práctica</button>
         <button class="nav-item" data-view="review"><span>↻</span> Repaso</button>
+        <button class="nav-item" data-view="glossary"><span>ABC</span> Glosario</button>
         <button class="nav-item" data-view="driver"><span>▣</span> Driver Card</button>
         <button class="nav-item teacher-only" data-view="teacher"><span>▦</span> Panel docente</button>
       </nav>
@@ -102,7 +475,7 @@
         </div>
 
         <div class="section-heading">
-          <div><p class="eyebrow">RUTA ACTUAL</p><h2>Texas → Tennessee</h2></div>
+          <div><p class="eyebrow">RUTA ACTUAL</p><h2>Programa completo B1</h2></div>
           <button class="text-btn" data-go="route">Ver ruta completa →</button>
         </div>
 
@@ -115,8 +488,8 @@
             <div class="route-header">
               <div>
                 <p class="eyebrow">RUTA PROFESIONAL</p>
-                <h2>Texas → Tennessee</h2>
-                <p>Completa misiones reales para avanzar por la ruta.</p>
+                <h2>Programa completo B1</h2>
+                <p>17 misiones basadas en la Guía para el Nuevo Operador B1.</p>
               </div>
               <div class="route-badge"><strong id="routeMiles">0</strong><small>millas</small></div>
             </div>
@@ -156,6 +529,33 @@
           <span class="pill" id="reviewCount">0 expresiones</span>
         </div>
         <div class="review-grid" id="reviewGrid"></div>
+      </section>
+
+
+      <section class="view" id="view-glossary">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">VOCABULARIO DE LA MISIÓN 1</p>
+            <h2>Glosario y práctica</h2>
+            <p class="section-subtitle">Repasa los bloques que necesitas para hablar de ti. Escucha, escribe, elige y responde oralmente.</p>
+          </div>
+          <span class="pill" id="glossaryProgress">0 dominados</span>
+        </div>
+
+        <div class="glossary-mission-selector">
+          <label for="glossaryMissionSelect">Glosario desbloqueado</label>
+          <select id="glossaryMissionSelect"></select>
+        </div>
+
+        <div class="glossary-toolbar">
+          <button class="practice-mode active" data-mode="cards">Tarjetas</button>
+          <button class="practice-mode" data-mode="listen">Escuchar y repetir</button>
+          <button class="practice-mode" data-mode="multiple">Opción múltiple</button>
+          <button class="practice-mode" data-mode="write">Escribir</button>
+          <button class="practice-mode" data-mode="speak">Español → dilo en inglés</button>
+        </div>
+
+        <article class="glossary-workspace" id="glossaryWorkspace"></article>
       </section>
 
       <section class="view" id="view-driver">
@@ -248,6 +648,1343 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="script.js"></script>
+  <script>
+const missions = [
+  {
+    "id": 1,
+    "title": "Identificación DOT",
+    "icon": "🪪",
+    "desc": "Datos personales y respuestas básicas ante un oficial.",
+    "situation": "Un oficial inicia una revisión y confirma tu identidad.",
+    "items": [
+      {
+        "prompt": "What is your name?",
+        "meaning": "¿Cuál es su nombre?",
+        "response": "My name is",
+        "responseMeaning": "Mi nombre es…",
+        "openResponse": "name",
+        "requiredPatterns": ["my name is"],
+        "ignoreAfterPattern": true
+      },
+      {
+        "prompt": "How old are you?",
+        "meaning": "¿Cuántos años tiene?",
+        "response": "I am … years old.",
+        "responseMeaning": "Tengo … años.",
+        "openResponse": "age",
+        "requiredPatterns": ["i am", "i'm"],
+        "ignoreAfterPattern": true
+      },
+      {
+        "prompt": "Where are you from?",
+        "meaning": "¿De dónde es?",
+        "response": "I am from Nuevo León, Mexico.",
+        "responseMeaning": "Soy de Nuevo León, México."
+      },
+      {
+        "prompt": "What is your date of birth?",
+        "meaning": "¿Cuál es su fecha de nacimiento?",
+        "response": "My date of birth is June first, nineteen ninety-four.",
+        "responseMeaning": "Mi fecha de nacimiento es el primero de junio de 1994."
+      },
+      {
+        "prompt": "Where do you work?",
+        "meaning": "¿Dónde trabaja?",
+        "response": "I am a B1 driver at PAM Transport.",
+        "responseMeaning": "Trabajo como operador B1 en PAM Transport."
+      },
+      {
+        "prompt": "How long have you worked there?",
+        "meaning": "¿Cuánto tiempo lleva trabajando ahí?",
+        "response": "I have worked at PAM for three years.",
+        "responseMeaning": "He trabajado en PAM durante tres años."
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Origen y destino",
+    "icon": "🗺️",
+    "desc": "Explicar de dónde vienes, hacia dónde vas y dónde recogiste la caja.",
+    "situation": "El oficial verifica tu ruta y el origen de la carga.",
+    "items": [
+      {
+        "prompt": "Where are you coming from?",
+        "meaning": "¿De dónde viene?",
+        "response": "I am coming from the PAM yard in Laredo, Texas.",
+        "responseMeaning": "Vengo del patio de PAM en Laredo, Texas."
+      },
+      {
+        "prompt": "Where are you going?",
+        "meaning": "¿Hacia dónde se dirige?",
+        "response": "I am going to Tennessee to drop the trailer.",
+        "responseMeaning": "Voy a Tennessee para desenganchar la caja."
+      },
+      {
+        "prompt": "Where are you headed?",
+        "meaning": "¿Hacia dónde se dirige?",
+        "response": "I am headed to Laredo, Texas.",
+        "responseMeaning": "Me dirijo a Laredo, Texas."
+      },
+      {
+        "prompt": "Where did you pick up your trailer?",
+        "meaning": "¿Dónde recogió su caja?",
+        "response": "I picked it up at the PAM Nuevo Laredo yard.",
+        "responseMeaning": "La recogí en el patio PAM Nuevo Laredo."
+      },
+      {
+        "prompt": "Where is your company located?",
+        "meaning": "¿Dónde se encuentra su empresa?",
+        "response": "The company is located in Laredo, Texas.",
+        "responseMeaning": "La empresa está ubicada en Laredo, Texas."
+      },
+      {
+        "prompt": "Do you know your company's phone number?",
+        "meaning": "¿Conoce el número telefónico de su empresa?",
+        "response": "Yes. The phone number is eight one one, nine four six, two zero two zero.",
+        "responseMeaning": "Sí. El número es 8119462020."
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Documentos y permisos",
+    "icon": "📁",
+    "desc": "Presentar licencia, seguro, permisos y horas de servicio.",
+    "situation": "El oficial solicita documentos obligatorios.",
+    "items": [
+      {
+        "prompt": "Do you have a license?",
+        "meaning": "¿Tiene licencia?",
+        "response": "Yes. I have my license here.",
+        "responseMeaning": "Sí. Aquí tengo mi licencia."
+      },
+      {
+        "prompt": "Can I see your permit book?",
+        "meaning": "¿Puedo ver su carpeta de permisos?",
+        "response": "Yes, sir. Here you go.",
+        "responseMeaning": "Sí, señor. Aquí tiene."
+      },
+      {
+        "prompt": "Do you have insurance?",
+        "meaning": "¿Cuenta con seguro?",
+        "response": "Yes. The insurance is in my permit book.",
+        "responseMeaning": "Sí. El seguro está en mi carpeta de permisos."
+      },
+      {
+        "prompt": "Please show me your hours of service.",
+        "meaning": "Muéstreme sus horas de servicio, por favor.",
+        "response": "Yes, sir. Here are my hours of service.",
+        "responseMeaning": "Sí, señor. Aquí están mis horas de servicio."
+      },
+      {
+        "prompt": "How many hours have you been driving today?",
+        "meaning": "¿Cuántas horas ha manejado hoy?",
+        "response": "I have driven seven of my eleven hours.",
+        "responseMeaning": "He manejado siete de mis once horas."
+      },
+      {
+        "prompt": "Turn on your electronic log device.",
+        "meaning": "Encienda su libro electrónico.",
+        "response": "Yes, sir. I will turn it on.",
+        "responseMeaning": "Sí, señor. Lo encenderé."
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Instrucciones del oficial",
+    "icon": "🛂",
+    "desc": "Comprender y responder instrucciones directas durante una inspección.",
+    "situation": "El oficial te pide realizar acciones dentro y fuera de la unidad.",
+    "items": [
+      {
+        "prompt": "Can you please turn off your truck?",
+        "meaning": "¿Puede apagar su unidad, por favor?",
+        "response": "Yes, I can.",
+        "responseMeaning": "Sí, puedo."
+      },
+      {
+        "prompt": "Can you please turn on your truck?",
+        "meaning": "¿Puede encender su unidad, por favor?",
+        "response": "Yes, I can.",
+        "responseMeaning": "Sí, puedo."
+      },
+      {
+        "prompt": "Can you please step out of the truck?",
+        "meaning": "¿Puede bajar de la unidad, por favor?",
+        "response": "Yes, I can.",
+        "responseMeaning": "Sí, puedo."
+      },
+      {
+        "prompt": "Can you please step into the truck?",
+        "meaning": "¿Puede subir a la unidad, por favor?",
+        "response": "Yes, I can.",
+        "responseMeaning": "Sí, puedo."
+      },
+      {
+        "prompt": "Can you please turn off your four-way flashers?",
+        "meaning": "¿Puede apagar sus intermitentes, por favor?",
+        "response": "Yes, I can.",
+        "responseMeaning": "Sí, puedo."
+      },
+      {
+        "prompt": "Turn on your four-way flashers.",
+        "meaning": "Encienda sus intermitentes.",
+        "response": "Yes, sir. I will turn them on.",
+        "responseMeaning": "Sí, señor. Los encenderé."
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Pre-trip y seguridad",
+    "icon": "✅",
+    "desc": "Responder sobre inspección previa, semáforos, señales y condiciones para manejar.",
+    "situation": "El oficial comprueba que realizaste las revisiones de seguridad.",
+    "items": [
+      {
+        "prompt": "Did you do your pre-trip inspection today?",
+        "meaning": "¿Realizó su inspección previa hoy?",
+        "response": "Yes, I did my pre-trip inspection.",
+        "responseMeaning": "Sí, realicé mi inspección previa."
+      },
+      {
+        "prompt": "Did you do your pre-trip before rolling?",
+        "meaning": "¿Realizó su pre-trip antes de avanzar?",
+        "response": "Yes, I did my pre-trip before rolling.",
+        "responseMeaning": "Sí, hice mi pre-trip antes de avanzar."
+      },
+      {
+        "prompt": "Did you check the traffic light before crossing?",
+        "meaning": "¿Revisó el semáforo antes de cruzar?",
+        "response": "Yes, I did.",
+        "responseMeaning": "Sí, lo hice."
+      },
+      {
+        "prompt": "Did you check the traffic sign?",
+        "meaning": "¿Revisó el señalamiento?",
+        "response": "Yes, I checked the traffic sign.",
+        "responseMeaning": "Sí, revisé el señalamiento."
+      },
+      {
+        "prompt": "Did you check the railroad crossing sign?",
+        "meaning": "¿Revisó la señal de cruce ferroviario?",
+        "response": "Yes, I checked the railroad crossing sign.",
+        "responseMeaning": "Sí, revisé la señal de cruce ferroviario."
+      },
+      {
+        "prompt": "Do you feel okay to roll?",
+        "meaning": "¿Se siente bien para continuar manejando?",
+        "response": "Yes, I feel good to roll.",
+        "responseMeaning": "Sí, me siento bien para continuar."
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Salud y condición física",
+    "icon": "🩺",
+    "desc": "Hablar de salud, lentes, alergias, fatiga y alcohol.",
+    "situation": "El oficial confirma que estás en condiciones seguras para manejar.",
+    "items": [
+      {
+        "prompt": "Do you have any medical conditions?",
+        "meaning": "¿Tiene alguna condición médica?",
+        "response": "No, I do not have any medical conditions.",
+        "responseMeaning": "No, no tengo ninguna condición médica."
+      },
+      {
+        "prompt": "Do you need glasses?",
+        "meaning": "¿Necesita lentes?",
+        "response": "Yes, I do.",
+        "responseMeaning": "Sí, los necesito."
+      },
+      {
+        "prompt": "Are you allergic to any medicine or medication?",
+        "meaning": "¿Es alérgico a algún medicamento?",
+        "response": "No, I am not allergic to any medication.",
+        "responseMeaning": "No, no soy alérgico a ningún medicamento."
+      },
+      {
+        "prompt": "Have you had any alcohol today?",
+        "meaning": "¿Ha consumido alcohol hoy?",
+        "response": "No, I have not.",
+        "responseMeaning": "No, no he consumido alcohol."
+      },
+      {
+        "prompt": "Do you feel fatigued?",
+        "meaning": "¿Se siente fatigado?",
+        "response": "No, I do not feel fatigued.",
+        "responseMeaning": "No, no me siento fatigado."
+      },
+      {
+        "prompt": "Do you feel tired?",
+        "meaning": "¿Se siente cansado?",
+        "response": "No, I do not feel tired.",
+        "responseMeaning": "No, no me siento cansado."
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Accidentes y velocidad",
+    "icon": "🚨",
+    "desc": "Responder preguntas sobre accidentes y velocidad.",
+    "situation": "El oficial investiga antecedentes o un incidente en carretera.",
+    "items": [
+      {
+        "prompt": "Have you ever been in an accident?",
+        "meaning": "¿Alguna vez ha estado involucrado en un accidente?",
+        "response": "No, I have not been in an accident.",
+        "responseMeaning": "No, no he estado involucrado en un accidente."
+      },
+      {
+        "prompt": "How fast were you going?",
+        "meaning": "¿A qué velocidad iba?",
+        "response": "I was driving at sixty-four miles per hour.",
+        "responseMeaning": "Iba manejando a 64 millas por hora."
+      },
+      {
+        "prompt": "When was the last time you got diesel?",
+        "meaning": "¿Cuándo fue la última vez que cargó diésel?",
+        "response": "The last time I got diesel was in Natalia, Texas.",
+        "responseMeaning": "La última vez que cargué diésel fue en Natalia, Texas."
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Hazmat, carga y entrega",
+    "icon": "☣️",
+    "desc": "Hablar de material peligroso, pickup, delivery, hook y drop.",
+    "situation": "Un oficial o trabajador de almacén confirma la carga y el movimiento de la caja.",
+    "items": [
+      {
+        "prompt": "Are you carrying hazardous material?",
+        "meaning": "¿Transporta material peligroso?",
+        "response": "No, I am not carrying hazardous material.",
+        "responseMeaning": "No, no transporto material peligroso."
+      },
+      {
+        "prompt": "Are you carrying hazardous material?",
+        "meaning": "¿Transporta material peligroso?",
+        "response": "Yes. I am carrying hazardous material. Here is the paperwork.",
+        "responseMeaning": "Sí. Transporto material peligroso. Aquí está la documentación."
+      },
+      {
+        "prompt": "Here is your pickup number.",
+        "meaning": "Aquí está su número de recolección.",
+        "response": "Thank you. I have the pickup number.",
+        "responseMeaning": "Gracias. Tengo el número de recolección."
+      },
+      {
+        "prompt": "Here is your delivery number.",
+        "meaning": "Aquí está su número de entrega.",
+        "response": "Thank you. I have the delivery number.",
+        "responseMeaning": "Gracias. Tengo el número de entrega."
+      },
+      {
+        "prompt": "Please drop the trailer at dock seventeen.",
+        "meaning": "Desenganche la caja en la puerta 17, por favor.",
+        "response": "Yes. I will drop it at dock seventeen.",
+        "responseMeaning": "Sí. La desengancharé en la puerta 17."
+      },
+      {
+        "prompt": "Please hook the trailer from dock seventeen.",
+        "meaning": "Enganche la caja de la puerta 17, por favor.",
+        "response": "Yes. I will hook it from dock seventeen.",
+        "responseMeaning": "Sí. La engancharé de la puerta 17."
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Road service",
+    "icon": "🛠️",
+    "desc": "Reportar una llanta ponchada y confirmar el contacto con rescate.",
+    "situation": "La unidad presenta una falla en carretera.",
+    "items": [
+      {
+        "prompt": "Do you have a flat tire?",
+        "meaning": "¿Tiene una llanta ponchada?",
+        "response": "Yes, I have a flat tire.",
+        "responseMeaning": "Sí, tengo una llanta ponchada."
+      },
+      {
+        "prompt": "Did you contact road service to fix your tire?",
+        "meaning": "¿Contactó al servicio de rescate para reparar la llanta?",
+        "response": "Yes, I contacted road service.",
+        "responseMeaning": "Sí, contacté al servicio de rescate."
+      },
+      {
+        "prompt": "My truck needs road service.",
+        "meaning": "Mi unidad necesita servicio de carretera.",
+        "response": "I am in a safe location and I need assistance.",
+        "responseMeaning": "Estoy en un lugar seguro y necesito ayuda."
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Direcciones y carriles",
+    "icon": "↔️",
+    "desc": "Comprender giros, carriles, incorporaciones y rutas.",
+    "situation": "Sigues instrucciones de navegación para vehículos comerciales.",
+    "items": [
+      {
+        "prompt": "Turn right.",
+        "meaning": "Gire a la derecha.",
+        "response": "I will turn right.",
+        "responseMeaning": "Giraré a la derecha."
+      },
+      {
+        "prompt": "Turn left.",
+        "meaning": "Gire a la izquierda.",
+        "response": "I will turn left.",
+        "responseMeaning": "Giraré a la izquierda."
+      },
+      {
+        "prompt": "You must stay in this lane.",
+        "meaning": "Debe mantenerse en este carril.",
+        "response": "I will stay in this lane.",
+        "responseMeaning": "Me mantendré en este carril."
+      },
+      {
+        "prompt": "Right lane must merge.",
+        "meaning": "El carril derecho debe incorporarse.",
+        "response": "I will merge safely.",
+        "responseMeaning": "Me incorporaré de manera segura."
+      },
+      {
+        "prompt": "The customer is one block ahead.",
+        "meaning": "El cliente está una cuadra adelante.",
+        "response": "I understand. One block ahead.",
+        "responseMeaning": "Entiendo. Una cuadra adelante."
+      },
+      {
+        "prompt": "No truck route.",
+        "meaning": "Ruta no permitida para camiones.",
+        "response": "I will use another route.",
+        "responseMeaning": "Usaré otra ruta."
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Señales críticas I",
+    "icon": "🚧",
+    "desc": "Reconocer señales de alto, entrada, dirección y velocidad.",
+    "situation": "Conduces por una zona con señalamientos de seguridad.",
+    "items": [
+      {
+        "prompt": "Stop.",
+        "meaning": "Alto.",
+        "response": "I will make a complete stop.",
+        "responseMeaning": "Haré un alto completo."
+      },
+      {
+        "prompt": "Yield.",
+        "meaning": "Ceda el paso.",
+        "response": "I will yield.",
+        "responseMeaning": "Cederé el paso."
+      },
+      {
+        "prompt": "Do not enter.",
+        "meaning": "No entre.",
+        "response": "I will not enter.",
+        "responseMeaning": "No entraré."
+      },
+      {
+        "prompt": "Wrong way.",
+        "meaning": "Sentido contrario.",
+        "response": "I will turn around safely.",
+        "responseMeaning": "Daré vuelta de manera segura."
+      },
+      {
+        "prompt": "One way.",
+        "meaning": "Un solo sentido.",
+        "response": "I will follow the one-way street.",
+        "responseMeaning": "Seguiré la calle de un solo sentido."
+      },
+      {
+        "prompt": "No passing zone.",
+        "meaning": "Zona de no rebasar.",
+        "response": "I will not pass.",
+        "responseMeaning": "No rebasaré."
+      },
+      {
+        "prompt": "Speed limit fifty, minimum thirty.",
+        "meaning": "Límite 50, mínimo 30.",
+        "response": "I will follow the speed limit.",
+        "responseMeaning": "Respetaré el límite de velocidad."
+      },
+      {
+        "prompt": "Trucks forty.",
+        "meaning": "Límite de velocidad para camiones: 40.",
+        "response": "I will drive at forty or less.",
+        "responseMeaning": "Manejaré a 40 o menos."
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Señales críticas II",
+    "icon": "🌉",
+    "desc": "Altura, peso, carriles, curvas y zonas restringidas.",
+    "situation": "La ruta incluye restricciones especiales para camiones.",
+    "items": [
+      {
+        "prompt": "Low clearance ahead.",
+        "meaning": "Altura reducida adelante.",
+        "response": "I will check my truck height.",
+        "responseMeaning": "Revisaré la altura de mi unidad."
+      },
+      {
+        "prompt": "Low bridge ahead.",
+        "meaning": "Puente de baja altura adelante.",
+        "response": "I will use a safe alternate route.",
+        "responseMeaning": "Usaré una ruta alterna segura."
+      },
+      {
+        "prompt": "Weight limit ten tons.",
+        "meaning": "Límite de peso: 10 toneladas.",
+        "response": "I will verify my weight.",
+        "responseMeaning": "Verificaré mi peso."
+      },
+      {
+        "prompt": "Right lane ends ahead.",
+        "meaning": "El carril derecho termina adelante.",
+        "response": "I will merge safely.",
+        "responseMeaning": "Me incorporaré de manera segura."
+      },
+      {
+        "prompt": "Left lane must turn left.",
+        "meaning": "El carril izquierdo debe girar a la izquierda.",
+        "response": "I will follow the lane direction.",
+        "responseMeaning": "Seguiré la dirección del carril."
+      },
+      {
+        "prompt": "No trucks allowed.",
+        "meaning": "No se permiten camiones.",
+        "response": "I will use another route.",
+        "responseMeaning": "Usaré otra ruta."
+      },
+      {
+        "prompt": "No trucks beyond this point.",
+        "meaning": "No se permiten camiones después de este punto.",
+        "response": "I will not continue on this road.",
+        "responseMeaning": "No continuaré por este camino."
+      },
+      {
+        "prompt": "Truck rollover warning. Right curve ahead.",
+        "meaning": "Advertencia de volcadura. Curva a la derecha adelante.",
+        "response": "I will slow down before the curve.",
+        "responseMeaning": "Reduciré la velocidad antes de la curva."
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "title": "Cruces y obras",
+    "icon": "🚦",
+    "desc": "Ferrocarril, semáforos, peatones, obras y desvíos.",
+    "situation": "Atraviesas una zona urbana y de construcción.",
+    "items": [
+      {
+        "prompt": "Railroad crossing.",
+        "meaning": "Cruce de ferrocarril.",
+        "response": "I will stop and check both directions.",
+        "responseMeaning": "Me detendré y revisaré ambas direcciones."
+      },
+      {
+        "prompt": "Traffic signal lights ahead.",
+        "meaning": "Semáforo adelante.",
+        "response": "I will watch the traffic signal.",
+        "responseMeaning": "Observaré el semáforo."
+      },
+      {
+        "prompt": "Pedestrians crossing ahead.",
+        "meaning": "Cruce peatonal adelante.",
+        "response": "I will slow down and yield.",
+        "responseMeaning": "Reduciré la velocidad y cederé el paso."
+      },
+      {
+        "prompt": "Road work ahead.",
+        "meaning": "Obras en el camino adelante.",
+        "response": "I will slow down in the work zone.",
+        "responseMeaning": "Reduciré la velocidad en la zona de obras."
+      },
+      {
+        "prompt": "Road workers are near the roadway.",
+        "meaning": "Hay trabajadores cerca de la carretera.",
+        "response": "I will drive carefully.",
+        "responseMeaning": "Manejaré con cuidado."
+      },
+      {
+        "prompt": "Detour to the right.",
+        "meaning": "Desvío a la derecha.",
+        "response": "I will follow the detour.",
+        "responseMeaning": "Seguiré el desvío."
+      },
+      {
+        "prompt": "Four-way intersection.",
+        "meaning": "Intersección de cuatro sentidos.",
+        "response": "I will proceed carefully.",
+        "responseMeaning": "Avanzaré con cuidado."
+      },
+      {
+        "prompt": "Two-way traffic ahead.",
+        "meaning": "Tráfico en doble sentido adelante.",
+        "response": "I will stay in my lane.",
+        "responseMeaning": "Me mantendré en mi carril."
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "title": "Cierres y estacionamiento",
+    "icon": "⛔",
+    "desc": "Reconocer cierres, callejones, entradas y restricciones de estacionamiento.",
+    "situation": "Buscas acceso seguro a una instalación.",
+    "items": [
+      {
+        "prompt": "Road closed.",
+        "meaning": "Camino cerrado.",
+        "response": "I will use another road.",
+        "responseMeaning": "Usaré otro camino."
+      },
+      {
+        "prompt": "No outlet. Dead end.",
+        "meaning": "Callejón sin salida.",
+        "response": "I will turn around safely.",
+        "responseMeaning": "Daré vuelta de manera segura."
+      },
+      {
+        "prompt": "No exit. Entrance only.",
+        "meaning": "Sin salida. Solo entrada.",
+        "response": "I will look for the exit.",
+        "responseMeaning": "Buscaré la salida."
+      },
+      {
+        "prompt": "No truck parking.",
+        "meaning": "Prohibido estacionar camiones.",
+        "response": "I will find truck parking.",
+        "responseMeaning": "Buscaré estacionamiento para camiones."
+      },
+      {
+        "prompt": "Shoulder closed ahead.",
+        "meaning": "Acotamiento cerrado adelante.",
+        "response": "I will stay in the travel lane.",
+        "responseMeaning": "Me mantendré en el carril de circulación."
+      },
+      {
+        "prompt": "Commercial vehicles prohibited in the left lane.",
+        "meaning": "Vehículos comerciales prohibidos en el carril izquierdo.",
+        "response": "I will stay out of the left lane.",
+        "responseMeaning": "No usaré el carril izquierdo."
+      },
+      {
+        "prompt": "Trucks enter inspection station when lights are flashing.",
+        "meaning": "Los camiones deben entrar a inspección cuando las luces parpadeen.",
+        "response": "I will enter when the lights are flashing.",
+        "responseMeaning": "Entraré cuando las luces estén parpadeando."
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Clima y carretera",
+    "icon": "🌦️",
+    "desc": "Comprender lluvia, inundación, nieve, hielo y tormentas.",
+    "situation": "Las condiciones climáticas cambian durante la ruta.",
+    "items": [
+      {
+        "prompt": "Heavy rains flooded the street.",
+        "meaning": "Las lluvias fuertes inundaron la calle.",
+        "response": "I will not drive through flooded water.",
+        "responseMeaning": "No conduciré a través del agua inundada."
+      },
+      {
+        "prompt": "The streets are covered with snow.",
+        "meaning": "Las calles están cubiertas de nieve.",
+        "response": "I will reduce my speed.",
+        "responseMeaning": "Reduciré mi velocidad."
+      },
+      {
+        "prompt": "The streets are wet because of the rain.",
+        "meaning": "Las calles están mojadas por la lluvia.",
+        "response": "I will increase my following distance.",
+        "responseMeaning": "Aumentaré mi distancia de seguimiento."
+      },
+      {
+        "prompt": "The storm is very strong.",
+        "meaning": "La tormenta es muy fuerte.",
+        "response": "I will find a safe place to stop.",
+        "responseMeaning": "Buscaré un lugar seguro para detenerme."
+      },
+      {
+        "prompt": "Watch for ice on the bridge.",
+        "meaning": "Cuidado con el hielo en el puente.",
+        "response": "I will slow down before the bridge.",
+        "responseMeaning": "Reduciré la velocidad antes del puente."
+      },
+      {
+        "prompt": "Did you check the weather?",
+        "meaning": "¿Revisó el clima?",
+        "response": "Yes, I checked the weather.",
+        "responseMeaning": "Sí, revisé el clima."
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "title": "Road test",
+    "icon": "🚛",
+    "desc": "Comprender las acciones esenciales del examen práctico de manejo.",
+    "situation": "Realizas una prueba práctica con un instructor.",
+    "items": [
+      {
+        "prompt": "Enter the truck using three points of contact.",
+        "meaning": "Suba a la unidad usando tres puntos de contacto.",
+        "response": "I will use three points of contact.",
+        "responseMeaning": "Usaré tres puntos de contacto."
+      },
+      {
+        "prompt": "Adjust your seat and mirrors.",
+        "meaning": "Ajuste su asiento y espejos.",
+        "response": "I will adjust my seat and mirrors.",
+        "responseMeaning": "Ajustaré mi asiento y espejos."
+      },
+      {
+        "prompt": "Maintain control of the truck.",
+        "meaning": "Mantenga el control de la unidad.",
+        "response": "I will maintain control of the truck.",
+        "responseMeaning": "Mantendré el control de la unidad."
+      },
+      {
+        "prompt": "Make a complete stop for three seconds.",
+        "meaning": "Haga un alto completo durante tres segundos.",
+        "response": "I will stop completely for three seconds.",
+        "responseMeaning": "Me detendré completamente durante tres segundos."
+      },
+      {
+        "prompt": "Make three right turns and three left turns.",
+        "meaning": "Realice tres vueltas a la derecha y tres a la izquierda.",
+        "response": "I will use my turn signals before every turn.",
+        "responseMeaning": "Usaré las direccionales antes de cada vuelta."
+      },
+      {
+        "prompt": "Change lanes safely.",
+        "meaning": "Cambie de carril de manera segura.",
+        "response": "I will signal and check my mirrors.",
+        "responseMeaning": "Pondré la direccional y revisaré mis espejos."
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "title": "Backing test y G.O.A.L.",
+    "icon": "↩️",
+    "desc": "Comprender instrucciones para estacionarse de reversa con seguridad.",
+    "situation": "Realizas la prueba de reversa y aplicas Get Out And Look.",
+    "items": [
+      {
+        "prompt": "Get out and look.",
+        "meaning": "Baje de la unidad y observe.",
+        "response": "I will get out and look.",
+        "responseMeaning": "Bajaré y observaré."
+      },
+      {
+        "prompt": "Inspect the backing area before you start.",
+        "meaning": "Inspeccione el área de reversa antes de comenzar.",
+        "response": "I will inspect the area first.",
+        "responseMeaning": "Primero inspeccionaré el área."
+      },
+      {
+        "prompt": "Use three points of contact every time you exit.",
+        "meaning": "Use tres puntos de contacto cada vez que baje.",
+        "response": "I will use three points of contact.",
+        "responseMeaning": "Usaré tres puntos de contacto."
+      },
+      {
+        "prompt": "You may pull forward and reposition.",
+        "meaning": "Puede avanzar y reacomodarse.",
+        "response": "I will reposition if necessary.",
+        "responseMeaning": "Me reacomodaré si es necesario."
+      },
+      {
+        "prompt": "Do not cross the exercise boundary.",
+        "meaning": "No cruce el límite del ejercicio.",
+        "response": "I will stay inside the boundary.",
+        "responseMeaning": "Me mantendré dentro del límite."
+      },
+      {
+        "prompt": "Do not touch a cone.",
+        "meaning": "No toque ningún cono.",
+        "response": "I will stop and check my position.",
+        "responseMeaning": "Me detendré y revisaré mi posición."
+      },
+      {
+        "prompt": "Position the trailer safely in the parking area.",
+        "meaning": "Coloque la caja de manera segura en el área de estacionamiento.",
+        "response": "I will position the trailer safely.",
+        "responseMeaning": "Colocaré la caja de manera segura."
+      }
+    ]
+  }
+];
+
+
+function buildMissionGlossary(mission){
+  const blocks=[];
+  const seen=new Set();
+
+  function add(en,es,example,note,type="expression"){
+    const key=(en+"|"+es).toLowerCase();
+    if(!en || !es || seen.has(key)) return;
+    seen.add(key);
+    blocks.push({en,es,example:example||en,note:note||"Bloque útil para esta misión.",type});
+  }
+
+  mission.items.forEach(item=>{
+    // Pregunta o instrucción completa
+    add(
+      item.prompt,
+      item.meaning,
+      item.response ? `${item.prompt} — ${item.response}` : item.prompt,
+      "Escúchala para reconocer lo que la otra persona te está diciendo.",
+      "prompt"
+    );
+
+    // Respuesta completa
+    const responseText = item.openResponse==="name"
+      ? "My name is"
+      : item.openResponse==="age"
+        ? "I am … years old"
+        : item.response;
+
+    add(
+      responseText,
+      item.responseMeaning,
+      item.response,
+      item.openResponse
+        ? "Completa este bloque con tus datos reales. El sistema solo evalúa la estructura en inglés."
+        : "Úsala como respuesta adecuada dentro de esta situación.",
+      "response"
+    );
+
+    // Bloques funcionales por fragmentos
+    splitPhrase(responseText).forEach(fragment=>{
+      if(fragment!==responseText){
+        add(
+          fragment,
+          fragmentMeaning(fragment,item),
+          item.response,
+          "Practica este fragmento antes de decir la respuesta completa.",
+          "chunk"
+        );
+      }
+    });
+
+    splitPhrase(item.prompt).forEach(fragment=>{
+      if(fragment!==item.prompt){
+        add(
+          fragment,
+          fragmentMeaning(fragment,item,true),
+          item.prompt,
+          "Bloque auditivo que aparece dentro de la pregunta o instrucción.",
+          "chunk"
+        );
+      }
+    });
+  });
+
+  return blocks;
+}
+
+function fragmentMeaning(fragment,item,isPrompt=false){
+  const common={
+    "my name is":"mi nombre es",
+    "i am":"yo soy / yo tengo",
+    "i'm":"yo soy / yo tengo",
+    "years old":"años de edad",
+    "i am from":"soy de",
+    "where are you from":"¿de dónde es?",
+    "where do you work":"¿dónde trabaja?",
+    "my date of birth is":"mi fecha de nacimiento es",
+    "i work at":"trabajo en",
+    "i have worked at":"he trabajado en",
+    "for three years":"durante tres años",
+    "yes sir":"sí, señor",
+    "here you go":"aquí tiene",
+    "turn off":"apagar",
+    "turn on":"encender",
+    "your truck":"su unidad",
+    "step out":"bajar / salir",
+    "step into":"subir / entrar",
+    "hours of service":"horas de servicio",
+    "hazardous material":"material peligroso",
+    "road service":"servicio de rescate",
+    "flat tire":"llanta ponchada",
+    "turn right":"gire a la derecha",
+    "turn left":"gire a la izquierda",
+    "low clearance":"altura reducida",
+    "road work":"obras en el camino",
+    "railroad crossing":"cruce de ferrocarril",
+    "get out and look":"baje y observe"
+  };
+  const clean=fragment.toLowerCase().replace(/[?.!,]/g,"").trim();
+  if(common[clean]) return common[clean];
+  return isPrompt ? "Parte de la pregunta o instrucción." : "Parte de la respuesta.";
+}
+
+let glossaryMode="cards";
+let glossaryIndex=0;
+let glossaryMissionId=1;
+
+const defaultState = {
+  completed:[], currentMission:1, currentItem:0, miles:0, minutes:0, attempts:0,
+  speakingScores:[], listeningScores:[], practiced:[], streak:1, grades:{},
+  teacherNotes:"", missionTimes:{}, missionResults:{}, lastPractice:new Date().toISOString(), profileName:"", profileAge:"", glossaryMastered:[], glossaryAttempts:0
+};
+
+let state=loadState();
+let lessonStep=0;
+let audioEnabled=true;
+let recognition=null;
+
+function loadState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("eorStateComplete")||"{}");
+    return {...defaultState,...saved};
+  }catch{return {...defaultState}}
+}
+function saveState(){
+  localStorage.setItem("eorStateComplete",JSON.stringify(state));
+  renderAll();
+}
+function avg(a){return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0}
+function currentMission(){return missions.find(m=>m.id===state.currentMission)||missions[0]}
+function currentItem(){const m=currentMission();return m.items[Math.min(state.currentItem,m.items.length-1)]}
+function splitPhrase(text){
+  const words=text.replace(/[?.!]/g,"").split(/\s+/);
+  if(words.length<=4)return [text];
+  const mid=Math.ceil(words.length/2);
+  return [words.slice(0,mid).join(" "),words.slice(mid).join(" "),text];
+}
+function distractors(item){
+  const pool=currentMission().items.map(x=>x.meaning).filter(x=>x!==item.meaning);
+  return [...pool.sort(()=>Math.random()-.5).slice(0,2),item.meaning].sort(()=>Math.random()-.5);
+}
+function showToast(msg){
+  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2200);
+}
+function setView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("view-"+name).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
+  const titles={home:["DRIVER TRAINING","Panel del operador"],route:["LEARNING ROUTE","Ruta completa"],practice:["ACTIVE MISSION","Práctica autodidacta"],review:["SPACED PRACTICE","Repaso"],glossary:["VOCABULARY LAB","Glosario de la misión 1"],driver:["DRIVER PERFORMANCE","Driver Card"],teacher:["SCHOOL MONITORING","Panel docente"]};
+  document.getElementById("viewEyebrow").textContent=titles[name][0];
+  document.getElementById("viewTitle").textContent=titles[name][1];
+  if(name==="practice")renderLesson();
+  if(name==="glossary")renderGlossary();
+  if(innerWidth<1050)document.getElementById("sidebar").classList.remove("open");
+}
+
+function displayResponse(item){
+  if(item.openResponse==="name"){
+    return state.profileName ? `My name is ${state.profileName}.` : "My name is …";
+  }
+  if(item.openResponse==="age"){
+    return state.profileAge ? `I am ${state.profileAge} years old.` : "I am … years old.";
+  }
+  return item.response;
+}
+function displayResponseMeaning(item){
+  if(item.openResponse==="name"){
+    return state.profileName ? `Mi nombre es ${state.profileName}.` : "Mi nombre es…";
+  }
+  if(item.openResponse==="age"){
+    return state.profileAge ? `Tengo ${state.profileAge} años.` : "Tengo … años.";
+  }
+  return item.responseMeaning;
+}
+function acceptedOpenResponse(said,item){
+  if(!item.requiredPatterns)return null;
+  const clean=said.toLowerCase().replace(/[^a-z0-9\' ]/g," ").replace(/\s+/g," ").trim();
+  return item.requiredPatterns.some(pattern=>clean.includes(pattern));
+}
+function normalizeText(s){
+  return s.toLowerCase().replace(/[.,!?¿¡']/g,"").replace(/\s+/g," ").trim();
+}
+
+function renderAll(){
+  const progress=Math.round(state.completed.length/missions.length*100),pron=avg(state.speakingScores),listen=avg(state.listeningScores);
+  document.getElementById("heroProgressBar").style.width=progress+"%";
+  document.getElementById("heroProgressText").textContent=progress+"% completado";
+  document.getElementById("dailyMinutes").textContent=state.minutes;
+  document.getElementById("dailyRing").style.background=`conic-gradient(var(--accent) ${Math.min(state.minutes/15*360,360)}deg,#e6edf4 0deg)`;
+  document.getElementById("milesStat").textContent=state.miles;
+  document.getElementById("pronStat").textContent=pron+"%";
+  document.getElementById("listenStat").textContent=listen+"%";
+  document.getElementById("streakStat").textContent=state.streak;
+  document.getElementById("routeMiles").textContent=state.miles;
+  document.getElementById("licenseBar").style.width=Math.min(state.completed.length/5*100,100)+"%";
+  document.getElementById("cardHours").textContent=(state.minutes/60).toFixed(1);
+  document.getElementById("cardMiles").textContent=state.miles;
+  document.getElementById("cardPhrases").textContent=state.practiced.length;
+  document.getElementById("metricPron").textContent=pron+"%";
+  document.getElementById("metricListen").textContent=listen+"%";
+  document.getElementById("metricPronBar").style.width=pron+"%";
+  document.getElementById("metricListenBar").style.width=listen+"%";
+  const m=currentMission();
+  document.querySelector(".hero-content h2").textContent=m.title;
+  document.querySelector(".hero-content p").textContent=m.desc;
+  renderHomeMissions();renderRoadmap();renderReview();renderBadges();renderTeacher();
+}
+function startMission(id){
+  state.currentMission=id;state.currentItem=0;lessonStep=0;saveState();setView("practice");
+}
+function renderHomeMissions(){
+  const idx=Math.max(0,missions.findIndex(m=>m.id===state.currentMission));
+  const shown=missions.slice(idx,idx+3).length?missions.slice(idx,idx+3):missions.slice(-3);
+  document.getElementById("homeMissionRow").innerHTML=shown.map(m=>`
+    <article class="mission-card">
+      <div class="mission-cover"><strong>${m.title}</strong><span>${m.icon}</span></div>
+      <div class="mission-body"><h3>${state.completed.includes(m.id)?"Completada":"Misión "+m.id}</h3>
+      <p>${m.desc}</p><div class="mission-meta"><span>${m.items.length} situaciones</span>
+      <button class="text-btn mission-open" data-id="${m.id}">${state.completed.includes(m.id)?"Repetir":"Abrir"} →</button></div></div>
+    </article>`).join("");
+  document.querySelectorAll(".mission-open").forEach(b=>b.onclick=()=>startMission(Number(b.dataset.id)));
+}
+function renderRoadmap(){
+  const next=missions.find(m=>!state.completed.includes(m.id))||missions[0];
+  document.getElementById("nextStopTitle").textContent=next.title;
+  document.getElementById("nextStopText").textContent=next.desc;
+  document.getElementById("roadmap").innerHTML=missions.map(m=>{
+    const done=state.completed.includes(m.id),current=m.id===state.currentMission;
+    return `<div class="route-stop ${done?"completed":current?"current":""}">
+      <div class="stop-node">${done?"✓":m.icon}</div><div class="stop-content"><h3>Misión ${m.id} · ${m.title}</h3>
+      <p>${m.desc} · ${m.items.length} situaciones</p><button class="secondary-btn route-open" data-id="${m.id}">${done?"Repetir misión":"Comenzar misión"}</button></div></div>`;
+  }).join("");
+  document.querySelectorAll(".route-open").forEach(b=>b.onclick=()=>startMission(Number(b.dataset.id)));
+}
+function renderReview(){
+  const phrases=state.practiced.length?state.practiced.slice(-24):missions.flatMap(m=>m.items.map(x=>x.response)).slice(0,24);
+  document.getElementById("reviewCount").textContent=phrases.length+" expresiones";
+  document.getElementById("reviewGrid").innerHTML=phrases.map((p,i)=>`<article class="review-card"><p class="eyebrow">REPASO ${i+1}</p><h3>${p}</h3><p>Escucha y repite la respuesta.</p><button class="secondary-btn review-audio" data-text="${encodeURIComponent(p)}">🔊 Escuchar</button></article>`).join("");
+  document.querySelectorAll(".review-audio").forEach(b=>b.onclick=()=>speak(decodeURIComponent(b.dataset.text)));
+}
+function renderBadges(){
+  document.getElementById("badgeGrid").innerHTML=missions.slice(0,8).map(m=>`<article class="badge-item ${state.completed.includes(m.id)?"":"locked"}"><div class="badge-icon">${m.icon}</div><h3>${m.title}</h3><small>${state.completed.includes(m.id)?"Obtenida":"Bloqueada"}</small></article>`).join("");
+}
+
+function unlockedMissionIds(){
+  const highestCompleted=state.completed.length?Math.max(...state.completed):0;
+  const highest=Math.max(highestCompleted,state.currentMission||1);
+  return missions.filter(m=>m.id<=highest).map(m=>m.id);
+}
+
+function currentGlossaryMission(){
+  const unlocked=unlockedMissionIds();
+  if(!unlocked.includes(glossaryMissionId)) glossaryMissionId=unlocked[unlocked.length-1]||1;
+  return missions.find(m=>m.id===glossaryMissionId)||missions[0];
+}
+
+function renderGlossary(){
+  const unlocked=unlockedMissionIds();
+  const mission=currentGlossaryMission();
+  const glossary=buildMissionGlossary(mission);
+
+  if(glossaryIndex>=glossary.length) glossaryIndex=0;
+
+  const select=document.getElementById("glossaryMissionSelect");
+  if(select){
+    select.innerHTML=missions.map(m=>{
+      const open=unlocked.includes(m.id);
+      return `<option value="${m.id}" ${m.id===mission.id?"selected":""} ${open?"":"disabled"}>${open?"🔓":"🔒"} Misión ${m.id}: ${m.title}</option>`;
+    }).join("");
+  }
+
+  const masteredForMission=glossary.filter(g=>state.glossaryMastered.includes(`${mission.id}:${g.en}`)).length;
+  document.getElementById("glossaryProgress").textContent=`${masteredForMission}/${glossary.length} dominados`;
+
+  document.querySelectorAll(".practice-mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===glossaryMode));
+  const box=document.getElementById("glossaryWorkspace");
+  const item=glossary[glossaryIndex % glossary.length];
+
+  if(!item){
+    box.innerHTML="<p>No hay vocabulario disponible para esta misión.</p>";
+    return;
+  }
+
+  if(glossaryMode==="cards"){
+    box.innerHTML=`<div class="glossary-unlock-banner"><strong>Misión ${mission.id}: ${mission.title}</strong><span>${glossary.length} bloques disponibles</span></div>
+    <div class="glossary-card-grid">${glossary.map((g,i)=>`
+      <article class="vocab-card">
+        <div class="vocab-number">${i+1}</div>
+        <p class="eyebrow">${g.type==="prompt"?"QUESTION / INSTRUCTION":g.type==="response"?"YOUR RESPONSE":"USEFUL BLOCK"}</p>
+        <h3>${g.en}</h3>
+        <strong>${g.es}</strong>
+        <p>${g.note}</p>
+        <div class="vocab-example">${g.example}</div>
+        <div class="vocab-actions">
+          <button class="mini-btn glossary-listen" data-text="${encodeURIComponent(g.en)}">🔊</button>
+          <button class="mini-btn glossary-speak" data-text="${encodeURIComponent(g.en)}">🎙</button>
+        </div>
+      </article>`).join("")}</div>`;
+  }
+
+  if(glossaryMode==="listen"){
+    box.innerHTML=`<div class="single-practice">
+      <p class="eyebrow">MISIÓN ${mission.id} · ESCUCHA Y REPITE · ${glossaryIndex+1}/${glossary.length}</p>
+      <h2>${item.en}</h2>
+      <p class="translation">${item.es}</p>
+      <div class="large-actions">
+        <button class="audio-btn" id="glossaryListen">▶</button>
+        <button class="mic-btn" id="glossaryMic">🎙</button>
+      </div>
+      <div class="feedback" id="glossaryFeedback"></div>
+      <div class="practice-nav"><button class="secondary-btn" id="glossaryPrev">← Anterior</button><button class="primary-btn" id="glossaryNext">Siguiente →</button></div>
+    </div>`;
+  }
+
+  if(glossaryMode==="multiple"){
+    const wrong=glossary.filter(x=>x.en!==item.en).sort(()=>Math.random()-.5).slice(0,3).map(x=>x.en);
+    const options=[item.en,...wrong].sort(()=>Math.random()-.5);
+    box.innerHTML=`<div class="single-practice">
+      <p class="eyebrow">MISIÓN ${mission.id} · OPCIÓN MÚLTIPLE · ${glossaryIndex+1}/${glossary.length}</p>
+      <h2>¿Cómo se dice en inglés?</h2>
+      <div class="spanish-prompt">${item.es}</div>
+      <div class="options">${options.map(o=>`<button class="option glossary-option" data-correct="${o===item.en}">${o}</button>`).join("")}</div>
+      <div class="feedback" id="glossaryFeedback"></div>
+      <div class="practice-nav"><button class="secondary-btn" id="glossaryPrev">← Anterior</button><button class="primary-btn" id="glossaryNext">Siguiente →</button></div>
+    </div>`;
+  }
+
+  if(glossaryMode==="write"){
+    box.innerHTML=`<div class="single-practice">
+      <p class="eyebrow">MISIÓN ${mission.id} · ESCRIBE · ${glossaryIndex+1}/${glossary.length}</p>
+      <h2>Escribe este bloque en inglés</h2>
+      <div class="spanish-prompt">${item.es}</div>
+      <input class="writing-input" id="writingInput" autocomplete="off" placeholder="Escribe aquí">
+      <button class="primary-btn" id="checkWriting">Revisar</button>
+      <div class="feedback" id="glossaryFeedback"></div>
+      <div class="practice-nav"><button class="secondary-btn" id="glossaryPrev">← Anterior</button><button class="primary-btn" id="glossaryNext">Siguiente →</button></div>
+    </div>`;
+  }
+
+  if(glossaryMode==="speak"){
+    box.innerHTML=`<div class="single-practice">
+      <p class="eyebrow">MISIÓN ${mission.id} · ESPAÑOL → INGLÉS · ${glossaryIndex+1}/${glossary.length}</p>
+      <h2>Dilo en inglés</h2>
+      <div class="spanish-prompt">${item.es}</div>
+      <p class="lesson-help">Piensa la respuesta, toca el micrófono y dilo en voz alta.</p>
+      <button class="mic-btn" id="translateMic">🎙</button>
+      <button class="text-btn" id="showGlossaryAnswer">Ver respuesta</button>
+      <div class="hidden-answer" id="hiddenGlossaryAnswer"><strong>${item.en}</strong><button class="mini-btn" id="answerListen">🔊</button></div>
+      <div class="feedback" id="glossaryFeedback"></div>
+      <div class="practice-nav"><button class="secondary-btn" id="glossaryPrev">← Anterior</button><button class="primary-btn" id="glossaryNext">Siguiente →</button></div>
+    </div>`;
+  }
+  bindGlossary();
+}
+
+function bindGlossary(){
+  const glossary=buildMissionGlossary(currentGlossaryMission());
+  const select=document.getElementById("glossaryMissionSelect");
+  if(select) select.onchange=()=>{
+    glossaryMissionId=Number(select.value);
+    glossaryIndex=0;
+    renderGlossary();
+  };
+
+  document.querySelectorAll(".practice-mode").forEach(b=>b.onclick=()=>{glossaryMode=b.dataset.mode;glossaryIndex=0;renderGlossary()});
+  document.querySelectorAll(".glossary-listen").forEach(b=>b.onclick=()=>speak(decodeURIComponent(b.dataset.text)));
+  document.querySelectorAll(".glossary-speak").forEach(b=>b.onclick=()=>startGlossaryRecognition(decodeURIComponent(b.dataset.text)));
+  const prev=document.getElementById("glossaryPrev");if(prev)prev.onclick=()=>{glossaryIndex=(glossaryIndex-1+glossary.length)%glossary.length;renderGlossary()};
+  const next=document.getElementById("glossaryNext");if(next)next.onclick=()=>{glossaryIndex=(glossaryIndex+1)%glossary.length;renderGlossary()};
+  const listen=document.getElementById("glossaryListen");if(listen)listen.onclick=()=>speak(glossary[glossaryIndex].en);
+  const mic=document.getElementById("glossaryMic");if(mic)mic.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en);
+
+  document.querySelectorAll(".glossary-option").forEach(o=>o.onclick=()=>{
+    const ok=o.dataset.correct==="true";o.classList.add(ok?"correct":"soft-wrong");
+    glossaryResult(ok,ok?"¡Muy bien! Elegiste el bloque correcto.":`Buen intento. La respuesta es: ${glossary[glossaryIndex].en}`);
+  });
+
+  const check=document.getElementById("checkWriting");if(check)check.onclick=()=>{
+    const typed=document.getElementById("writingInput").value;
+    const ok=normalizeText(typed)===normalizeText(glossary[glossaryIndex].en);
+    glossaryResult(ok,ok?"¡Excelente! Lo escribiste correctamente.":`Casi. Revisa este modelo: ${glossary[glossaryIndex].en}`);
+  };
+
+  const tm=document.getElementById("translateMic");if(tm)tm.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en);
+  const show=document.getElementById("showGlossaryAnswer");if(show)show.onclick=()=>document.getElementById("hiddenGlossaryAnswer").classList.toggle("show");
+  const al=document.getElementById("answerListen");if(al)al.onclick=()=>speak(glossary[glossaryIndex].en);
+}
+
+function glossaryResult(ok,message){
+  state.glossaryAttempts++;
+  const glossary=buildMissionGlossary(currentGlossaryMission());
+  const en=glossary[glossaryIndex].en;
+  const key=`${currentGlossaryMission().id}:${en}`;
+  if(ok&&!state.glossaryMastered.includes(key))state.glossaryMastered.push(key);
+  saveState();
+  const f=document.getElementById("glossaryFeedback");
+  if(f){f.className=`feedback show ${ok?"good":"retry"}`;f.textContent=message}
+}
+function startGlossaryRecognition(expected){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const f=document.getElementById("glossaryFeedback")||document.getElementById("feedback");
+  if(!SR){if(f){f.className="feedback show retry";f.textContent="El navegador no permite reconocimiento de voz. Escucha y repite libremente."}return}
+  const r=new SR();r.lang="en-US";r.interimResults=false;
+  r.onresult=e=>{
+    const said=e.results[0][0].transcript;
+    const ok=similarity(said,expected)>=.55;
+    glossaryResult(ok,ok?`¡Muy bien! Escuchamos: “${said}”`:`Buen intento. Escucha el modelo y prueba otra vez: ${expected}`);
+  };
+  r.onerror=()=>{if(f){f.className="feedback show retry";f.textContent="No logramos escuchar con claridad. Inténtalo nuevamente."}};
+  r.start();
+}
+
+function renderTeacher(){
+  const pron=avg(state.speakingScores),listen=avg(state.listeningScores),general=Math.round((pron+listen)/2)||0;
+  document.getElementById("teacherAverage").textContent=general+"%";
+  document.getElementById("teacherHours").textContent=(state.minutes/60).toFixed(1)+" h";
+  document.getElementById("teacherCompleted").textContent=state.completed.length+"/"+missions.length;
+  document.getElementById("teacherLast").textContent=new Date(state.lastPractice).toLocaleDateString("es-MX");
+  const q=(document.getElementById("teacherSearch")?.value||"").toLowerCase();
+  document.getElementById("teacherTable").innerHTML=missions.filter(m=>m.title.toLowerCase().includes(q)).map(m=>{
+    const r=state.missionResults[m.id],done=state.completed.includes(m.id),grade=state.grades[m.id]?.value??"—";
+    return `<tr><td><strong>${m.title}</strong></td><td><span class="status ${done?"done":"pending"}">${done?"Completada":"Pendiente"}</span></td>
+    <td>${r?r.listening+"%":"—"}</td><td>${r?r.speaking+"%":"—"}</td><td>${r?r.attempts:"—"}</td>
+    <td>${state.missionTimes[m.id]||0} min</td><td>${grade}</td></tr>`;
+  }).join("");
+  document.getElementById("teacherNotes").value=state.teacherNotes||"";
+  document.getElementById("gradeMission").innerHTML=missions.map(m=>`<option value="${m.id}">${m.title}</option>`).join("");
+}
+function renderLesson(){
+  const m=currentMission(),item=currentItem(),total=m.items.length;
+  document.getElementById("lessonProgressBar").style.width=((state.currentItem+(lessonStep/6))/total*100)+"%";
+  document.getElementById("lessonStepLabel").textContent=`Situación ${state.currentItem+1} de ${total}`;
+  const stage=document.getElementById("lessonStage");
+  if(lessonStep===0)stage.innerHTML=`<article class="lesson-card"><div class="lesson-scene"><div><p class="eyebrow light">MISIÓN ${m.id} · ${m.items.length} SITUACIONES</p><h2>${m.title}</h2><p>${m.situation}</p></div><div class="scene-art">${m.icon}🚛</div></div><div class="lesson-body"><div class="learning-guide"><strong>La plataforma te enseñará todo antes de pedirte una respuesta.</strong><span>Escucha → comprende → aprende la respuesta → practica → simula.</span><span>Puedes repetir cada audio y usar el apoyo escrito cuando lo necesites.</span></div>
+      ${m.id===1?`<div class="personal-data-card"><p class="eyebrow">PERSONALIZA TUS RESPUESTAS</p><h3>Usa tus datos reales</h3><p>La plataforma solo calificará el bloque de inglés. Tu nombre y tu edad no se marcarán como error.</p><label>Tu nombre real<input id="profileNameInput" value="${state.profileName||""}" placeholder="Ejemplo: Luis Vega"></label><label>Tu edad<input id="profileAgeInput" type="number" min="18" max="90" value="${state.profileAge||""}" placeholder="Ejemplo: 34"></label></div>`:""}
+      <button class="primary-btn full" id="nextLesson">Comenzar situación ${state.currentItem+1}</button></div></article>`;
+  if(lessonStep===1)stage.innerHTML=`<article class="lesson-card"><div class="lesson-body center"><p class="eyebrow">1 · ESCUCHA</p><h2>Escucha lo que dice la otra persona</h2><button class="audio-btn" id="promptAudio">▶</button><button class="transcript-toggle" id="showTranscript">Ver apoyo escrito</button><div class="transcript-box" id="transcriptBox"><strong>${item.prompt}</strong><span>${item.meaning}</span></div><div><button class="primary-btn" id="nextLesson" style="margin-top:28px">Ya escuché</button></div></div></article>`;
+  if(lessonStep===2){
+    const opts=distractors(item);
+    stage.innerHTML=`<article class="lesson-card"><div class="lesson-body center"><p class="eyebrow">2 · COMPRENDE</p><h2>¿Qué significa?</h2><button class="audio-btn" id="promptAudio">▶</button><div class="options">${opts.map(o=>`<button class="option" data-correct="${o===item.meaning}">${o}</button>`).join("")}</div><div class="feedback" id="feedback"></div><button class="primary-btn" id="nextLesson" style="display:none">Aprender respuesta</button></div></article>`;
+  }
+  if(lessonStep===3)stage.innerHTML=`<article class="lesson-card"><div class="lesson-body"><p class="eyebrow">3 · APRENDE QUÉ RESPONDER</p><h2>Respuesta adecuada</h2><div class="conversation-study"><div class="speech officer"><small>OTHER PERSON</small><strong>${item.prompt}</strong><span>${item.meaning}</span><button class="mini-btn prompt-small">🔊</button></div><div class="speech driver"><small>YOUR RESPONSE</small><strong>${displayResponse(item)}</strong><span>${displayResponseMeaning(item)}</span><button class="mini-btn response-small">🔊</button></div></div><div class="tip-box"><strong>Recuerda:</strong> esta respuesta se practicará antes de la simulación.</div><button class="primary-btn full" id="nextLesson">Practicar respuesta</button></div></article>`;
+  if(lessonStep===4){
+    const frags=splitPhrase(displayResponse(item));
+    stage.innerHTML=`<article class="lesson-card"><div class="lesson-body"><p class="eyebrow">4 · PRONUNCIACIÓN GUIADA</p><h2>Repite por partes</h2><p class="lesson-help">Escucha cada fragmento y repítelo. Los intentos son ilimitados.</p><div class="fragment-list">${frags.map(f=>`<div class="fragment"><strong>${f}</strong><button class="mini-btn frag-audio" data-text="${encodeURIComponent(f)}">🔊</button><button class="mini-btn frag-mic" data-text="${encodeURIComponent(f)}">🎙</button></div>`).join("")}</div><div class="feedback" id="feedback"></div><button class="primary-btn full" id="nextLesson">Practicar respuesta completa</button></div></article>`;
+  }
+  if(lessonStep===5)stage.innerHTML=`<article class="lesson-card"><div class="lesson-body center"><p class="eyebrow">5 · RESPUESTA COMPLETA</p><h2>${displayResponse(item)}</h2><p class="lesson-help">${displayResponseMeaning(item)}</p><button class="audio-btn" id="responseAudio">▶</button><div class="mic-zone"><button class="mic-btn" id="responseMic">🎙</button><div class="listening" id="listening">Escuchando...</div></div><div class="feedback" id="feedback"></div><button class="primary-btn" id="nextLesson">Ir a simulación</button></div></article>`;
+  if(lessonStep===6)stage.innerHTML=`<article class="lesson-card"><div class="lesson-scene"><div><p class="eyebrow light">6 · SIMULACIÓN</p><h2>Responde sin presión</h2><p>Ya aprendiste y practicaste la respuesta.</p></div><div class="scene-art">${m.icon}</div></div><div class="lesson-body center"><div class="simulation-bubble"><small>OTHER PERSON</small><div class="big-phrase">${item.prompt}</div><button class="mini-btn" id="simPrompt">🔊</button></div><div class="self-study-reminder"><span>Respuesta practicada:</span><strong>${displayResponse(item)}</strong><button class="text-btn" id="hearAgain">Escuchar respuesta</button></div><button class="mic-btn" id="simMic">🎙</button><div class="listening" id="listening">Escuchando...</div><div class="feedback" id="feedback"></div><button class="primary-btn" id="finishItem">Continuar</button></div></article>`;
+  bindLessonEvents();
+}
+function bindLessonEvents(){
+  const next=document.getElementById("nextLesson");if(next)next.onclick=()=>{
+    const nameInput=document.getElementById("profileNameInput");
+    const ageInput=document.getElementById("profileAgeInput");
+    if(nameInput)state.profileName=nameInput.value.trim();
+    if(ageInput)state.profileAge=ageInput.value.trim();
+    if(nameInput||ageInput)saveState();
+    lessonStep=Math.min(lessonStep+1,6);renderLesson()
+  };
+  const p=document.getElementById("promptAudio");if(p)p.onclick=()=>speak(currentItem().prompt);
+  const show=document.getElementById("showTranscript");if(show)show.onclick=()=>document.getElementById("transcriptBox").classList.toggle("show");
+  document.querySelectorAll(".option").forEach(o=>o.onclick=()=>{
+    document.querySelectorAll(".option").forEach(x=>x.disabled=true);
+    const ok=o.dataset.correct==="true";o.classList.add(ok?"correct":"soft-wrong");
+    const f=document.getElementById("feedback");f.className="feedback show "+(ok?"good":"retry");
+    f.textContent=ok?"¡Muy bien! Comprendiste el mensaje.":"Buen intento. Escucha otra vez y revisa el apoyo.";
+    state.listeningScores.push(ok?95:72);saveState();document.getElementById("nextLesson").style.display="inline-block";
+  });
+  const ps=document.querySelector(".prompt-small");if(ps)ps.onclick=()=>speak(currentItem().prompt);
+  const rs=document.querySelector(".response-small");if(rs)rs.onclick=()=>speak(displayResponse(currentItem()));
+  document.querySelectorAll(".frag-audio").forEach(b=>b.onclick=()=>speak(decodeURIComponent(b.dataset.text)));
+  document.querySelectorAll(".frag-mic").forEach(b=>b.onclick=()=>startRecognition(decodeURIComponent(b.dataset.text),false));
+  const ra=document.getElementById("responseAudio");if(ra)ra.onclick=()=>speak(displayResponse(currentItem()));
+  const rm=document.getElementById("responseMic");if(rm)rm.onclick=()=>startRecognition(displayResponse(currentItem()),false,currentItem());
+  const sp=document.getElementById("simPrompt");if(sp)sp.onclick=()=>speak(currentItem().prompt);
+  const ha=document.getElementById("hearAgain");if(ha)ha.onclick=()=>speak(displayResponse(currentItem()));
+  const sm=document.getElementById("simMic");if(sm)sm.onclick=()=>startRecognition(displayResponse(currentItem()),true,currentItem());
+  const fi=document.getElementById("finishItem");if(fi)fi.onclick=advanceItem;
+}
+function advanceItem(){
+  const m=currentMission(),item=currentItem();
+  if(!state.practiced.includes(displayResponse(item)))state.practiced.push(displayResponse(item));
+  state.minutes+=3;state.lastPractice=new Date().toISOString();
+  if(state.currentItem<m.items.length-1){
+    state.currentItem++;lessonStep=1;saveState();renderLesson();showToast("Siguiente situación");
+  }else completeMission();
+}
+function completeMission(){
+  const m=currentMission();
+  if(!state.completed.includes(m.id))state.completed.push(m.id);
+  state.miles+=150;state.missionTimes[m.id]=(state.missionTimes[m.id]||0)+Math.max(10,m.items.length*3);
+  state.missionResults[m.id]={listening:avg(state.listeningScores.slice(-m.items.length)),speaking:avg(state.speakingScores.slice(-m.items.length)),attempts:state.attempts};
+  const next=missions.find(x=>x.id===m.id+1);
+  if(next){state.currentMission=next.id;state.currentItem=0}else{state.currentMission=1;state.currentItem=0}
+  saveState();
+  document.getElementById("lessonStage").innerHTML=`<article class="lesson-card"><div class="lesson-body center"><div style="font-size:70px">🏁</div><p class="eyebrow">MISIÓN COMPLETADA</p><h2>${m.title}</h2><p>Practicaste ${m.items.length} situaciones completas.</p><div class="result-grid"><div><strong>+150</strong><small>Millas</small></div><div><strong>${state.missionResults[m.id].speaking||0}%</strong><small>Speaking</small></div><div><strong>${state.missionResults[m.id].listening||0}%</strong><small>Listening</small></div></div>${next?`<button class="primary-btn" id="nextMissionBtn">Continuar con ${next.title}</button>`:`<button class="primary-btn" id="nextMissionBtn">Volver a la ruta</button>`}</div></article>`;
+  document.getElementById("nextMissionBtn").onclick=()=>{lessonStep=0;next?setView("practice"):setView("route")};
+}
+function speak(text){
+  if(!audioEnabled)return;
+  speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="en-US";u.rate=.8;speechSynthesis.speak(u);
+}
+function similarity(a,b){
+  const clean=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g,"").split(/\s+/).filter(Boolean);
+  const A=clean(a),B=clean(b);return A.filter(w=>B.includes(w)).length/Math.max(B.length,1);
+}
+function startRecognition(expected,simulation,itemOverride=null){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const f=document.getElementById("feedback"),listening=document.getElementById("listening");
+  if(!SR){f.className="feedback show retry";f.textContent="Tu navegador no permite reconocimiento de voz. Escucha y repite libremente.";return}
+  recognition=new SR();recognition.lang="en-US";recognition.interimResults=false;recognition.maxAlternatives=3;
+  if(listening)listening.classList.add("active");
+  recognition.onresult=e=>{
+    const said=e.results[0][0].transcript;
+    const openOk=itemOverride?acceptedOpenResponse(said,itemOverride):null;
+    const score=openOk===true?95:Math.round(similarity(said,expected)*100);
+    state.attempts++;state.speakingScores.push(Math.max(score,55));
+    if(!state.practiced.includes(expected))state.practiced.push(expected);
+    saveState();f.className="feedback show "+(score>=55?"good":"retry");
+    f.innerHTML=score>=55?`¡Muy bien! Tu respuesta fue comprendida.<br><small>Escuchamos: “${said}”</small>`:`Buen intento. Escucha de nuevo y prueba otra vez.<br><small>Esperábamos: “${expected}”</small>`;
+  };
+  recognition.onerror=()=>{f.className="feedback show retry";f.textContent="No pudimos escuchar con claridad. Puedes intentarlo nuevamente."};
+  recognition.onend=()=>{if(listening)listening.classList.remove("active")};
+  recognition.start();
+}
+function exportCSV(){
+  const rows=[["Misión","Estado","Listening","Speaking","Intentos","Tiempo","Calificación"]];
+  missions.forEach(m=>{const r=state.missionResults[m.id];rows.push([m.title,state.completed.includes(m.id)?"Completada":"Pendiente",r?.listening||"",r?.speaking||"",r?.attempts||"",state.missionTimes[m.id]||0,state.grades[m.id]?.value||""])});
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="english-on-the-road-reporte.csv";a.click();URL.revokeObjectURL(a.href);
+}
+document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setView(b.dataset.go));
+document.getElementById("continueBtn").onclick=()=>setView("practice");
+document.getElementById("startNextBtn").onclick=()=>startMission((missions.find(m=>!state.completed.includes(m.id))||missions[0]).id);
+document.getElementById("exitLessonBtn").onclick=()=>setView("route");
+document.getElementById("menuBtn").onclick=()=>document.getElementById("sidebar").classList.toggle("open");
+document.getElementById("volumeBtn").onclick=e=>{audioEnabled=!audioEnabled;e.currentTarget.textContent=audioEnabled?"🔊":"🔇"};
+document.getElementById("roleSelect").onchange=e=>{if(e.target.value==="teacher")setView("teacher");else setView("home")};
+document.getElementById("resetBtn").onclick=()=>{if(confirm("¿Restablecer todo el progreso?")){localStorage.removeItem("eorStateComplete");state={...defaultState};lessonStep=0;renderAll();setView("home")}};
+document.getElementById("exportBtn").onclick=exportCSV;
+document.getElementById("teacherSearch").oninput=renderTeacher;
+document.getElementById("saveNotesBtn").onclick=()=>{state.teacherNotes=document.getElementById("teacherNotes").value;saveState();showToast("Observaciones guardadas")};
+document.getElementById("gradeBtn").onclick=()=>document.getElementById("gradeModal").classList.add("show");
+document.getElementById("closeGradeModal").onclick=()=>document.getElementById("gradeModal").classList.remove("show");
+document.getElementById("saveGradeBtn").onclick=()=>{const id=Number(document.getElementById("gradeMission").value),value=Math.max(0,Math.min(100,Number(document.getElementById("gradeValue").value)||0));state.grades[id]={value,comment:document.getElementById("gradeComment").value,date:new Date().toISOString()};saveState();document.getElementById("gradeModal").classList.remove("show");showToast("Calificación registrada")};
+renderAll();
+
+</script>
 </body>
 </html>
