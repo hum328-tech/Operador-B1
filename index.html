@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>English on the Road</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">E<span>R</span></div>
+        <div>
+          <strong>English on the Road</strong>
+          <small>Driver Communication Simulator</small>
+        </div>
+      </div>
+
+      <nav class="main-nav" aria-label="Navegación principal">
+        <button class="nav-item active" data-view="home"><span>⌂</span> Inicio</button>
+        <button class="nav-item" data-view="route"><span>⌁</span> Mi ruta</button>
+        <button class="nav-item" data-view="practice"><span>🎙</span> Práctica</button>
+        <button class="nav-item" data-view="review"><span>↻</span> Repaso</button>
+        <button class="nav-item" data-view="driver"><span>▣</span> Driver Card</button>
+        <button class="nav-item teacher-only" data-view="teacher"><span>▦</span> Panel docente</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="role-switch">
+          <span>Modo</span>
+          <select id="roleSelect" aria-label="Cambiar modo">
+            <option value="student">Operador</option>
+            <option value="teacher">Docente</option>
+          </select>
+        </div>
+        <button class="ghost-btn" id="resetBtn">Restablecer demo</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Abrir menú">☰</button>
+        <div>
+          <p class="eyebrow" id="viewEyebrow">DRIVER TRAINING</p>
+          <h1 id="viewTitle">Panel del operador</h1>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" id="volumeBtn" title="Audio">🔊</button>
+          <div class="driver-mini">
+            <div class="avatar">LV</div>
+            <div>
+              <strong id="miniName">Luis Vega</strong>
+              <small>B1 Driver</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="view active" id="view-home">
+        <div class="hero-grid">
+          <article class="hero-card">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+              <p class="eyebrow light">CONTINÚA TU ENTRENAMIENTO</p>
+              <h2>Inspección DOT</h2>
+              <p>Practica cómo responder con seguridad durante una revisión en carretera.</p>
+              <div class="hero-progress">
+                <div class="progress-bar"><span id="heroProgressBar"></span></div>
+                <span id="heroProgressText">0% completado</span>
+              </div>
+              <button class="primary-btn" id="continueBtn">Continuar misión</button>
+            </div>
+            <div class="truck-visual" aria-hidden="true">
+              <div class="road-line"></div>
+              <div class="truck">
+                <div class="cab"></div>
+                <div class="trailer"></div>
+                <i class="wheel w1"></i><i class="wheel w2"></i><i class="wheel w3"></i>
+              </div>
+            </div>
+          </article>
+
+          <article class="daily-card">
+            <div class="daily-icon">🎧</div>
+            <p class="eyebrow">META DE HOY</p>
+            <h3>15 minutos de práctica</h3>
+            <div class="ring" id="dailyRing"><span id="dailyMinutes">0</span><small>min</small></div>
+            <p>Escucha, repite y completa una simulación.</p>
+          </article>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card"><span class="stat-icon">🛣</span><div><strong id="milesStat">0</strong><small>Millas recorridas</small></div></article>
+          <article class="stat-card"><span class="stat-icon">🎙</span><div><strong id="pronStat">0%</strong><small>Pronunciación</small></div></article>
+          <article class="stat-card"><span class="stat-icon">🎧</span><div><strong id="listenStat">0%</strong><small>Comprensión auditiva</small></div></article>
+          <article class="stat-card"><span class="stat-icon">🔥</span><div><strong id="streakStat">1</strong><small>Días de racha</small></div></article>
+        </div>
+
+        <div class="section-heading">
+          <div><p class="eyebrow">RUTA ACTUAL</p><h2>Texas → Tennessee</h2></div>
+          <button class="text-btn" data-go="route">Ver ruta completa →</button>
+        </div>
+
+        <div class="mission-row" id="homeMissionRow"></div>
+      </section>
+
+      <section class="view" id="view-route">
+        <div class="route-layout">
+          <article class="route-panel">
+            <div class="route-header">
+              <div>
+                <p class="eyebrow">RUTA PROFESIONAL</p>
+                <h2>Texas → Tennessee</h2>
+                <p>Completa misiones reales para avanzar por la ruta.</p>
+              </div>
+              <div class="route-badge"><strong id="routeMiles">0</strong><small>millas</small></div>
+            </div>
+            <div class="roadmap" id="roadmap"></div>
+          </article>
+          <aside class="route-side">
+            <article class="info-card">
+              <p class="eyebrow">PRÓXIMA PARADA</p>
+              <h3 id="nextStopTitle">DOT Inspection</h3>
+              <p id="nextStopText">Responde instrucciones de un oficial.</p>
+              <button class="primary-btn full" id="startNextBtn">Iniciar misión</button>
+            </article>
+            <article class="info-card dark">
+              <p class="eyebrow light">LICENCIA ACTUAL</p>
+              <h3>Safety Driver I</h3>
+              <p>Completa 3 misiones para desbloquear el siguiente nivel.</p>
+              <div class="license-progress"><span id="licenseBar"></span></div>
+            </article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="view-practice">
+        <div class="practice-shell">
+          <div class="lesson-top">
+            <button class="back-btn" id="exitLessonBtn">← Salir</button>
+            <div class="lesson-progress"><span id="lessonProgressBar"></span></div>
+            <span id="lessonStepLabel">Paso 1 de 5</span>
+          </div>
+          <div id="lessonStage"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-review">
+        <div class="section-heading">
+          <div><p class="eyebrow">REPETICIÓN ESPACIADA</p><h2>Repaso inteligente</h2></div>
+          <span class="pill" id="reviewCount">0 expresiones</span>
+        </div>
+        <div class="review-grid" id="reviewGrid"></div>
+      </section>
+
+      <section class="view" id="view-driver">
+        <div class="driver-layout">
+          <article class="driver-card-large">
+            <div class="card-stripe"></div>
+            <div class="driver-head">
+              <div class="avatar large">LV</div>
+              <div><p class="eyebrow light">DRIVER CARD</p><h2>Luis Vega</h2><span>B1 DRIVER · NUEVO LAREDO</span></div>
+            </div>
+            <div class="driver-code">EOR-001-B1</div>
+            <div class="driver-card-stats">
+              <div><strong id="cardHours">0.0</strong><small>Horas</small></div>
+              <div><strong id="cardMiles">0</strong><small>Millas</small></div>
+              <div><strong id="cardPhrases">0</strong><small>Expresiones</small></div>
+            </div>
+          </article>
+
+          <article class="performance-card">
+            <p class="eyebrow">DESEMPEÑO</p>
+            <h2>Progreso del operador</h2>
+            <div class="metric"><div><span>Pronunciación</span><strong id="metricPron">0%</strong></div><div class="metric-bar"><span id="metricPronBar"></span></div></div>
+            <div class="metric"><div><span>Comprensión auditiva</span><strong id="metricListen">0%</strong></div><div class="metric-bar"><span id="metricListenBar"></span></div></div>
+            <div class="metric"><div><span>Constancia</span><strong id="metricConsistency">20%</strong></div><div class="metric-bar"><span style="width:20%"></span></div></div>
+          </article>
+        </div>
+
+        <div class="section-heading"><div><p class="eyebrow">RECONOCIMIENTOS</p><h2>Insignias obtenidas</h2></div></div>
+        <div class="badge-grid" id="badgeGrid"></div>
+      </section>
+
+      <section class="view" id="view-teacher">
+        <div class="teacher-toolbar">
+          <div><p class="eyebrow">SEGUIMIENTO ACADÉMICO</p><h2>Panel docente</h2><p>Consulta práctica, resultados y evidencia de avance.</p></div>
+          <div class="toolbar-actions">
+            <button class="secondary-btn" id="exportBtn">Exportar CSV</button>
+            <button class="primary-btn" id="gradeBtn">Registrar calificación</button>
+          </div>
+        </div>
+
+        <div class="teacher-stats">
+          <article><span>Promedio general</span><strong id="teacherAverage">0%</strong></article>
+          <article><span>Tiempo de práctica</span><strong id="teacherHours">0.0 h</strong></article>
+          <article><span>Misiones completadas</span><strong id="teacherCompleted">0/6</strong></article>
+          <article><span>Última práctica</span><strong id="teacherLast">Hoy</strong></article>
+        </div>
+
+        <article class="table-card">
+          <div class="table-head">
+            <div><h3>Registro de desempeño</h3><p>Resultados guardados localmente en este dispositivo.</p></div>
+            <input type="search" id="teacherSearch" placeholder="Buscar misión..." />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Misión</th><th>Estado</th><th>Listening</th><th>Speaking</th><th>Intentos</th><th>Tiempo</th><th>Calificación</th></tr></thead>
+              <tbody id="teacherTable"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="teacher-notes">
+          <div>
+            <h3>Observaciones del docente</h3>
+            <p>Registra comentarios de seguimiento para el operador.</p>
+          </div>
+          <textarea id="teacherNotes" placeholder="Ejemplo: mejorar pronunciación de 'clearance' y practicar respuestas completas..."></textarea>
+          <button class="secondary-btn" id="saveNotesBtn">Guardar observaciones</button>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="gradeModal" aria-hidden="true">
+    <div class="modal-card">
+      <button class="modal-close" id="closeGradeModal">×</button>
+      <p class="eyebrow">EVALUACIÓN DOCENTE</p>
+      <h2>Registrar calificación</h2>
+      <label>Misión
+        <select id="gradeMission"></select>
+      </label>
+      <label>Calificación
+        <input id="gradeValue" type="number" min="0" max="100" value="85">
+      </label>
+      <label>Comentario
+        <textarea id="gradeComment" placeholder="Retroalimentación breve"></textarea>
+      </label>
+      <button class="primary-btn full" id="saveGradeBtn">Guardar calificación</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
