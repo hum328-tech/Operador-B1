@@ -1731,7 +1731,7 @@ function renderGlossary(){
         <p>${g.note}</p>
         <div class="vocab-example">${g.example}</div>
         <div class="vocab-actions">
-          <button class="mini-btn glossary-listen" data-text="${encodeURIComponent(g.en)}">🔊</button>
+          <button class="mini-btn glossary-listen" data-text="${encodeURIComponent(g.en)}" data-type="${g.type}">🔊</button>
           <button class="mini-btn glossary-speak" data-text="${encodeURIComponent(g.en)}">🎙</button>
         </div>
       </article>`).join("")}</div>`;
@@ -1802,11 +1802,11 @@ function bindGlossary(){
   };
 
   document.querySelectorAll(".practice-mode").forEach(b=>b.onclick=()=>{glossaryMode=b.dataset.mode;glossaryIndex=0;renderGlossary()});
-  document.querySelectorAll(".glossary-listen").forEach(b=>b.onclick=()=>speak(decodeURIComponent(b.dataset.text)));
+  document.querySelectorAll(".glossary-listen").forEach(b=>b.onclick=()=>{const t=decodeURIComponent(b.dataset.text);if(b.dataset.type==="prompt")playPromptAudio(t,b);else speak(t)});
   document.querySelectorAll(".glossary-speak").forEach(b=>b.onclick=()=>startGlossaryRecognition(decodeURIComponent(b.dataset.text)));
   const prev=document.getElementById("glossaryPrev");if(prev)prev.onclick=()=>{glossaryIndex=(glossaryIndex-1+glossary.length)%glossary.length;renderGlossary()};
   const next=document.getElementById("glossaryNext");if(next)next.onclick=()=>{glossaryIndex=(glossaryIndex+1)%glossary.length;renderGlossary()};
-  const listen=document.getElementById("glossaryListen");if(listen)listen.onclick=()=>speak(glossary[glossaryIndex].en);
+  const listen=document.getElementById("glossaryListen");if(listen)listen.onclick=()=>{const g=glossary[glossaryIndex];if(g.type==="prompt")playPromptAudio(g.en,listen);else speak(g.en)};
   const mic=document.getElementById("glossaryMic");if(mic)mic.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en);
 
   document.querySelectorAll(".glossary-option").forEach(o=>o.onclick=()=>{
@@ -1896,7 +1896,7 @@ function bindLessonEvents(){
     if(nameInput||ageInput)saveState();
     lessonStep=Math.min(lessonStep+1,6);renderLesson()
   };
-  const p=document.getElementById("promptAudio");if(p)p.onclick=()=>speak(currentItem().prompt);
+  const p=document.getElementById("promptAudio");if(p)p.onclick=()=>playPromptAudio(currentItem().prompt,p);
   const show=document.getElementById("showTranscript");if(show)show.onclick=()=>document.getElementById("transcriptBox").classList.toggle("show");
   document.querySelectorAll(".option").forEach(o=>o.onclick=()=>{
     document.querySelectorAll(".option").forEach(x=>x.disabled=true);
@@ -1905,13 +1905,13 @@ function bindLessonEvents(){
     f.textContent=ok?"¡Muy bien! Comprendiste el mensaje.":"Buen intento. Escucha otra vez y revisa el apoyo.";
     state.listeningScores.push(ok?95:72);saveState();document.getElementById("nextLesson").style.display="inline-block";
   });
-  const ps=document.querySelector(".prompt-small");if(ps)ps.onclick=()=>speak(currentItem().prompt);
+  const ps=document.querySelector(".prompt-small");if(ps)ps.onclick=()=>playPromptAudio(currentItem().prompt,ps);
   const rs=document.querySelector(".response-small");if(rs)rs.onclick=()=>speak(displayResponse(currentItem()));
   document.querySelectorAll(".frag-audio").forEach(b=>b.onclick=()=>speak(decodeURIComponent(b.dataset.text)));
   document.querySelectorAll(".frag-mic").forEach(b=>b.onclick=()=>startRecognition(decodeURIComponent(b.dataset.text),false));
   const ra=document.getElementById("responseAudio");if(ra)ra.onclick=()=>speak(displayResponse(currentItem()));
   const rm=document.getElementById("responseMic");if(rm)rm.onclick=()=>startRecognition(displayResponse(currentItem()),false,currentItem());
-  const sp=document.getElementById("simPrompt");if(sp)sp.onclick=()=>speak(currentItem().prompt);
+  const sp=document.getElementById("simPrompt");if(sp)sp.onclick=()=>playPromptAudio(currentItem().prompt,sp);
   const ha=document.getElementById("hearAgain");if(ha)ha.onclick=()=>speak(displayResponse(currentItem()));
   const sm=document.getElementById("simMic");if(sm)sm.onclick=()=>startRecognition(displayResponse(currentItem()),true,currentItem());
   const fi=document.getElementById("finishItem");if(fi)fi.onclick=advanceItem;
@@ -1935,9 +1935,144 @@ function completeMission(){
   document.getElementById("lessonStage").innerHTML=`<article class="lesson-card"><div class="lesson-body center"><div style="font-size:70px">🏁</div><p class="eyebrow">MISIÓN COMPLETADA</p><h2>${m.title}</h2><p>Practicaste ${m.items.length} situaciones completas.</p><div class="result-grid"><div><strong>+150</strong><small>Millas</small></div><div><strong>${state.missionResults[m.id].speaking||0}%</strong><small>Speaking</small></div><div><strong>${state.missionResults[m.id].listening||0}%</strong><small>Listening</small></div></div>${next?`<button class="primary-btn" id="nextMissionBtn">Continuar con ${next.title}</button>`:`<button class="primary-btn" id="nextMissionBtn">Volver a la ruta</button>`}</div></article>`;
   document.getElementById("nextMissionBtn").onclick=()=>{lessonStep=0;next?setView("practice"):setView("route")};
 }
+let currentPromptAudio=null;
+
 function speak(text){
   if(!audioEnabled)return;
-  speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="en-US";u.rate=.8;speechSynthesis.speak(u);
+  if(currentPromptAudio){
+    currentPromptAudio.pause();
+    currentPromptAudio.currentTime=0;
+    currentPromptAudio=null;
+  }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="en-US";
+  u.rate=.8;
+  speechSynthesis.speak(u);
+}
+
+/*
+  Reproduce las PREGUNTAS desde la carpeta /audio de GitHub.
+  Los MP3 fueron guardados con el nombre de la pregunta.
+
+  Ejemplo:
+  prompt: "What is your name?"
+  archivo esperado: audio/What is your name.mp3
+
+  Se prueban varias variantes automáticamente por si el nombre:
+  - no tiene signo de interrogación;
+  - cambió guiones por espacios;
+  - omitió signos no permitidos por Windows.
+  Si no encuentra el MP3, usa la voz del navegador como respaldo.
+*/
+function promptAudioCandidates(text){
+  const raw=String(text||"").trim();
+
+  const windowsSafe=raw
+    .replace(/[<>:"/\\|?*]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const noPunctuation=raw
+    .replace(/[?!.,;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const hyphenAsSpace=windowsSafe
+    .replace(/[-–—]/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const apostropheRemoved=hyphenAsSpace
+    .replace(/[’']/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const baseNames=[
+    raw,
+    windowsSafe,
+    noPunctuation,
+    hyphenAsSpace,
+    apostropheRemoved
+  ].filter(Boolean);
+
+  // GitHub Pages distingue mayúsculas y minúsculas.
+  // Tus MP3 están guardados principalmente en minúsculas,
+  // así que probamos ambas variantes.
+  const names=[
+    ...baseNames,
+    ...baseNames.map(name=>name.toLowerCase())
+  ]
+    .filter((value,index,array)=>array.indexOf(value)===index)
+    .map(name=>`audio/${encodeURIComponent(name)}.mp3`);
+
+  return names;
+}
+
+function playPromptAudio(text,button=null){
+  if(!audioEnabled)return;
+
+  speechSynthesis.cancel();
+
+  if(currentPromptAudio){
+    currentPromptAudio.pause();
+    currentPromptAudio.currentTime=0;
+    currentPromptAudio=null;
+  }
+
+  const candidates=promptAudioCandidates(text);
+  let index=0;
+
+  const restoreButton=()=>{
+    if(button){
+      button.classList.remove("playing");
+      if(button.dataset.originalText!==undefined){
+        button.textContent=button.dataset.originalText;
+      }
+    }
+  };
+
+  const fallback=()=>{
+    restoreButton();
+    // Si todavía no existe ese MP3, la plataforma sigue funcionando.
+    speak(text);
+  };
+
+  const tryNext=()=>{
+    if(index>=candidates.length){
+      fallback();
+      return;
+    }
+
+    const src=candidates[index++];
+    const audio=new Audio(src);
+    currentPromptAudio=audio;
+
+    if(button){
+      if(button.dataset.originalText===undefined){
+        button.dataset.originalText=button.textContent;
+      }
+      button.classList.add("playing");
+      button.textContent="🔊";
+    }
+
+    audio.onended=()=>{
+      restoreButton();
+      if(currentPromptAudio===audio) currentPromptAudio=null;
+    };
+
+    audio.onerror=()=>{
+      if(currentPromptAudio===audio) currentPromptAudio=null;
+      tryNext();
+    };
+
+    audio.play().catch(()=>{
+      if(currentPromptAudio===audio) currentPromptAudio=null;
+      tryNext();
+    });
+  };
+
+  tryNext();
 }
 function similarity(a,b){
   const clean=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g,"").split(/\s+/).filter(Boolean);
