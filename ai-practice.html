@@ -88,19 +88,23 @@
 
   </main>
 
- <script>
+<script>
   const startBtn = document.getElementById("startBtn");
   const status = document.getElementById("status");
+
+  // Tu Worker de Cloudflare
+  const WORKER_URL =
+    "https://b1-ai-officer.hum328.workers.dev";
 
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
 
   let recognition;
+  let conversation = [];
+  let busy = false;
 
   if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-
-    // El operador practicará inglés estadounidense
     recognition.lang = "en-US";
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -109,21 +113,28 @@
       status.textContent = "🎙️ Listening...";
     };
 
-    recognition.onresult = (event) => {
+    recognition.onresult = async (event) => {
       const answer = event.results[0][0].transcript;
 
-      status.textContent = 'You said: "' + answer + '"';
+      status.textContent = 'You: "' + answer + '"';
 
-      console.log("Driver:", answer);
+      conversation.push({
+        role: "user",
+        text: answer
+      });
+
+      await askGemini();
     };
 
     recognition.onerror = (event) => {
-      console.error(event.error);
+      busy = false;
 
       if (event.error === "not-allowed") {
         status.textContent = "Microphone permission is required.";
+      } else if (event.error === "no-speech") {
+        status.textContent = "I didn't hear you. Tap START PRACTICE.";
       } else {
-        status.textContent = "I couldn't hear you. Try again.";
+        status.textContent = "Microphone error. Try again.";
       }
     };
   }
@@ -135,6 +146,8 @@
       return;
     }
 
+    busy = false;
+
     try {
       recognition.start();
     } catch (error) {
@@ -143,15 +156,12 @@
   }
 
   function speak(text) {
-    status.textContent = text;
+    status.textContent = "Officer: " + text;
 
     const speech = new SpeechSynthesisUtterance(text);
-
     speech.lang = "en-US";
     speech.rate = 0.9;
 
-    // Cuando el oficial termine de hablar,
-    // el micrófono se activa automáticamente.
     speech.onend = () => {
       setTimeout(listen, 300);
     };
@@ -160,10 +170,63 @@
     window.speechSynthesis.speak(speech);
   }
 
-  startBtn.addEventListener("click", () => {
+  async function askGemini() {
+    if (busy) return;
+
+    busy = true;
+    status.textContent = "Officer is thinking...";
+
+    try {
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: conversation
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error(data);
+        status.textContent = "AI connection error.";
+        busy = false;
+        return;
+      }
+
+      const reply = data.reply;
+
+      conversation.push({
+        role: "assistant",
+        text: reply
+      });
+
+      busy = false;
+      speak(reply);
+
+    } catch (error) {
+      console.error(error);
+      status.textContent = "Could not connect to the AI.";
+      busy = false;
+    }
+  }
+
+  startBtn.addEventListener("click", async () => {
+    if (busy) return;
+
     startBtn.textContent = "Practice in progress...";
 
-    speak("What is your name?");
+    // Comenzamos una conversación nueva.
+    conversation = [
+      {
+        role: "user",
+        text: "Start the inspection."
+      }
+    ];
+
+    await askGemini();
   });
 </script>
 </body>
