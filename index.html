@@ -947,7 +947,7 @@ function renderVocabReview(){
 
 function bindVocabReviewEvents(){
  const item=vocabItem();
- const hear=document.getElementById("vocabHear");if(hear)hear.onclick=()=>speak(item.en);
+ const hear=document.getElementById("vocabHear");if(hear)hear.onclick=()=>speak(item.en,hear);
  const mic=document.getElementById("vocabSpeak");if(mic)mic.onclick=()=>startRecognition(item.en,false);
  const prev=document.getElementById("vocabPrev");if(prev)prev.onclick=()=>cycleVocab(-1);
  const next=document.getElementById("vocabNext");if(next)next.onclick=()=>cycleVocab(1);
@@ -2110,7 +2110,7 @@ function renderReview(){
   const phrases=state.practiced.length?state.practiced.slice(-24):missions.flatMap(m=>m.items.map(x=>x.response)).slice(0,24);
   document.getElementById("reviewCount").textContent=phrases.length+" expresiones";
   document.getElementById("reviewGrid").innerHTML=phrases.map((p,i)=>`<article class="review-card"><p class="eyebrow">REPASO ${i+1}</p><h3>${p}</h3><p>Escucha y repite la respuesta.</p><button class="secondary-btn review-audio" data-text="${encodeURIComponent(p)}">🔊 Escuchar</button></article>`).join("");
-  document.querySelectorAll(".review-audio").forEach(b=>b.onclick=()=>speak(decodeURIComponent(b.dataset.text)));
+  document.querySelectorAll(".review-audio").forEach(b=>b.onclick=()=>speak(decodeURIComponent(b.dataset.text),b));
 }
 function renderBadges(){
   document.getElementById("badgeGrid").innerHTML=missions.slice(0,8).map(m=>`<article class="badge-item ${state.completed.includes(m.id)?"":"locked"}"><div class="badge-icon">${m.icon}</div><h3>${m.title}</h3><small>${state.completed.includes(m.id)?"Obtenida":"Bloqueada"}</small></article>`).join("");
@@ -2244,11 +2244,11 @@ function bindGlossary(){
   };
 
   document.querySelectorAll(".practice-mode").forEach(b=>b.onclick=()=>{glossaryMode=b.dataset.mode;glossaryIndex=0;renderGlossary()});
-  document.querySelectorAll(".glossary-listen").forEach(b=>b.onclick=()=>{const t=decodeURIComponent(b.dataset.text);if(b.dataset.type==="prompt")playPromptAudio(findPromptItem(t)||t,b);else speak(t)});
+  document.querySelectorAll(".glossary-listen").forEach(b=>b.onclick=()=>{const t=decodeURIComponent(b.dataset.text);if(b.dataset.type==="prompt")playPromptAudio(findPromptItem(t)||t,b);else speak(t,b)});
   document.querySelectorAll(".glossary-speak").forEach(b=>b.onclick=()=>startGlossaryRecognition(decodeURIComponent(b.dataset.text)));
   const prev=document.getElementById("glossaryPrev");if(prev)prev.onclick=()=>{glossaryIndex=(glossaryIndex-1+glossary.length)%glossary.length;renderGlossary()};
   const next=document.getElementById("glossaryNext");if(next)next.onclick=()=>{glossaryIndex=(glossaryIndex+1)%glossary.length;renderGlossary()};
-  const listen=document.getElementById("glossaryListen");if(listen)listen.onclick=()=>{const g=glossary[glossaryIndex];if(g.type==="prompt")playPromptAudio(findPromptItem(g.en)||g.en,listen);else speak(g.en)};
+  const listen=document.getElementById("glossaryListen");if(listen)listen.onclick=()=>{const g=glossary[glossaryIndex];if(g.type==="prompt")playPromptAudio(findPromptItem(g.en)||g.en,listen);else speak(g.en,listen)};
   const mic=document.getElementById("glossaryMic");if(mic)mic.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en);
 
   document.querySelectorAll(".glossary-option").forEach(o=>o.onclick=()=>{
@@ -2264,7 +2264,7 @@ function bindGlossary(){
 
   const tm=document.getElementById("translateMic");if(tm)tm.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en);
   const show=document.getElementById("showGlossaryAnswer");if(show)show.onclick=()=>document.getElementById("hiddenGlossaryAnswer").classList.toggle("show");
-  const al=document.getElementById("answerListen");if(al)al.onclick=()=>speak(glossary[glossaryIndex].en);
+  const al=document.getElementById("answerListen");if(al)al.onclick=()=>speak(glossary[glossaryIndex].en,al);
 }
 
 function glossaryResult(ok,message){
@@ -2378,15 +2378,162 @@ function completeMission(){
   document.getElementById("nextMissionBtn").onclick=()=>{lessonStep=0;next?setView("practice"):setView("route")};
 }
 let currentPromptAudio=null;
+let currentVocabAudio=null;
 
-function speak(text){
-  if(!audioEnabled)return;
+/*
+  AUDIOS DE VOCABULARIO
+  Todos están dentro de /audio y los nombres respetan exactamente
+  los archivos subidos al repositorio.
+*/
+const VOCAB_AUDIO = {
+  "accident":"audio/Accident.mp3",
+  "alcohol":"audio/Alcohol.mp3",
+  "allergic":"audio/Allergic.mp3",
+  "assistance":"audio/assistence.mp3",
+  "assistence":"audio/assistence.mp3",
+  "coming from":"audio/Coming from.mp3",
+  "company":"audio/Company.mp3",
+  "crossing":"audio/Crossing.mp3",
+  "date of birth":"audio/Date of birth.mp3",
+  "delivery":"audio/Delivery.mp3",
+  "diesel":"audio/Diesel.mp3",
+  "dock":"audio/dook.mp3",
+  "dook":"audio/dook.mp3",
+  "driver":"audio/Driver.mp3",
+  "driving":"audio/Driving.mp3",
+  "drop":"audio/drop.mp3",
+  "electronic log device":"audio/Electronic log device.mp3",
+  "fatigued":"audio/Fatigued.mp3",
+  "fix":"audio/Fix.mp3",
+  "flat tire":"audio/Flat tire.mp3",
+  "four way flashers":"audio/Four way flashers.mp3",
+  "four-way flashers":"audio/Four way flashers.mp3",
+  "from":"audio/From.mp3",
+  "glasses":"audio/Glasses.mp3",
+  "going to":"audio/Going to.mp3",
+  "hazardous material":"audio/hazardous material.mp3",
+  "headed":"audio/Headed.mp3",
+  "hook":"audio/Hook.mp3",
+  "hours of service":"audio/Hours of service.mp3",
+  "how long":"audio/How long.mp3",
+  "insurance":"audio/Insurance.mp3",
+  "license":"audio/license.mp3",
+  "located":"audio/Located.mp3",
+  "medical condition":"audio/Medical condition.mp3",
+  "medication":"audio/Medication.mp3",
+  "miles per hour":"audio/Miles per hour.mp3",
+  "name":"audio/Name.mp3",
+  "paperwork":"audio/Paperwork.mp3",
+  "permit book":"audio/Permit book.mp3",
+  "phone number":"audio/Phone Numbers.mp3",
+  "phone numbers":"audio/Phone Numbers.mp3",
+  "pick up":"audio/Pick up.mp3",
+  "pickup":"audio/Pick up.mp3",
+  "pre trip inspection":"audio/Pre trip inspection.mp3",
+  "pre-trip inspection":"audio/Pre trip inspection.mp3",
+  "railroad crossing":"audio/Railroad crossing.mp3",
+  "road service":"audio/Road service.mp3",
+  "roll":"audio/Roll.mp3",
+  "speed":"audio/Speed.mp3",
+  "step into":"audio/Step into.mp3",
+  "step out":"audio/Step out.mp3",
+  "tire":"audio/Tire.mp3",
+  "tired":"audio/Tired.mp3",
+  "traffic light":"audio/Traffic light.mp3",
+  "traffic sign":"audio/Traffic sign.mp3",
+  "trailer":"audio/Trailer.mp3",
+  "truck":"audio/Truck.mp3",
+  "turn off":"audio/Turn off.mp3",
+  "turn on":"audio/Turn on.mp3",
+  "work":"audio/Work.mp3",
+  "yard":"audio/Yard.mp3",
+  "years old":"audio/Years old.mp3"
+};
+
+function normalizeAudioKey(text){
+  return String(text||"")
+    .toLowerCase()
+    .replace(/[’']/g,"")
+    .replace(/[?.!,;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function stopAllAudio(){
   if(currentPromptAudio){
     currentPromptAudio.pause();
     currentPromptAudio.currentTime=0;
     currentPromptAudio=null;
   }
+  if(currentVocabAudio){
+    currentVocabAudio.pause();
+    currentVocabAudio.currentTime=0;
+    currentVocabAudio=null;
+  }
   speechSynthesis.cancel();
+}
+
+function playVocabAudio(text,button=null){
+  if(!audioEnabled)return false;
+
+  const key=normalizeAudioKey(text);
+  const src=VOCAB_AUDIO[key];
+  if(!src)return false;
+
+  stopAllAudio();
+
+  const audio=new Audio(encodeURI(src));
+  currentVocabAudio=audio;
+
+  if(button){
+    if(button.dataset.originalText===undefined){
+      button.dataset.originalText=button.textContent;
+    }
+    button.classList.add("playing");
+    button.textContent="🔊";
+  }
+
+  const restore=()=>{
+    if(button){
+      button.classList.remove("playing");
+      if(button.dataset.originalText!==undefined){
+        button.textContent=button.dataset.originalText;
+      }
+    }
+  };
+
+  audio.onended=()=>{
+    restore();
+    if(currentVocabAudio===audio)currentVocabAudio=null;
+  };
+
+  audio.onerror=()=>{
+    restore();
+    if(currentVocabAudio===audio)currentVocabAudio=null;
+    console.error("No se pudo cargar el audio de vocabulario:",src);
+  };
+
+  audio.play().catch(err=>{
+    restore();
+    if(currentVocabAudio===audio)currentVocabAudio=null;
+    console.error("No se pudo reproducir el audio de vocabulario:",src,err);
+  });
+
+  return true;
+}
+
+/*
+  speak() ahora intenta PRIMERO usar un MP3 grabado.
+  Solo usa la voz del navegador cuando el texto completo no tiene
+  un archivo de vocabulario dedicado (por ejemplo, respuestas completas).
+*/
+function speak(text,button=null){
+  if(!audioEnabled)return;
+
+  if(playVocabAudio(text,button))return;
+
+  stopAllAudio();
+
   const u=new SpeechSynthesisUtterance(text);
   u.lang="en-US";
   u.rate=.8;
