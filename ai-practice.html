@@ -92,29 +92,40 @@
   const startBtn = document.getElementById("startBtn");
   const status = document.getElementById("status");
 
-  // Tu Worker de Cloudflare
   const WORKER_URL =
     "https://b1-ai-officer.hum328.workers.dev";
 
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  let recognition;
+  let recognition = null;
   let conversation = [];
   let busy = false;
+  let listening = false;
+  let sessionActive = false;
+
+  // -------------------------
+  // RECONOCIMIENTO DE VOZ
+  // -------------------------
 
   if (SpeechRecognition) {
     recognition = new SpeechRecognition();
+
     recognition.lang = "en-US";
     recognition.continuous = false;
     recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
+      listening = true;
       status.textContent = "🎙️ Listening...";
     };
 
     recognition.onresult = async (event) => {
-      const answer = event.results[0][0].transcript;
+      listening = false;
+
+      const answer =
+        event.results[event.results.length - 1][0].transcript;
 
       status.textContent = 'You: "' + answer + '"';
 
@@ -127,61 +138,154 @@
     };
 
     recognition.onerror = (event) => {
-      busy = false;
+      listening = false;
+
+      console.log("Speech error:", event.error);
 
       if (event.error === "not-allowed") {
-        status.textContent = "Microphone permission is required.";
-      } else if (event.error === "no-speech") {
-        status.textContent = "I didn't hear you. Tap START PRACTICE.";
-      } else {
-        status.textContent = "Microphone error. Try again.";
+        status.textContent =
+          "Microphone permission is required.";
+        return;
       }
+
+      if (event.error === "no-speech") {
+        status.textContent =
+          "I didn't hear you. Tap the button to listen again.";
+
+        startBtn.textContent = "🎙️ LISTEN AGAIN";
+        busy = false;
+        return;
+      }
+
+      if (event.error === "aborted") {
+        return;
+      }
+
+      status.textContent =
+        "Microphone error. Tap the button to continue.";
+
+      startBtn.textContent = "🎙️ CONTINUE";
+      busy = false;
+    };
+
+    recognition.onend = () => {
+      listening = false;
     };
   }
 
+  // -------------------------
+  // DETENER MICRÓFONO
+  // -------------------------
+
+  function stopListening() {
+    if (!recognition) return;
+
+    try {
+      recognition.abort();
+    } catch (error) {
+      console.log(error);
+    }
+
+    listening = false;
+  }
+
+  // -------------------------
+  // ESCUCHAR
+  // -------------------------
+
   function listen() {
+    if (!sessionActive) return;
+
     if (!recognition) {
       status.textContent =
         "Speech recognition is not supported on this browser.";
       return;
     }
 
+    if (listening) return;
+
     busy = false;
 
     try {
       recognition.start();
     } catch (error) {
-      console.log(error);
+      console.log("Recognition start error:", error);
+
+      setTimeout(() => {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.log(e);
+        }
+      }, 500);
     }
   }
 
+  // -------------------------
+  // HABLAR
+  // -------------------------
+
   function speak(text) {
+    stopListening();
+
+    window.speechSynthesis.cancel();
+
     status.textContent = "Officer: " + text;
 
     const speech = new SpeechSynthesisUtterance(text);
+
     speech.lang = "en-US";
     speech.rate = 0.9;
+    speech.volume = 1;
 
-    speech.onend = () => {
-      setTimeout(listen, 300);
+    speech.onstart = () => {
+      status.textContent = "Officer: " + text;
     };
 
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(speech);
+    speech.onend = () => {
+      if (!sessionActive) return;
+
+      setTimeout(() => {
+        listen();
+      }, 600);
+    };
+
+    speech.onerror = (event) => {
+      console.log("Speech synthesis error:", event);
+
+      status.textContent =
+        "Officer: " + text;
+
+      startBtn.textContent = "🎙️ ANSWER";
+      busy = false;
+    };
+
+    setTimeout(() => {
+      window.speechSynthesis.speak(speech);
+    }, 100);
   }
+
+  // -------------------------
+  // GEMINI
+  // -------------------------
 
   async function askGemini() {
     if (busy) return;
 
     busy = true;
+
+    stopListening();
+
     status.textContent = "Officer is thinking...";
 
     try {
       const response = await fetch(WORKER_URL, {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
           messages: conversation
         })
@@ -190,13 +294,30 @@
       const data = await response.json();
 
       if (!response.ok) {
-        console.error(data);
-        status.textContent = "AI connection error.";
+        console.error("Worker error:", data);
+
+        status.textContent =
+          "AI connection error.";
+
+        startBtn.textContent = "🔄 START AGAIN";
         busy = false;
+
         return;
       }
 
-      const reply = data.reply;
+      if (!data.reply) {
+        console.error("No reply:", data);
+
+        status.textContent =
+          "The officer did not answer.";
+
+        startBtn.textContent = "🔄 START AGAIN";
+        busy = false;
+
+        return;
+      }
+
+      const reply = data.reply.trim();
 
       conversation.push({
         role: "assistant",
@@ -204,29 +325,71 @@
       });
 
       busy = false;
+
       speak(reply);
 
     } catch (error) {
-      console.error(error);
-      status.textContent = "Could not connect to the AI.";
+      console.error("Connection error:", error);
+
+      status.textContent =
+        "Could not connect to the AI.";
+
+      startBtn.textContent = "🔄 START AGAIN";
+
       busy = false;
     }
   }
 
-  startBtn.addEventListener("click", async () => {
-    if (busy) return;
+  // -------------------------
+  // NUEVA SESIÓN
+  // -------------------------
 
-    startBtn.textContent = "Practice in progress...";
+  async function startNewSession() {
+    sessionActive = false;
 
-    // Comenzamos una conversación nueva.
-    conversation = [
-      {
-        role: "user",
-        text: "Start the inspection."
-      }
-    ];
+    stopListening();
+    window.speechSynthesis.cancel();
+
+    busy = false;
+
+    conversation = [];
+
+    await new Promise(resolve =>
+      setTimeout(resolve, 300)
+    );
+
+    sessionActive = true;
+
+    startBtn.textContent = "🔄 RESTART PRACTICE";
+
+    conversation.push({
+      role: "user",
+      text: "Start a new inspection from the beginning."
+    });
 
     await askGemini();
+  }
+
+  // -------------------------
+  // BOTÓN
+  // -------------------------
+
+  startBtn.addEventListener("click", async () => {
+
+    // Si está esperando una respuesta,
+    // el botón sirve para reactivar el micrófono.
+    if (
+      sessionActive &&
+      !busy &&
+      !listening &&
+      startBtn.textContent.includes("LISTEN")
+    ) {
+      startBtn.textContent = "🔄 RESTART PRACTICE";
+      listen();
+      return;
+    }
+
+    await startNewSession();
   });
 </script>
 </body>
