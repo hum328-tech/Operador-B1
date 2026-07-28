@@ -380,9 +380,73 @@ button{cursor:pointer}
   .glossary-unlock-banner{align-items:flex-start;flex-direction:column}
 }
 
+
+.onboarding-overlay{position:fixed;inset:0;z-index:500;display:grid;place-items:center;padding:20px;background:rgba(7,17,31,.88);backdrop-filter:blur(8px)}
+.onboarding-overlay.hidden{display:none}
+.onboarding-card{width:min(620px,96vw);background:#fff;border-radius:28px;padding:32px;box-shadow:0 30px 80px rgba(0,0,0,.28)}
+.onboarding-card h1{margin:4px 0 10px;font-size:32px}.onboarding-card>p{color:var(--muted);line-height:1.55}
+.onboarding-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.onboarding-card label{display:grid;gap:7px;font-weight:800;font-size:13px;color:#30475f}
+.onboarding-card input{width:100%;border:1px solid #d7e0ea;border-radius:12px;padding:14px;background:#f8fafc}
+.onboarding-note{margin:18px 0;padding:14px;border-radius:14px;background:#fff8e6;color:#715617;font-size:13px}
+.onboarding-error{min-height:20px;margin:10px 0;color:#b42318;font-size:13px;font-weight:700}
+@media(max-width:650px){.onboarding-card{padding:24px 18px}.onboarding-grid{grid-template-columns:1fr}}
+
+/* Repaso de vocabulario por misión */
+.mission-vocab-btn{margin-top:12px;width:100%}
+.vocab-review-shell{max-width:920px;margin:auto}
+.vocab-review-card{background:#fff;border:1px solid #dfe7ef;border-radius:26px;box-shadow:var(--shadow);overflow:hidden}
+.vocab-review-head{padding:26px 28px;background:linear-gradient(135deg,#0b1c2f,#173d5d);color:#fff}
+.vocab-review-head h2{margin:6px 0 8px;font-size:32px}
+.vocab-review-head p{margin:0;color:#c7d5e4}
+.vocab-tabs{display:flex;gap:9px;flex-wrap:wrap;padding:18px 22px;border-bottom:1px solid #e4eaf1;background:#f8fafc}
+.vocab-tab{border:1px solid #d8e1ea;background:#fff;border-radius:999px;padding:10px 14px;font-weight:800;color:#40566e}
+.vocab-tab.active{background:#0b1c2f;color:#fff;border-color:#0b1c2f}
+.vocab-stage{padding:26px}
+.flashcard-wrap{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:stretch}
+.flashcard-main{min-height:300px;border:1px solid #dde6ee;border-radius:22px;padding:30px;display:grid;align-content:center;text-align:center;background:linear-gradient(180deg,#fff,#f8fafc)}
+.flashcard-main .word{font-size:42px;font-weight:900;margin-bottom:12px}
+.flashcard-main .meaning{font-size:24px;color:#53677c;margin-bottom:18px}
+.flashcard-main .example{font-size:18px;line-height:1.55;color:#41556c;background:#f1f5f8;padding:16px;border-radius:14px}
+.flashcard-actions{display:grid;gap:12px;align-content:center}
+.flashcard-actions button{width:64px;height:64px;border-radius:18px;border:0;font-size:26px}
+.vocab-progress-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px}
+.vocab-count{font-weight:800;color:#425970}
+.vocab-nav{display:flex;justify-content:space-between;gap:12px;margin-top:20px}
+.vocab-question{max-width:700px;margin:auto;text-align:center}
+.vocab-question h3{font-size:30px;margin:10px 0 20px}
+.vocab-option-grid{display:grid;gap:12px;margin:20px auto;max-width:600px}
+.vocab-option{padding:16px;border:2px solid #dfe6ee;border-radius:15px;background:#fff;text-align:left;font-weight:800}
+.vocab-option.correct{border-color:var(--success);background:#eafaf4}
+.vocab-option.wrong{border-color:#f2c46c;background:#fff8e8}
+.vocab-write-input{width:100%;max-width:520px;margin:18px auto;padding:16px;border:2px solid #d8e1ea;border-radius:14px;font-size:20px;text-align:center;display:block}
+.vocab-listen-box{font-size:72px;margin:20px 0}
+.vocab-small{color:var(--muted);line-height:1.5}
+@media(max-width:700px){
+ .flashcard-wrap{grid-template-columns:1fr}
+ .flashcard-actions{grid-template-columns:repeat(2,1fr)}
+ .flashcard-actions button{width:100%}
+ .flashcard-main .word{font-size:34px}
+}
+
 </style>
 </head>
 <body>
+<div class="onboarding-overlay" id="onboardingOverlay">
+<form class="onboarding-card" id="onboardingForm">
+<p class="eyebrow">ANTES DE COMENZAR</p><h1>Configura tu práctica</h1>
+<p>Usaremos tus propios datos para practicar con información familiar y real.</p>
+<div class="onboarding-grid">
+<label>Tu nombre<input id="profileName" autocomplete="name" placeholder="Ej. Carlos Ramírez" required></label>
+<label>Tu edad<input id="profileAge" type="number" inputmode="numeric" min="18" max="90" placeholder="Ej. 38" required></label>
+<label>Compañía<input id="profileCompany" autocomplete="organization" placeholder="Ej. PAM Transport" required></label>
+<label>Ciudad de origen<input id="profileCity" autocomplete="address-level2" placeholder="Ej. Nuevo Laredo" required></label>
+</div>
+<div class="onboarding-note">🎧 Tus respuestas de nombre, edad, origen y compañía se adaptarán automáticamente.</div>
+<div class="onboarding-error" id="onboardingError"></div>
+<button class="primary-btn full" type="submit">Comenzar entrenamiento</button>
+</form></div>
+
   <div id="app">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
@@ -558,6 +622,29 @@ button{cursor:pointer}
         <article class="glossary-workspace" id="glossaryWorkspace"></article>
       </section>
 
+
+      <section class="view" id="view-vocab-review">
+        <div class="vocab-review-shell">
+          <button class="back-btn" id="exitVocabReview">← Volver a la misión</button>
+          <article class="vocab-review-card">
+            <div class="vocab-review-head">
+              <p class="eyebrow light" id="vocabMissionLabel">REPASO DE VOCABULARIO</p>
+              <h2 id="vocabMissionTitle">Vocabulario de la misión</h2>
+              <p>Escucha, pronuncia, comprende y escribe las palabras que usarás en situaciones reales.</p>
+            </div>
+            <div class="vocab-tabs">
+              <button class="vocab-tab active" data-vocab-mode="cards">Flashcards</button>
+              <button class="vocab-tab" data-vocab-mode="listen">Escuchar y repetir</button>
+              <button class="vocab-tab" data-vocab-mode="multiple">Opción múltiple</button>
+              <button class="vocab-tab" data-vocab-mode="write">Escribir</button>
+              <button class="vocab-tab" data-vocab-mode="speak">Español → inglés</button>
+              <button class="vocab-tab" data-vocab-mode="recognize">Reconocer al escuchar</button>
+            </div>
+            <div class="vocab-stage" id="vocabReviewStage"></div>
+          </article>
+        </div>
+      </section>
+
       <section class="view" id="view-driver">
         <div class="driver-layout">
           <article class="driver-card-large">
@@ -649,6 +736,267 @@ button{cursor:pointer}
   <div class="toast" id="toast"></div>
 
   <script>
+
+const missionVocabulary = {
+  1:[
+    {en:"name",es:"nombre",example:"What is your name?"},
+    {en:"years old",es:"años de edad",example:"I am 38 years old."},
+    {en:"from",es:"de / proveniente de",example:"I am from Nuevo Laredo."},
+    {en:"date of birth",es:"fecha de nacimiento",example:"What is your date of birth?"},
+    {en:"work",es:"trabajar",example:"Where do you work?"},
+    {en:"driver",es:"operador / conductor",example:"I am a B1 driver."},
+    {en:"company",es:"compañía",example:"My company is in Laredo."},
+    {en:"how long",es:"cuánto tiempo",example:"How long have you worked there?"},
+    {en:"phone number",es:"número telefónico",example:"Do you know your company's phone number?"}
+  ],
+  2:[
+    {en:"coming from",es:"viniendo de",example:"Where are you coming from?"},
+    {en:"going to",es:"yendo a",example:"Where are you going?"},
+    {en:"headed",es:"dirigiéndose",example:"Where are you headed?"},
+    {en:"pick up",es:"recoger / enganchar",example:"Where did you pick up your trailer?"},
+    {en:"trailer",es:"remolque / caja",example:"I picked up the trailer."},
+    {en:"yard",es:"patio",example:"PAM yard"},
+    {en:"located",es:"ubicado",example:"Where is your company located?"},
+    {en:"drop",es:"desenganchar / dejar",example:"I am going to drop the trailer."}
+  ],
+  3:[
+    {en:"license",es:"licencia",example:"Do you have a license?"},
+    {en:"permit book",es:"carpeta de permisos",example:"Can I see your permit book?"},
+    {en:"insurance",es:"seguro",example:"Do you have insurance?"},
+    {en:"hours of service",es:"horas de servicio",example:"Show me your hours of service."},
+    {en:"driving",es:"manejando",example:"How many hours have you been driving today?"},
+    {en:"electronic log device",es:"libro electrónico",example:"Turn on your electronic log device."}
+  ],
+  4:[
+    {en:"turn off",es:"apagar",example:"Turn off your truck."},
+    {en:"turn on",es:"encender",example:"Turn on your truck."},
+    {en:"step out",es:"bajar / salir",example:"Step out of the truck."},
+    {en:"step into",es:"subir / entrar",example:"Step into the truck."},
+    {en:"four-way flashers",es:"intermitentes",example:"Turn off your four-way flashers."},
+    {en:"truck",es:"unidad / camión",example:"Turn on your truck."}
+  ],
+  5:[
+    {en:"pre-trip inspection",es:"inspección previa",example:"Did you do your pre-trip inspection today?"},
+    {en:"traffic light",es:"semáforo",example:"Did you check the traffic light?"},
+    {en:"traffic sign",es:"señalamiento",example:"Did you check the traffic sign?"},
+    {en:"railroad crossing",es:"cruce de ferrocarril",example:"Did you check the railroad crossing sign?"},
+    {en:"roll",es:"continuar manejando",example:"Do you feel okay to roll?"},
+    {en:"crossing",es:"cruce",example:"Before crossing."}
+  ],
+  6:[
+    {en:"medical condition",es:"condición médica",example:"Do you have any medical conditions?"},
+    {en:"glasses",es:"lentes",example:"Do you need glasses?"},
+    {en:"allergic",es:"alérgico",example:"Are you allergic to any medication?"},
+    {en:"medication",es:"medicamento",example:"Any medication?"},
+    {en:"alcohol",es:"alcohol",example:"Have you had any alcohol today?"},
+    {en:"fatigued",es:"fatigado",example:"Do you feel fatigued?"},
+    {en:"tired",es:"cansado",example:"Do you feel tired?"}
+  ],
+  7:[
+    {en:"accident",es:"accidente",example:"Have you ever been in an accident?"},
+    {en:"speed",es:"velocidad",example:"How fast were you going?"},
+    {en:"miles per hour",es:"millas por hora",example:"Sixty-four miles per hour."},
+    {en:"diesel",es:"diésel",example:"When was the last time you got diesel?"}
+  ],
+  8:[
+    {en:"hazardous material",es:"material peligroso",example:"Are you carrying hazardous material?"},
+    {en:"paperwork",es:"documentación",example:"Here is the paperwork."},
+    {en:"pickup",es:"recolección",example:"Pickup number"},
+    {en:"delivery",es:"entrega",example:"Delivery number"},
+    {en:"drop",es:"desenganchar",example:"Drop the trailer."},
+    {en:"hook",es:"enganchar",example:"Hook the trailer."},
+    {en:"dock",es:"puerta / andén",example:"Dock seventeen."}
+  ],
+  9:[
+    {en:"flat tire",es:"llanta ponchada",example:"Do you have a flat tire?"},
+    {en:"road service",es:"servicio de carretera",example:"Contact road service."},
+    {en:"fix",es:"reparar",example:"Fix your tire."},
+    {en:"tire",es:"llanta",example:"Your tire."},
+    {en:"assistance",es:"asistencia",example:"I need assistance."}
+  ],
+  10:[
+    {en:"right",es:"derecha",example:"Turn right."},
+    {en:"left",es:"izquierda",example:"Turn left."},
+    {en:"lane",es:"carril",example:"Stay in this lane."},
+    {en:"merge",es:"incorporarse",example:"Right lane must merge."},
+    {en:"ahead",es:"adelante",example:"One block ahead."},
+    {en:"route",es:"ruta",example:"No truck route."}
+  ],
+  11:[
+    {en:"stop",es:"alto",example:"Stop."},
+    {en:"yield",es:"ceda el paso",example:"Yield."},
+    {en:"do not enter",es:"no entrar",example:"Do not enter."},
+    {en:"wrong way",es:"sentido contrario",example:"Wrong way."},
+    {en:"one way",es:"un solo sentido",example:"One way."},
+    {en:"speed limit",es:"límite de velocidad",example:"Speed limit fifty."}
+  ],
+  12:[
+    {en:"weight limit",es:"límite de peso",example:"Weight limit ten tons."},
+    {en:"right lane ends",es:"termina el carril derecho",example:"Right lane ends ahead."},
+    {en:"left lane",es:"carril izquierdo",example:"Left lane must turn left."},
+    {en:"no trucks",es:"no camiones",example:"No trucks allowed."},
+    {en:"rollover",es:"volcadura",example:"Truck rollover warning."},
+    {en:"curve",es:"curva",example:"Right curve ahead."}
+  ],
+  13:[
+    {en:"railroad crossing",es:"cruce de ferrocarril",example:"Railroad crossing."},
+    {en:"traffic signal",es:"semáforo",example:"Traffic signal lights ahead."},
+    {en:"pedestrians",es:"peatones",example:"Pedestrians crossing ahead."},
+    {en:"road work",es:"obras en el camino",example:"Road work ahead."},
+    {en:"road workers",es:"trabajadores en carretera",example:"Road workers are near the roadway."},
+    {en:"detour",es:"desvío",example:"Detour to the right."}
+  ],
+  14:[
+    {en:"low clearance",es:"baja altura",example:"Low clearance ahead."},
+    {en:"bridge",es:"puente",example:"Low bridge ahead."},
+    {en:"shoulder",es:"acotamiento",example:"Shoulder closed ahead."},
+    {en:"road closed",es:"camino cerrado",example:"Road closed."},
+    {en:"inspection station",es:"estación de inspección",example:"Enter inspection station."}
+  ],
+  15:[
+    {en:"flood",es:"inundación",example:"Flooded street."},
+    {en:"snow",es:"nieve",example:"Streets are covered with snow."},
+    {en:"rain",es:"lluvia",example:"Wet because of the rain."},
+    {en:"storm",es:"tormenta",example:"The storm is very strong."},
+    {en:"ice",es:"hielo",example:"Watch for ice on the bridge."},
+    {en:"weather",es:"clima",example:"Did you check the weather?"}
+  ],
+  16:[
+    {en:"three points of contact",es:"tres puntos de contacto",example:"Use three points of contact."},
+    {en:"seat",es:"asiento",example:"Adjust your seat."},
+    {en:"mirrors",es:"espejos",example:"Adjust your mirrors."},
+    {en:"control",es:"control",example:"Maintain control of the truck."},
+    {en:"complete stop",es:"alto completo",example:"Make a complete stop."},
+    {en:"turn signals",es:"direccionales",example:"Use your turn signals."},
+    {en:"change lanes",es:"cambiar de carril",example:"Change lanes safely."}
+  ],
+  17:[
+    {en:"get out and look",es:"baja y observa",example:"Get out and look."},
+    {en:"backing area",es:"área de reversa",example:"Inspect the backing area."},
+    {en:"reposition",es:"reacomodarse",example:"You may reposition."},
+    {en:"boundary",es:"límite",example:"Do not cross the boundary."},
+    {en:"cone",es:"cono",example:"Do not touch a cone."},
+    {en:"parking area",es:"área de estacionamiento",example:"Position the trailer safely."}
+  ]
+};
+
+let vocabReviewMissionId=1;
+let vocabReviewMode="cards";
+let vocabReviewIndex=0;
+
+function getMissionVocab(id){return missionVocabulary[id]||[]}
+function openVocabReview(id){
+  const missionId=Number(id)||1;
+  vocabReviewMissionId=missionId;
+  glossaryMissionId=missionId;
+  vocabReviewMode="cards";
+  vocabReviewIndex=0;
+  glossaryIndex=0;
+  setView("vocab-review");
+  renderVocabReview();
+}
+function vocabItem(){const v=getMissionVocab(vocabReviewMissionId);return v[vocabReviewIndex]||v[0]}
+function cycleVocab(dir){
+  const v=getMissionVocab(vocabReviewMissionId);if(!v.length)return;
+  vocabReviewIndex=(vocabReviewIndex+dir+v.length)%v.length;renderVocabReview();
+}
+function shuffled(arr){return [...arr].sort(()=>Math.random()-.5)}
+function renderVocabReview(){
+  const mission=missions.find(m=>m.id===vocabReviewMissionId)||missions[0];
+  const vocab=getMissionVocab(vocabReviewMissionId);
+  document.getElementById("vocabMissionLabel").textContent=`MISIÓN ${mission.id} · REPASO DE VOCABULARIO`;
+  document.getElementById("vocabMissionTitle").textContent=mission.title;
+  document.querySelectorAll(".vocab-tab").forEach(b=>b.classList.toggle("active",b.dataset.vocabMode===vocabReviewMode));
+  const stage=document.getElementById("vocabReviewStage");
+  if(!vocab.length){stage.innerHTML="<p>No hay vocabulario cargado para esta misión.</p>";return}
+  const item=vocabItem();
+
+  if(vocabReviewMode==="cards"){
+    stage.innerHTML=`<div class="vocab-progress-row"><span class="vocab-count">${vocabReviewIndex+1}/${vocab.length}</span><span class="vocab-small">Repasa a tu ritmo.</span></div>
+    <div class="flashcard-wrap"><div class="flashcard-main"><div class="word">${item.en}</div><div class="meaning">${item.es}</div><div class="example">${item.example}</div></div>
+    <div class="flashcard-actions"><button class="audio-btn" id="vocabHear">🔊</button><button class="mic-btn" id="vocabSpeak">🎙</button></div></div>
+    <div class="feedback" id="feedback"></div><div class="vocab-nav"><button class="secondary-btn" id="vocabPrev">← Anterior</button><button class="primary-btn" id="vocabNext">Siguiente →</button></div>`;
+  }
+
+  if(vocabReviewMode==="listen"){
+    stage.innerHTML=`<div class="vocab-question"><p class="eyebrow">ESCUCHAR Y REPETIR</p><h3>${item.en}</h3><p class="translation">${item.es}</p><div class="large-actions"><button class="audio-btn" id="vocabHear">▶</button><button class="mic-btn" id="vocabSpeak">🎙</button></div><div class="feedback" id="feedback"></div><div class="vocab-nav"><button class="secondary-btn" id="vocabPrev">←</button><button class="primary-btn" id="vocabNext">→</button></div></div>`;
+  }
+
+  if(vocabReviewMode==="multiple"){
+    const wrong=shuffled(vocab.filter(x=>x.es!==item.es)).slice(0,3).map(x=>x.es);
+    const options=shuffled([item.es,...wrong]);
+    stage.innerHTML=`<div class="vocab-question"><p class="eyebrow">OPCIÓN MÚLTIPLE</p><h3>¿Qué significa “${item.en}”?</h3><div class="vocab-option-grid">${options.map(o=>`<button class="vocab-option" data-ok="${o===item.es}">${o}</button>`).join("")}</div><div class="feedback" id="feedback"></div><div class="vocab-nav"><button class="secondary-btn" id="vocabPrev">←</button><button class="primary-btn" id="vocabNext">→</button></div></div>`;
+  }
+
+  if(vocabReviewMode==="write"){
+    stage.innerHTML=`<div class="vocab-question"><p class="eyebrow">ESCRIBIR</p><h3>Escribe en inglés:</h3><div class="spanish-prompt">${item.es}</div><input id="vocabWrite" class="vocab-write-input" autocomplete="off" placeholder="Escribe la palabra o expresión"><button class="primary-btn" id="checkVocabWrite">Revisar</button><div class="feedback" id="feedback"></div><div class="vocab-nav"><button class="secondary-btn" id="vocabPrev">←</button><button class="primary-btn" id="vocabNext">→</button></div></div>`;
+  }
+
+  if(vocabReviewMode==="speak"){
+    stage.innerHTML=`<div class="vocab-question"><p class="eyebrow">ESPAÑOL → INGLÉS</p><h3>Di esto en inglés:</h3><div class="spanish-prompt">${item.es}</div><button class="mic-btn" id="vocabSpeak">🎙</button><div class="feedback" id="feedback"></div><button class="text-btn" id="vocabReveal">Ver respuesta</button><div class="hidden-answer" id="vocabAnswer"><strong>${item.en}</strong><button class="mini-btn" id="vocabHear">🔊</button></div><div class="vocab-nav"><button class="secondary-btn" id="vocabPrev">←</button><button class="primary-btn" id="vocabNext">→</button></div></div>`;
+  }
+
+  if(vocabReviewMode==="recognize"){
+    const wrong=shuffled(vocab.filter(x=>x.es!==item.es)).slice(0,3).map(x=>x.es);
+    const options=shuffled([item.es,...wrong]);
+    stage.innerHTML=`<div class="vocab-question"><p class="eyebrow">RECONOCER AL ESCUCHAR</p><h3>Escucha y elige el significado</h3><div class="vocab-listen-box">🎧</div><button class="audio-btn" id="vocabHear">▶</button><div class="vocab-option-grid">${options.map(o=>`<button class="vocab-option" data-ok="${o===item.es}">${o}</button>`).join("")}</div><div class="feedback" id="feedback"></div><div class="vocab-nav"><button class="secondary-btn" id="vocabPrev">←</button><button class="primary-btn" id="vocabNext">→</button></div></div>`;
+  }
+
+  bindVocabReviewEvents();
+}
+
+function bindVocabReviewEvents(){
+ const item=vocabItem();
+ const hear=document.getElementById("vocabHear");if(hear)hear.onclick=()=>speak(item.en);
+ const mic=document.getElementById("vocabSpeak");if(mic)mic.onclick=()=>startRecognition(item.en,false);
+ const prev=document.getElementById("vocabPrev");if(prev)prev.onclick=()=>cycleVocab(-1);
+ const next=document.getElementById("vocabNext");if(next)next.onclick=()=>cycleVocab(1);
+ const reveal=document.getElementById("vocabReveal");if(reveal)reveal.onclick=()=>document.getElementById("vocabAnswer").classList.toggle("show");
+ const check=document.getElementById("checkVocabWrite");if(check)check.onclick=()=>{
+   const val=document.getElementById("vocabWrite").value.trim().toLowerCase();
+   const expected=item.en.trim().toLowerCase();
+   const f=document.getElementById("feedback");
+   const ok=val===expected;
+   f.className="feedback show "+(ok?"good":"retry");
+   f.textContent=ok?"¡Muy bien!":"Buen intento. La respuesta correcta es: "+item.en;
+ };
+ document.querySelectorAll(".vocab-option").forEach(b=>b.onclick=()=>{
+   document.querySelectorAll(".vocab-option").forEach(x=>x.disabled=true);
+   const ok=b.dataset.ok==="true";b.classList.add(ok?"correct":"wrong");
+   const f=document.getElementById("feedback");f.className="feedback show "+(ok?"good":"retry");
+   f.textContent=ok?"¡Correcto!":"Buen intento. Escucha o revisa de nuevo.";
+ });
+}
+
+const PROFILE_KEY="eor_driver_profile_v1";
+function loadDriverProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"null")}catch(e){return null}}
+function saveDriverProfile(p){localStorage.setItem(PROFILE_KEY,JSON.stringify(p))}
+function driverInitials(n){return String(n||"OP").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"OP"}
+function applyDriverProfile(p){
+ if(!p)return;
+ document.querySelectorAll(".avatar").forEach(el=>el.textContent=driverInitials(p.name));
+ const mini=document.getElementById("miniName");if(mini)mini.textContent=p.name;
+ const cn=document.querySelector(".driver-head h2");if(cn)cn.textContent=p.name;
+ const cs=document.querySelector(".driver-head span");if(cs)cs.textContent=`B1 DRIVER · ${p.city.toUpperCase()}`;
+ const m=missions.find(x=>x.id===1);if(!m)return;
+ const q=t=>m.items.find(i=>i.prompt===t);
+ let i=q("What is your name?");if(i){i.response=`My name is ${p.name}.`;i.responseMeaning=`Mi nombre es ${p.name}.`}
+ i=q("How old are you?");if(i){i.response=`I am ${p.age} years old.`;i.responseMeaning=`Tengo ${p.age} años.`}
+ i=q("Where are you from?");if(i){i.response=`I am from ${p.city}.`;i.responseMeaning=`Soy de ${p.city}.`}
+ i=q("Where do you work?");if(i){i.response=`I am a B1 driver at ${p.company}.`;i.responseMeaning=`Trabajo como operador B1 en ${p.company}.`}
+}
+function setupOnboarding(){
+ const o=document.getElementById("onboardingOverlay"),f=document.getElementById("onboardingForm"),s=loadDriverProfile();
+ if(s&&s.name&&s.age&&s.company&&s.city){o.classList.add("hidden");applyDriverProfile(s)}
+ f.addEventListener("submit",e=>{
+  e.preventDefault();
+  const p={name:profileName.value.trim(),age:Number(profileAge.value),company:profileCompany.value.trim(),city:profileCity.value.trim()};
+  if(!p.name||!p.company||!p.city||!Number.isFinite(p.age)||p.age<18){onboardingError.textContent="Completa los cuatro datos para comenzar.";return}
+  saveDriverProfile(p);applyDriverProfile(p);o.classList.add("hidden");
+  if(typeof renderAll==="function")renderAll();
+ });
+}
+
 const missions = [
   {
     "id": 1,
@@ -1685,31 +2033,78 @@ function renderAll(){
   renderHomeMissions();renderRoadmap();renderReview();renderBadges();renderTeacher();
 }
 function startMission(id){
-  state.currentMission=id;state.currentItem=0;lessonStep=0;saveState();setView("practice");
+  state.currentMission=id;
+  state.currentItem=0;
+  lessonStep=0;
+
+  // Mantén tanto el glosario como el nuevo repaso ligados a ESTA misión.
+  glossaryMissionId=id;
+  vocabReviewMissionId=id;
+  glossaryIndex=0;
+  vocabReviewIndex=0;
+
+  saveState();
+  setView("practice");
 }
 function renderHomeMissions(){
   const idx=Math.max(0,missions.findIndex(m=>m.id===state.currentMission));
   const shown=missions.slice(idx,idx+3).length?missions.slice(idx,idx+3):missions.slice(-3);
+
   document.getElementById("homeMissionRow").innerHTML=shown.map(m=>`
     <article class="mission-card">
-      <div class="mission-cover"><strong>${m.title}</strong><span>${m.icon}</span></div>
-      <div class="mission-body"><h3>${state.completed.includes(m.id)?"Completada":"Misión "+m.id}</h3>
-      <p>${m.desc}</p><div class="mission-meta"><span>${m.items.length} situaciones</span>
-      <button class="text-btn mission-open" data-id="${m.id}">${state.completed.includes(m.id)?"Repetir":"Abrir"} →</button></div></div>
-    </article>`).join("");
-  document.querySelectorAll(".mission-open").forEach(b=>b.onclick=()=>startMission(Number(b.dataset.id)));
+      <div class="mission-cover">
+        <strong>${m.title}</strong>
+        <span>${m.icon}</span>
+      </div>
+      <div class="mission-body">
+        <h3>${state.completed.includes(m.id)?"Completada":"Misión "+m.id}</h3>
+        <p>${m.desc}</p>
+        <div class="mission-meta">
+          <span>${m.items.length} situaciones</span>
+          <button class="text-btn mission-open" data-id="${m.id}">
+            ${state.completed.includes(m.id)?"Repetir":"Abrir"} →
+          </button>
+        </div>
+        <button class="secondary-btn mission-vocab-btn" data-vocab-mission="${m.id}">
+          📚 Repasar vocabulario · Misión ${m.id}
+        </button>
+      </div>
+    </article>
+  `).join("");
+
+  document.querySelectorAll(".mission-open").forEach(
+    b=>b.onclick=()=>startMission(Number(b.dataset.id))
+  );
 }
 function renderRoadmap(){
   const next=missions.find(m=>!state.completed.includes(m.id))||missions[0];
   document.getElementById("nextStopTitle").textContent=next.title;
   document.getElementById("nextStopText").textContent=next.desc;
+
   document.getElementById("roadmap").innerHTML=missions.map(m=>{
-    const done=state.completed.includes(m.id),current=m.id===state.currentMission;
+    const done=state.completed.includes(m.id);
+    const current=m.id===state.currentMission;
+
     return `<div class="route-stop ${done?"completed":current?"current":""}">
-      <div class="stop-node">${done?"✓":m.icon}</div><div class="stop-content"><h3>Misión ${m.id} · ${m.title}</h3>
-      <p>${m.desc} · ${m.items.length} situaciones</p><button class="secondary-btn route-open" data-id="${m.id}">${done?"Repetir misión":"Comenzar misión"}</button></div></div>`;
+      <div class="stop-node">${done?"✓":m.icon}</div>
+      <div class="stop-content">
+        <h3>Misión ${m.id} · ${m.title}</h3>
+        <p>${m.desc} · ${m.items.length} situaciones</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button class="secondary-btn route-open" data-id="${m.id}">
+            ${done?"Repetir misión":"Comenzar misión"}
+          </button>
+          <button class="secondary-btn mission-vocab-btn" data-vocab-mission="${m.id}">
+            📚 Vocabulario misión ${m.id}
+          </button>
+        </div>
+      </div>
+    </div>`;
   }).join("");
-  document.querySelectorAll(".route-open").forEach(b=>b.onclick=()=>startMission(Number(b.dataset.id)));
+
+  document.querySelectorAll(".route-open").forEach(
+    b=>b.onclick=()=>startMission(Number(b.dataset.id))
+  );
 }
 function renderReview(){
   const phrases=state.practiced.length?state.practiced.slice(-24):missions.flatMap(m=>m.items.map(x=>x.response)).slice(0,24);
@@ -1729,7 +2124,14 @@ function unlockedMissionIds(){
 
 function currentGlossaryMission(){
   const unlocked=unlockedMissionIds();
-  if(!unlocked.includes(glossaryMissionId)) glossaryMissionId=unlocked[unlocked.length-1]||1;
+
+  // Si no hay una selección válida, usar la misión actual.
+  if(!unlocked.includes(glossaryMissionId)){
+    glossaryMissionId=unlocked.includes(state.currentMission)
+      ? state.currentMission
+      : (unlocked[unlocked.length-1]||1);
+  }
+
   return missions.find(m=>m.id===glossaryMissionId)||missions[0];
 }
 
@@ -1912,7 +2314,7 @@ function renderLesson(){
   const stage=document.getElementById("lessonStage");
   if(lessonStep===0)stage.innerHTML=`<article class="lesson-card"><div class="lesson-scene"><div><p class="eyebrow light">MISIÓN ${m.id} · ${m.items.length} SITUACIONES</p><h2>${m.title}</h2><p>${m.situation}</p></div><div class="scene-art">${m.icon}🚛</div></div><div class="lesson-body"><div class="learning-guide"><strong>La plataforma te enseñará todo antes de pedirte una respuesta.</strong><span>Escucha → comprende → aprende la respuesta → practica → simula.</span><span>Puedes repetir cada audio y usar el apoyo escrito cuando lo necesites.</span></div>
       ${m.id===1?`<div class="personal-data-card"><p class="eyebrow">PERSONALIZA TUS RESPUESTAS</p><h3>Usa tus datos reales</h3><p>La plataforma solo calificará el bloque de inglés. Tu nombre y tu edad no se marcarán como error.</p><label>Tu nombre real<input id="profileNameInput" value="${state.profileName||""}" placeholder="Ejemplo: Luis Vega"></label><label>Tu edad<input id="profileAgeInput" type="number" min="18" max="90" value="${state.profileAge||""}" placeholder="Ejemplo: 34"></label></div>`:""}
-      <button class="primary-btn full" id="nextLesson">Comenzar situación ${state.currentItem+1}</button></div></article>`;
+      <button class="secondary-btn full" data-vocab-mission="${m.id}" style="margin-bottom:10px">📚 Repasar vocabulario de esta misión</button><button class="primary-btn full" id="nextLesson">Comenzar situación ${state.currentItem+1}</button></div></article>`;
   if(lessonStep===1)stage.innerHTML=`<article class="lesson-card"><div class="lesson-body center"><p class="eyebrow">1 · ESCUCHA</p><h2>Escucha lo que dice la otra persona</h2><button class="audio-btn" id="promptAudio">▶</button><button class="transcript-toggle" id="showTranscript">Ver apoyo escrito</button><div class="transcript-box" id="transcriptBox"><strong>${item.prompt}</strong><span>${item.meaning}</span></div><div><button class="primary-btn" id="nextLesson" style="margin-top:28px">Ya escuché</button></div></div></article>`;
   if(lessonStep===2){
     const opts=distractors(item);
@@ -2113,7 +2515,13 @@ function exportCSV(){
   const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
   const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="english-on-the-road-reporte.csv";a.click();URL.revokeObjectURL(a.href);
 }
-document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>{
+  if(b.dataset.view==="glossary"){
+    glossaryMissionId=state.currentMission||1;
+    glossaryIndex=0;
+  }
+  setView(b.dataset.view);
+});
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setView(b.dataset.go));
 document.getElementById("continueBtn").onclick=()=>setView("practice");
 document.getElementById("startNextBtn").onclick=()=>startMission((missions.find(m=>!state.completed.includes(m.id))||missions[0]).id);
@@ -2129,6 +2537,24 @@ document.getElementById("gradeBtn").onclick=()=>document.getElementById("gradeMo
 document.getElementById("closeGradeModal").onclick=()=>document.getElementById("gradeModal").classList.remove("show");
 document.getElementById("saveGradeBtn").onclick=()=>{const id=Number(document.getElementById("gradeMission").value),value=Math.max(0,Math.min(100,Number(document.getElementById("gradeValue").value)||0));state.grades[id]={value,comment:document.getElementById("gradeComment").value,date:new Date().toISOString()};saveState();document.getElementById("gradeModal").classList.remove("show");showToast("Calificación registrada")};
 renderAll();
+
+
+document.addEventListener("DOMContentLoaded",setupOnboarding);
+
+
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll(".vocab-tab").forEach(b=>b.addEventListener("click",()=>{
+    vocabReviewMode=b.dataset.vocabMode;vocabReviewIndex=0;renderVocabReview();
+  }));
+  const exit=document.getElementById("exitVocabReview");if(exit)exit.onclick=()=>setView("route");
+});
+
+
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-vocab-mission]");
+  if(b){e.preventDefault();openVocabReview(Number(b.dataset.vocabMission))}
+});
 
 </script>
 </body>
