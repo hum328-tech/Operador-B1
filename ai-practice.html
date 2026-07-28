@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B1 AI Officer</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .practice {
+      width: min(92%, 430px);
+      text-align: center;
+    }
+
+    .officer {
+      font-size: 80px;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 35px;
+    }
+
+    #status {
+      min-height: 70px;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #startBtn {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #111;
+      color: white;
+    }
+
+    #startBtn:active {
+      transform: scale(.98);
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="practice">
+
+    <div class="officer">👮</div>
+
+    <h1>B1 AI Officer</h1>
+
+    <p class="subtitle">
+      Practice your English with a D.O.T. officer
+    </p>
+
+    <div id="status">
+      Ready to start
+    </div>
+
+    <button id="startBtn">
+      🎙️ START PRACTICE
+    </button>
+
+  </main>
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const status = document.getElementById("status");
+
+    startBtn.addEventListener("click", () => {
+      status.textContent = "Starting practice...";
+
+      setTimeout(() => {
+        status.textContent = "What is your name?";
+
+        const speech = new SpeechSynthesisUtterance(
+          "What is your name?"
+        );
+
+        speech.lang = "en-US";
+        speech.rate = 0.9;
+
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(speech);
+      }, 500);
+    });
+  </script>
+
+</body>
+</html>
