@@ -88,28 +88,83 @@
 
   </main>
 
-  <script>
-    const startBtn = document.getElementById("startBtn");
-    const status = document.getElementById("status");
+ <script>
+  const startBtn = document.getElementById("startBtn");
+  const status = document.getElementById("status");
 
-    startBtn.addEventListener("click", () => {
-      status.textContent = "Starting practice...";
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
 
-      setTimeout(() => {
-        status.textContent = "What is your name?";
+  let recognition;
 
-        const speech = new SpeechSynthesisUtterance(
-          "What is your name?"
-        );
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
 
-        speech.lang = "en-US";
-        speech.rate = 0.9;
+    // El operador practicará inglés estadounidense
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(speech);
-      }, 500);
-    });
-  </script>
+    recognition.onstart = () => {
+      status.textContent = "🎙️ Listening...";
+    };
 
+    recognition.onresult = (event) => {
+      const answer = event.results[0][0].transcript;
+
+      status.textContent = 'You said: "' + answer + '"';
+
+      console.log("Driver:", answer);
+    };
+
+    recognition.onerror = (event) => {
+      console.error(event.error);
+
+      if (event.error === "not-allowed") {
+        status.textContent = "Microphone permission is required.";
+      } else {
+        status.textContent = "I couldn't hear you. Try again.";
+      }
+    };
+  }
+
+  function listen() {
+    if (!recognition) {
+      status.textContent =
+        "Speech recognition is not supported on this browser.";
+      return;
+    }
+
+    try {
+      recognition.start();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function speak(text) {
+    status.textContent = text;
+
+    const speech = new SpeechSynthesisUtterance(text);
+
+    speech.lang = "en-US";
+    speech.rate = 0.9;
+
+    // Cuando el oficial termine de hablar,
+    // el micrófono se activa automáticamente.
+    speech.onend = () => {
+      setTimeout(listen, 300);
+    };
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(speech);
+  }
+
+  startBtn.addEventListener("click", () => {
+    startBtn.textContent = "Practice in progress...";
+
+    speak("What is your name?");
+  });
+</script>
 </body>
 </html>
