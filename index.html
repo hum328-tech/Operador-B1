@@ -920,6 +920,161 @@ TRAFFIC_SIGNS.forEach(sign=>{
   sign.actionAnswer=answers[1];
 });
 
+
+const RECORDED_AUDIO = {
+  "adjust your seat and mirrors":["audio/Adjust you seat and mirrors.mp3"],
+  "are you carrying hazardous material":["audio/Are you carrying hazardous material.mp3"],
+  "change lanes safely":["audio/Change lanes safely.mp3"],
+  "commercial vehicles except buses prohibited in left lane":["audio/Commercial vehicles except buses prohibited in left lane.mp3"],
+  "commercial vehicles prohibited in the left lane":["audio/Commercial vehicles except buses prohibited in left lane.mp3"],
+  "detour to the left":["audio/Detour to the left.mp3"],
+  "detour to the right":["audio/Detour to the right.mp3","audio/Detour to the right_1.mp3"],
+  "did you check the weather":["audio/Did you check the weather.mp3"],
+  "divided highway":["audio/Divided highway ahead.mp3"],
+  "divided highway ahead":["audio/Divided highway ahead.mp3"],
+  "do not cross the exercise boundary":["audio/Do not cross the exercise boundary.mp3"],
+  "do not enter":["audio/Do not enter.mp3"],
+  "do not touch a cone":["audio/Do not touch a cone.mp3"],
+  "enter the truck using three points of contact":["audio/Enter the truck using three points of contact.mp3"],
+  "flagger station":["audio/Flagged station.mp3"],
+  "flagged station":["audio/Flagged station.mp3"],
+  "flagger ahead":["audio/Flagger ahead.mp3"],
+  "flood":["audio/Flood.mp3"],
+  "floor is flooded":["audio/Floor is flooded.mp3"],
+  "four-way intersection":["audio/Four way intersection.mp3"],
+  "four way intersection":["audio/Four way intersection.mp3"],
+  "get out and look":["audio/Get out and look.mp3"],
+  "here is your pickup number":["audio/Here is you pick up number.mp3"],
+  "here is you pick up number":["audio/Here is you pick up number.mp3"],
+  "my name is":["audio/My name is.mp3"],
+  "my truck needs road service":["audio/My truck needs road service.mp3"],
+  "no exit entrance only":["audio/No exit entrance only.mp3"],
+  "no outlet dead end":["audio/No outlet dead end.mp3"],
+  "no parking":["audio/No parking.mp3"],
+  "no passing zone":["audio/No passing zone.mp3"],
+  "no right turn":["audio/No right turn.mp3"],
+  "no truck parking":["audio/No truck parking.mp3", "audio/No truck parking_1.mp3"],
+  "no truck parking_1":["audio/No truck parking_1.mp3"],
+  "no trucks allowed":["audio/No trucks allowed.mp3"],
+  "no trucks beyond this point":["audio/No trucks beyond this point.mp3"],
+  "no trucks left lane except left turns":["audio/No trucks left lane except left turns.mp3"],
+  "one way":["audio/One way.mp3"],
+  "pedestrian crossing ahead":["audio/Pedestrian crossing ahead.mp3", "audio/Pedestrians crossing ahead.mp3"],
+  "pedestrians crossing ahead":["audio/Pedestrians crossing ahead.mp3", "audio/Pedestrian crossing ahead.mp3"],
+  "please drop the trailer at dock 17":["audio/Please drop the trailer at dock 17.mp3"],
+  "please hook the trailer from dock 17":["audio/Please hook the trailer from dock 17.mp3"],
+  "please show me yours hours of service":["audio/Please show me yours hours of service.mp3"],
+  "position the trailer safely in the parking area":["audio/Position the trailer safely in the parking area.mp3"],
+  "railroad crossing":["audio/Railroad crossing.mp3"],
+  "reduce speed limits school zone ahead":["audio/Reduce speed limits school zone ahead.mp3"],
+  "right curve ahead truck rollover warning":["audio/Right curve ahead truck rollover warning.mp3"],
+  "right lane ends ahead":["audio/Right lane ends ahead.mp3"],
+  "right lane ends":["audio/Right lane ends.mp3"],
+  "road closed":["audio/Road closed.mp3"],
+  "road work ahead":["audio/Road work ahead.mp3"],
+  "road workers are in or near the roadway":["audio/Road workers are in or near the roadway.mp3"],
+  "road workers are near to the road way":["audio/Road workers are near to the road way.mp3"],
+  "shoulder closed ahead":["audio/Shoulder closed ahead.mp3"],
+  "speed limit 50 minimum 30":["audio/Speed limit 50 minimum 30.mp3"],
+  "stop":["audio/Stop.mp3"],
+  "the company is located in laredo texas":["audio/The company is located in Laredo Texas.mp3"],
+  "the storm is very strong":["audio/The storm is very strong.mp3"],
+  "the streets are covered with snow":["audio/The streets are covered with snow.mp3"],
+  "the streets are wet because of the rain":["audio/The streets are wet because of the rain.mp3"],
+  "traffic signal light ahead":["audio/Traffic signal light ahead.mp3"],
+  "truck parking":["audio/Truck parking.mp3"],
+  "trucks 40":["audio/Trucks 40.mp3"],
+  "trucks enter inspection station when lights flashings":["audio/Trucks enter inspection station when lights flashings.mp3"],
+  "trucks enter inspection station":["audio/Trucks enter inspection station.mp3"],
+  "turn on your electric log device":["audio/Turn on your electric log device.mp3"],
+  "turn on your four ways flashers":["audio/Turn on your four ways flashers.mp3"],
+  "two way traffic ahead":["audio/Two way traffic ahead.mp3"],
+  "use three points of contact every time you exit":["audio/Use three points of contact every time you exit.mp3"],
+  "watch for ice on the bridge":["audio/Watch for ice on the bridge.mp3"],
+  "weight limit 10 tons":["audio/Weight limit 10 tons.mp3"],
+  "wrong way":["audio/Wrong way.mp3"],
+  "yes i have my licenses here":["audio/Yes I have my licenses here.mp3"],
+  "yes sir here you go":["audio/Yes sir here you go.mp3"],
+  "yes the insurance is in my permit book":["audio/Yes the insurance is in my permit book.mp3"],
+  "yes the phone number is":["audio/Yes the phone number is.mp3"],
+  "yield":["audio/Yield.mp3"],
+  "you may pull forward and reposition":["audio/You may pull forward and reposition.mp3"],
+  "no exit – entrance only":["audio/No exit entrance only.mp3"],
+  "no exit - entrance only":["audio/No exit entrance only.mp3"],
+  "no outlet – dead end":["audio/No outlet dead end.mp3"],
+  "no outlet - dead end":["audio/No outlet dead end.mp3"],
+  "reduced speed limit – school zone ahead":["audio/Reduce speed limits school zone ahead.mp3"],
+  "reduced speed limit - school zone ahead":["audio/Reduce speed limits school zone ahead.mp3"],
+  "right curve ahead – truck rollover warning":["audio/Right curve ahead truck rollover warning.mp3"],
+  "right curve ahead - truck rollover warning":["audio/Right curve ahead truck rollover warning.mp3"],
+  "road workers":["audio/Road workers are in or near the roadway.mp3", "audio/Road workers are near to the road way.mp3"],
+  "speed limit 50 – minimum 30":["audio/Speed limit 50 minimum 30.mp3"],
+  "speed limit 50 - minimum 30":["audio/Speed limit 50 minimum 30.mp3"],
+  "traffic signal ahead":["audio/Traffic signal light ahead.mp3"],
+  "truck speed limit 40":["audio/Trucks 40.mp3"],
+  "trucks enter inspection station when lights flashing":["audio/Trucks enter inspection station when lights flashings.mp3", "audio/Trucks enter inspection station.mp3"],
+  "two-way traffic":["audio/Two way traffic ahead.mp3"],
+  "two way traffic":["audio/Two way traffic ahead.mp3"],
+};
+
+function recordedAudioCandidates(text){
+  const key=String(text||"")
+    .toLowerCase()
+    .replace(/[’']/g,"")
+    .replace(/[?.!,;:]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+  return RECORDED_AUDIO[key]||[];
+}
+
+function playRecordedAudio(text,button=null,onFail=null){
+  if(!audioEnabled)return false;
+  const candidates=recordedAudioCandidates(text);
+  if(!candidates.length)return false;
+
+  stopAllAudio();
+  let index=0;
+
+  const restore=()=>{
+    if(button){
+      button.classList.remove("playing");
+      if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
+    }
+  };
+
+  if(button){
+    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
+    button.classList.add("playing");
+    button.textContent="🔊";
+  }
+
+  const tryNext=()=>{
+    if(index>=candidates.length){
+      restore();
+      if(onFail)onFail();
+      return;
+    }
+    const src=candidates[index++];
+    const audio=new Audio(encodeURI(src));
+    currentVocabAudio=audio;
+    audio.onended=()=>{
+      restore();
+      if(currentVocabAudio===audio)currentVocabAudio=null;
+    };
+    audio.onerror=()=>{
+      if(currentVocabAudio===audio)currentVocabAudio=null;
+      tryNext();
+    };
+    audio.play().catch(()=>{
+      if(currentVocabAudio===audio)currentVocabAudio=null;
+      tryNext();
+    });
+  };
+
+  tryNext();
+  return true;
+}
+
 let signMode="learn";
 let signGameIndex=0;
 let signGameOrder=[];
@@ -940,12 +1095,18 @@ function signDistractors(correct,count=3){
 }
 function speakSign(text,button=null){
   if(!audioEnabled)return;
-  stopAllAudio();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang="en-US";u.rate=.78;
-  if(button)button.classList.add("playing");
-  u.onend=()=>{if(button)button.classList.remove("playing")};
-  speechSynthesis.speak(u);
+
+  const fallback=()=>{
+    stopAllAudio();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="en-US";u.rate=.78;
+    if(button)button.classList.add("playing");
+    u.onend=()=>{if(button)button.classList.remove("playing")};
+    speechSynthesis.speak(u);
+  };
+
+  if(playRecordedAudio(text,button,fallback))return;
+  fallback();
 }
 function signFeedback(ok,msg){
   const f=document.getElementById("signFeedback");
@@ -1674,7 +1835,7 @@ const missions = [
     "items": [
       {
         "prompt": "Are you carrying hazardous material?",
-        "audio": "audio/are you carrying hazardous material.mp3",
+        "audio": "audio/Are you carrying hazardous material.mp3",
         "meaning": "¿Transporta material peligroso?",
         "response": "No, I am not carrying hazardous material.",
         "responseMeaning": "No, no transporto material peligroso."
@@ -1687,6 +1848,7 @@ const missions = [
       },
       {
         "prompt": "Here is your pickup number.",
+        "audio": "audio/Here is you pick up number.mp3",
         "meaning": "Aquí está su número de recolección.",
         "response": "Thank you. I have the pickup number.",
         "responseMeaning": "Gracias. Tengo el número de recolección."
@@ -1734,6 +1896,7 @@ const missions = [
       },
       {
         "prompt": "My truck needs road service.",
+        "audio": "audio/My truck needs road service.mp3",
         "meaning": "Mi unidad necesita servicio de carretera.",
         "response": "I am in a safe location and I need assistance.",
         "responseMeaning": "Estoy en un lugar seguro y necesito ayuda."
@@ -1794,36 +1957,42 @@ const missions = [
     "items": [
       {
         "prompt": "Stop.",
+        "audio": "audio/Stop.mp3",
         "meaning": "Alto.",
         "response": "I will make a complete stop.",
         "responseMeaning": "Haré un alto completo."
       },
       {
         "prompt": "Yield.",
+        "audio": "audio/Yield.mp3",
         "meaning": "Ceda el paso.",
         "response": "I will yield.",
         "responseMeaning": "Cederé el paso."
       },
       {
         "prompt": "Do not enter.",
+        "audio": "audio/Do not enter.mp3",
         "meaning": "No entre.",
         "response": "I will not enter.",
         "responseMeaning": "No entraré."
       },
       {
         "prompt": "Wrong way.",
+        "audio": "audio/Wrong way.mp3",
         "meaning": "Sentido contrario.",
         "response": "I will turn around safely.",
         "responseMeaning": "Daré vuelta de manera segura."
       },
       {
         "prompt": "One way.",
+        "audio": "audio/One way.mp3",
         "meaning": "Un solo sentido.",
         "response": "I will follow the one-way street.",
         "responseMeaning": "Seguiré la calle de un solo sentido."
       },
       {
         "prompt": "No passing zone.",
+        "audio": "audio/No passing zone.mp3",
         "meaning": "Zona de no rebasar.",
         "response": "I will not pass.",
         "responseMeaning": "No rebasaré."
@@ -1869,6 +2038,7 @@ const missions = [
       },
       {
         "prompt": "Right lane ends ahead.",
+        "audio": "audio/Right lane ends ahead.mp3",
         "meaning": "El carril derecho termina adelante.",
         "response": "I will merge safely.",
         "responseMeaning": "Me incorporaré de manera segura."
@@ -1881,12 +2051,14 @@ const missions = [
       },
       {
         "prompt": "No trucks allowed.",
+        "audio": "audio/No trucks allowed.mp3",
         "meaning": "No se permiten camiones.",
         "response": "I will use another route.",
         "responseMeaning": "Usaré otra ruta."
       },
       {
         "prompt": "No trucks beyond this point.",
+        "audio": "audio/No trucks beyond this point.mp3",
         "meaning": "No se permiten camiones después de este punto.",
         "response": "I will not continue on this road.",
         "responseMeaning": "No continuaré por este camino."
@@ -1908,6 +2080,7 @@ const missions = [
     "items": [
       {
         "prompt": "Railroad crossing.",
+        "audio": "audio/Railroad crossing.mp3",
         "meaning": "Cruce de ferrocarril.",
         "response": "I will stop and check both directions.",
         "responseMeaning": "Me detendré y revisaré ambas direcciones."
@@ -1920,12 +2093,14 @@ const missions = [
       },
       {
         "prompt": "Pedestrians crossing ahead.",
+        "audio": "audio/Pedestrians crossing ahead.mp3",
         "meaning": "Cruce peatonal adelante.",
         "response": "I will slow down and yield.",
         "responseMeaning": "Reduciré la velocidad y cederé el paso."
       },
       {
         "prompt": "Road work ahead.",
+        "audio": "audio/Road work ahead.mp3",
         "meaning": "Obras en el camino adelante.",
         "response": "I will slow down in the work zone.",
         "responseMeaning": "Reduciré la velocidad en la zona de obras."
@@ -1938,12 +2113,14 @@ const missions = [
       },
       {
         "prompt": "Detour to the right.",
+        "audio": "audio/Detour to the right.mp3",
         "meaning": "Desvío a la derecha.",
         "response": "I will follow the detour.",
         "responseMeaning": "Seguiré el desvío."
       },
       {
         "prompt": "Four-way intersection.",
+        "audio": "audio/Four way intersection.mp3",
         "meaning": "Intersección de cuatro sentidos.",
         "response": "I will proceed carefully.",
         "responseMeaning": "Avanzaré con cuidado."
@@ -1965,36 +2142,42 @@ const missions = [
     "items": [
       {
         "prompt": "Road closed.",
+        "audio": "audio/Road closed.mp3",
         "meaning": "Camino cerrado.",
         "response": "I will use another road.",
         "responseMeaning": "Usaré otro camino."
       },
       {
         "prompt": "No outlet. Dead end.",
+        "audio": "audio/No outlet dead end.mp3",
         "meaning": "Callejón sin salida.",
         "response": "I will turn around safely.",
         "responseMeaning": "Daré vuelta de manera segura."
       },
       {
         "prompt": "No exit. Entrance only.",
+        "audio": "audio/No exit entrance only.mp3",
         "meaning": "Sin salida. Solo entrada.",
         "response": "I will look for the exit.",
         "responseMeaning": "Buscaré la salida."
       },
       {
         "prompt": "No truck parking.",
+        "audio": "audio/No truck parking.mp3",
         "meaning": "Prohibido estacionar camiones.",
         "response": "I will find truck parking.",
         "responseMeaning": "Buscaré estacionamiento para camiones."
       },
       {
         "prompt": "Shoulder closed ahead.",
+        "audio": "audio/Shoulder closed ahead.mp3",
         "meaning": "Acotamiento cerrado adelante.",
         "response": "I will stay in the travel lane.",
         "responseMeaning": "Me mantendré en el carril de circulación."
       },
       {
         "prompt": "Commercial vehicles prohibited in the left lane.",
+        "audio": "audio/Commercial vehicles except buses prohibited in left lane.mp3",
         "meaning": "Vehículos comerciales prohibidos en el carril izquierdo.",
         "response": "I will stay out of the left lane.",
         "responseMeaning": "No usaré el carril izquierdo."
@@ -2022,31 +2205,35 @@ const missions = [
       },
       {
         "prompt": "The streets are covered with snow.",
+        "audio": "audio/The streets are covered with snow.mp3",
         "meaning": "Las calles están cubiertas de nieve.",
         "response": "I will reduce my speed.",
         "responseMeaning": "Reduciré mi velocidad."
       },
       {
         "prompt": "The streets are wet because of the rain.",
+        "audio": "audio/The streets are wet because of the rain.mp3",
         "meaning": "Las calles están mojadas por la lluvia.",
         "response": "I will increase my following distance.",
         "responseMeaning": "Aumentaré mi distancia de seguimiento."
       },
       {
         "prompt": "The storm is very strong.",
+        "audio": "audio/The storm is very strong.mp3",
         "meaning": "La tormenta es muy fuerte.",
         "response": "I will find a safe place to stop.",
         "responseMeaning": "Buscaré un lugar seguro para detenerme."
       },
       {
         "prompt": "Watch for ice on the bridge.",
+        "audio": "audio/Watch for ice on the bridge.mp3",
         "meaning": "Cuidado con el hielo en el puente.",
         "response": "I will slow down before the bridge.",
         "responseMeaning": "Reduciré la velocidad antes del puente."
       },
       {
         "prompt": "Did you check the weather?",
-        "audio": "audio/did you check the weather.mp3",
+        "audio": "audio/Did you check the weather.mp3",
         "meaning": "¿Revisó el clima?",
         "response": "Yes, I checked the weather.",
         "responseMeaning": "Sí, revisé el clima."
@@ -2062,12 +2249,14 @@ const missions = [
     "items": [
       {
         "prompt": "Enter the truck using three points of contact.",
+        "audio": "audio/Enter the truck using three points of contact.mp3",
         "meaning": "Suba a la unidad usando tres puntos de contacto.",
         "response": "I will use three points of contact.",
         "responseMeaning": "Usaré tres puntos de contacto."
       },
       {
         "prompt": "Adjust your seat and mirrors.",
+        "audio": "audio/Adjust you seat and mirrors.mp3",
         "meaning": "Ajuste su asiento y espejos.",
         "response": "I will adjust my seat and mirrors.",
         "responseMeaning": "Ajustaré mi asiento y espejos."
@@ -2092,6 +2281,7 @@ const missions = [
       },
       {
         "prompt": "Change lanes safely.",
+        "audio": "audio/Change lanes safely.mp3",
         "meaning": "Cambie de carril de manera segura.",
         "response": "I will signal and check my mirrors.",
         "responseMeaning": "Pondré la direccional y revisaré mis espejos."
@@ -2107,6 +2297,7 @@ const missions = [
     "items": [
       {
         "prompt": "Get out and look.",
+        "audio": "audio/Get out and look.mp3",
         "meaning": "Baje de la unidad y observe.",
         "response": "I will get out and look.",
         "responseMeaning": "Bajaré y observaré."
@@ -2119,30 +2310,35 @@ const missions = [
       },
       {
         "prompt": "Use three points of contact every time you exit.",
+        "audio": "audio/Use three points of contact every time you exit.mp3",
         "meaning": "Use tres puntos de contacto cada vez que baje.",
         "response": "I will use three points of contact.",
         "responseMeaning": "Usaré tres puntos de contacto."
       },
       {
         "prompt": "You may pull forward and reposition.",
+        "audio": "audio/You may pull forward and reposition.mp3",
         "meaning": "Puede avanzar y reacomodarse.",
         "response": "I will reposition if necessary.",
         "responseMeaning": "Me reacomodaré si es necesario."
       },
       {
         "prompt": "Do not cross the exercise boundary.",
+        "audio": "audio/Do not cross the exercise boundary.mp3",
         "meaning": "No cruce el límite del ejercicio.",
         "response": "I will stay inside the boundary.",
         "responseMeaning": "Me mantendré dentro del límite."
       },
       {
         "prompt": "Do not touch a cone.",
+        "audio": "audio/Do not touch a cone.mp3",
         "meaning": "No toque ningún cono.",
         "response": "I will stop and check my position.",
         "responseMeaning": "Me detendré y revisaré mi posición."
       },
       {
         "prompt": "Position the trailer safely in the parking area.",
+        "audio": "audio/Position the trailer safely in the parking area.mp3",
         "meaning": "Coloque la caja de manera segura en el área de estacionamiento.",
         "response": "I will position the trailer safely.",
         "responseMeaning": "Colocaré la caja de manera segura."
@@ -2859,6 +3055,7 @@ function playVocabAudio(text,button=null){
 function speak(text,button=null){
   if(!audioEnabled)return;
 
+  if(playRecordedAudio(text,button))return;
   if(playVocabAudio(text,button))return;
 
   stopAllAudio();
