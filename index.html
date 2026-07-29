@@ -429,6 +429,73 @@ button{cursor:pointer}
  .flashcard-main .word{font-size:34px}
 }
 
+
+/* Señalamientos de tránsito */
+.signs-header{display:flex;justify-content:space-between;gap:18px;align-items:end;margin:26px 0 18px}
+.signs-header h2{margin:0;font-size:32px}
+.signs-header p{margin:6px 0 0;color:var(--muted);max-width:760px;line-height:1.55}
+.signs-count{white-space:nowrap}
+.signs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.sign-card{background:#fff;border:1px solid #dfe7ef;border-radius:20px;padding:18px;box-shadow:0 10px 30px rgba(7,17,31,.06);display:grid;gap:14px}
+.sign-image-box{min-height:170px;border-radius:16px;background:#f7f9fb;border:1px solid #e7edf3;display:grid;place-items:center;padding:14px}
+.sign-image{width:100%;max-width:190px;max-height:150px;object-fit:contain;display:block}
+.sign-card h3{margin:0;font-size:19px;line-height:1.25}
+.sign-es{color:#174a70;font-weight:800}
+.sign-use{margin:0;color:var(--muted);line-height:1.5;font-size:13px}
+.sign-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sign-actions .secondary-btn{padding:10px 12px}
+.sign-detail{display:none;margin-top:2px;padding:14px;border-radius:14px;background:#f3f7fb;border:1px solid #dce6ef;color:#40566e;line-height:1.5;font-size:13px}
+.sign-detail.show{display:block}
+@media(max-width:1000px){.signs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.signs-header{align-items:flex-start;flex-direction:column}.signs-grid{grid-template-columns:1fr}.sign-image-box{min-height:150px}}
+
+
+/* Módulo interactivo de señalamientos */
+.signs-modebar{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 18px}
+.sign-mode{border:1px solid #d7e0ea;background:#fff;color:#40566e;border-radius:999px;padding:11px 15px;font-weight:800}
+.sign-mode.active{background:#0b1c2f;color:#fff;border-color:#0b1c2f}
+.signs-stage{min-height:520px}
+.sign-learning-note{padding:14px 16px;border-radius:14px;background:#fff8e6;border:1px solid #f2d991;color:#715617;margin-bottom:18px;line-height:1.5}
+.sign-card.interactive{cursor:pointer;transition:.18s transform,.18s box-shadow,.18s border-color}
+.sign-card.interactive:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(7,17,31,.12);border-color:#bfcddd}
+.sign-card.playing{outline:3px solid rgba(247,183,49,.35);border-color:var(--accent)}
+.sign-card .sign-hear{width:44px;height:44px;border:0;border-radius:12px;background:#0b1c2f;color:#fff;font-size:19px}
+.sign-english-answer{background:#eef8f4;border:1px solid #c9e9dc;border-radius:14px;padding:13px 14px;color:#176b50;font-weight:800;line-height:1.45}
+.sign-game-shell{max-width:900px;margin:auto;background:#fff;border:1px solid #dfe7ef;border-radius:24px;padding:28px;box-shadow:0 10px 30px rgba(7,17,31,.06)}
+.sign-game-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.sign-game-question{text-align:center;margin:14px auto 22px;max-width:720px}
+.sign-game-question h3{font-size:30px;margin:8px 0 10px}
+.sign-game-question p{color:var(--muted);line-height:1.5}
+.sign-choice-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:720px;margin:auto}
+.sign-image-choice{border:2px solid #dfe7ef;background:#fff;border-radius:18px;padding:16px;min-height:185px;display:grid;place-items:center;transition:.15s}
+.sign-image-choice:hover{border-color:#9ab0c8}
+.sign-image-choice img{max-width:190px;max-height:150px;object-fit:contain}
+.sign-image-choice.correct,.sign-name-choice.correct{border-color:var(--success);background:#eafaf4}
+.sign-image-choice.wrong,.sign-name-choice.wrong{border-color:#f2c46c;background:#fff8e8}
+.sign-name-options{display:grid;gap:12px;max-width:650px;margin:20px auto}
+.sign-name-choice{padding:16px 18px;border:2px solid #dfe7ef;border-radius:15px;background:#fff;text-align:left;font-weight:800}
+.sign-focus-image{display:grid;place-items:center;min-height:250px;margin:12px auto 20px;padding:18px;background:#f8fafc;border:1px solid #e3eaf1;border-radius:20px;max-width:520px}
+.sign-focus-image img{max-width:300px;max-height:230px;object-fit:contain}
+.sign-audio-hero{width:92px;height:92px;border-radius:25px;border:0;background:#0b1c2f;color:#fff;font-size:38px;display:grid;place-items:center;margin:24px auto}
+.sign-explain-card{max-width:820px;margin:auto;background:#fff;border:1px solid #dfe7ef;border-radius:24px;overflow:hidden;box-shadow:0 10px 30px rgba(7,17,31,.06)}
+.sign-explain-head{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:center;padding:26px;background:linear-gradient(135deg,#f8fafc,#eef3f7)}
+.sign-explain-head img{width:100%;max-height:180px;object-fit:contain}
+.sign-explain-body{padding:26px}
+.officer-question{background:#eef3f7;border-radius:18px 18px 18px 5px;padding:18px;margin:16px 0}
+.officer-question small{display:block;font-weight:800;letter-spacing:.12em;color:#607185;margin-bottom:7px}
+.officer-question strong{font-size:21px}
+.driver-model{background:#fff6dc;border:1px solid #f0d78b;border-radius:18px 18px 5px 18px;padding:18px;margin:12px 0}
+.driver-model small{display:block;font-weight:800;letter-spacing:.12em;color:#8a6a16;margin-bottom:7px}
+.driver-model strong{font-size:21px}
+.sign-practice-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0 22px}
+.sign-practice-row .mic-btn{width:58px;height:58px;font-size:22px}
+.sign-practice-row .mini-btn{background:#0b1c2f;color:#fff}
+.sign-game-nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+@media(max-width:700px){
+ .sign-choice-images{grid-template-columns:1fr 1fr;gap:9px}.sign-image-choice{min-height:135px;padding:9px}.sign-image-choice img{max-width:125px;max-height:110px}
+ .sign-explain-head{grid-template-columns:1fr;text-align:center}.sign-explain-head img{max-width:220px;margin:auto}.sign-game-shell{padding:18px}.sign-game-question h3{font-size:24px}
+}
+
 </style>
 </head>
 <body>
@@ -463,6 +530,7 @@ button{cursor:pointer}
         <button class="nav-item" data-view="practice"><span>🎙</span> Práctica</button>
         <button class="nav-item" data-view="review"><span>↻</span> Repaso</button>
         <button class="nav-item" data-view="glossary"><span>ABC</span> Glosario</button>
+        <button class="nav-item" data-view="signs"><span>🚦</span> Señalamientos de tránsito</button>
         <button class="nav-item" data-view="driver"><span>▣</span> Driver Card</button>
         <button class="nav-item teacher-only" data-view="teacher"><span>▦</span> Panel docente</button>
       </nav>
@@ -645,6 +713,28 @@ button{cursor:pointer}
         </div>
       </section>
 
+
+      <section class="view" id="view-signs">
+        <div class="signs-header">
+          <div>
+            <p class="eyebrow">ROAD SIGNS TRAINING</p>
+            <h2>Señalamientos de tránsito</h2>
+            <p>Aprende a reconocer la señal, identificar su nombre en inglés y explicar con una respuesta sencilla qué significa y qué debes hacer.</p>
+          </div>
+          <span class="pill signs-count" id="signsCount">40 señales</span>
+        </div>
+
+        <div class="signs-modebar">
+          <button class="sign-mode active" data-sign-mode="learn">📖 Aprender</button>
+          <button class="sign-mode" data-sign-mode="text-image">📝 Nombre → Imagen</button>
+          <button class="sign-mode" data-sign-mode="audio-image">🎧 Audio → Imagen</button>
+          <button class="sign-mode" data-sign-mode="image-name">🖼 Imagen → Nombre</button>
+          <button class="sign-mode" data-sign-mode="explain">🎙 Explicar al oficial</button>
+        </div>
+
+        <div class="signs-stage" id="signsStage"></div>
+      </section>
+
       <section class="view" id="view-driver">
         <div class="driver-layout">
           <article class="driver-card-large">
@@ -736,6 +826,244 @@ button{cursor:pointer}
   <div class="toast" id="toast"></div>
 
   <script>
+
+
+const TRAFFIC_SIGNS = [
+  {name:'Railroad Crossing',es:'Cruce de ferrocarril',image:'senales/Captura.PNG',use:'Indica un cruce ferroviario.',detail:'Reduce la velocidad, observa y cruza solo cuando sea seguro.'},
+  {name:'Commercial Vehicles Except Buses Prohibited in Left Lane',es:'Vehículos comerciales, excepto autobuses, prohibidos en el carril izquierdo',image:'senales/Commercial vehicles except buses prohibited in left lane.png',use:'Restringe el carril izquierdo para vehículos comerciales.',detail:'Mantén el camión fuera del carril izquierdo.'},
+  {name:'Detour',es:'Desvío',image:'senales/detour.png',use:'Indica una ruta temporal alternativa.',detail:'Sigue la dirección indicada por el desvío.'},
+  {name:'Divided Highway',es:'Carretera dividida',image:'senales/divided highway.png',use:'Advierte que la vía se divide.',detail:'Mantente en el lado correcto de la división.'},
+  {name:'Do Not Enter',es:'No entrar',image:'senales/do not enter.png',use:'Prohíbe entrar por esa vía.',detail:'No continúes y busca una ruta permitida.'},
+  {name:'Flagger Station',es:'Banderero controlando el tránsito',image:'senales/flagged station.png',use:'Advierte presencia de una persona controlando el paso.',detail:'Reduce la velocidad y obedece sus señales.'},
+  {name:'Flood',es:'Inundación',image:'senales/flood.png',use:'Advierte agua o inundación en la vía.',detail:'No atravieses agua profunda; usa una ruta segura.'},
+  {name:'Four-Way Intersection',es:'Intersección de cuatro vías',image:'senales/four way intersection.png',use:'Advierte una intersección adelante.',detail:'Reduce la velocidad y observa ambos lados.'},
+  {name:'Hill Ahead',es:'Pendiente pronunciada adelante',image:'senales/hill ahead.png',use:'Advierte una pendiente importante.',detail:'Controla la velocidad y usa una marcha adecuada.'},
+  {name:'Left Lane Must Turn Left',es:'El carril izquierdo debe girar a la izquierda',image:'senales/left lane must turn left.png',use:'Obliga a girar a la izquierda desde ese carril.',detail:'Cambia de carril antes si necesitas seguir derecho.'},
+  {name:'Low Bridge Ahead',es:'Puente bajo adelante',image:'senales/low bridge ahead.png',use:'Advierte un puente con altura limitada.',detail:'Comprueba la altura total de tu unidad.'},
+  {name:'Low Clearance',es:'Altura limitada',image:'senales/low clearance.png',use:'Indica la altura máxima disponible.',detail:'No continúes si tu unidad excede la altura indicada.'},
+  {name:'Merging Traffic Entering From the Right',es:'Tráfico incorporándose por la derecha',image:'senales/Merging traffic entering from the right.png',use:'Advierte vehículos entrando por la derecha.',detail:'Mantén distancia y facilita la incorporación cuando sea seguro.'},
+  {name:'No Exit – Entrance Only',es:'Sin salida, solo entrada',image:'senales/no exit entrance only.png',use:'Indica un acceso solo de entrada.',detail:'Identifica otro punto para salir.'},
+  {name:'No Outlet – Dead End',es:'Sin salida / callejón sin salida',image:'senales/no outlet dead end.png',use:'Advierte que la vía termina.',detail:'Evita entrar si no podrás maniobrar con seguridad.'},
+  {name:'No Passing Zone',es:'Zona de no rebasar',image:'senales/no passing zone.png',use:'Prohíbe rebasar.',detail:'Permanece en tu carril hasta que termine la restricción.'},
+  {name:'No Trucks Allowed',es:'No se permiten camiones',image:'senales/no truck allowed.png',use:'Prohíbe el acceso de camiones.',detail:'Busca una ruta autorizada para vehículos comerciales.'},
+  {name:'No Truck Parking',es:'Prohibido estacionar camiones',image:'senales/no truck parking.png',use:'Prohíbe estacionar camiones.',detail:'Busca un área designada para camiones.'},
+  {name:'No Trucks Beyond This Point',es:'No se permiten camiones después de este punto',image:'senales/no trucks beyond this point.png',use:'Marca un límite para camiones.',detail:'No continúes y toma una ruta alternativa.'},
+  {name:'No Trucks Left Lane Except Left Turns',es:'Camiones fuera del carril izquierdo, excepto para girar a la izquierda',image:'senales/no trucks left lane except left turns.png',use:'Restringe el carril izquierdo a camiones.',detail:'Úsalo solo para preparar un giro a la izquierda.'},
+  {name:'No Right Turn',es:'Prohibido girar a la derecha',image:'senales/not right turn.png',use:'Prohíbe el giro a la derecha.',detail:'Continúa por una ruta permitida.'},
+  {name:'One Way',es:'Un solo sentido',image:'senales/one way.png',use:'Indica la dirección permitida.',detail:'Circula únicamente en la dirección de la flecha.'},
+  {name:'Left Turn Only',es:'Solo vuelta a la izquierda',image:'senales/only.png',use:'Obliga a girar a la izquierda.',detail:'No continúes derecho desde ese carril.'},
+  {name:'Pedestrian Crossing Ahead',es:'Cruce peatonal adelante',image:'senales/pedestrians crossing ahead.png',use:'Advierte presencia de peatones.',detail:'Reduce la velocidad y cede el paso.'},
+  {name:'Reduced Speed Limit – School Zone Ahead',es:'Límite reducido, zona escolar adelante',image:'senales/Reduced speed limit, school zone ahead.png',use:'Advierte un límite menor por zona escolar.',detail:'Respeta el límite y aumenta la atención.'},
+  {name:'Right Curve Ahead – Truck Rollover Warning',es:'Curva a la derecha, riesgo de volcadura',image:'senales/Right curve agead, truck rollover warning.png',use:'Advierte una curva peligrosa para camiones.',detail:'Reduce la velocidad antes de entrar a la curva.'},
+  {name:'Right Lane Ends Ahead',es:'El carril derecho termina adelante',image:'senales/right lane end ahead.png',use:'Advierte que el carril derecho terminará.',detail:'Incorpórate con anticipación y seguridad.'},
+  {name:'Right Lane Ends',es:'Termina el carril derecho',image:'senales/right lane ends.png',use:'Indica que desaparece el carril derecho.',detail:'Incorpórate al carril continuo cuando sea seguro.'},
+  {name:'Road Closed',es:'Camino cerrado',image:'senales/road closed.png',use:'Indica que la vía está cerrada.',detail:'No continúes; usa un desvío.'},
+  {name:'Road Work Ahead',es:'Obras en el camino adelante',image:'senales/road ork ahead.png',use:'Advierte una zona de obras.',detail:'Reduce la velocidad y sigue las instrucciones.'},
+  {name:'Road Workers',es:'Trabajadores en carretera',image:'senales/Road workers.png',use:'Advierte personal trabajando cerca de la vía.',detail:'Reduce la velocidad y deja espacio suficiente.'},
+  {name:'Speed Limit 50 – Minimum 30',es:'Máximo 50, mínimo 30',image:'senales/speed limit 50 minimum 30.png',use:'Establece velocidad máxima y mínima.',detail:'Mantén la velocidad dentro del rango permitido.'},
+  {name:'Stop',es:'Alto',image:'senales/stop.png',use:'Obliga a realizar un alto completo.',detail:'Detén completamente el vehículo antes de avanzar.'},
+  {name:'Traffic Signal Ahead',es:'Semáforo adelante',image:'senales/traffic sign light ahead.png',use:'Advierte que hay un semáforo próximo.',detail:'Prepárate para reducir la velocidad o detenerte.'},
+  {name:'Truck Speed Limit 40',es:'Límite para camiones: 40',image:'senales/truck 40.png',use:'Indica un límite específico para camiones.',detail:'Respeta el límite aunque otros vehículos tengan uno mayor.'},
+  {name:'Trucks Enter Inspection Station When Lights Flashing',es:'Camiones deben entrar a inspección cuando las luces parpadeen',image:'senales/Trucks enter inspection station when lights flashing.png',use:'Ordena entrar a inspección cuando las luces estén activas.',detail:'Si parpadean, entra a la estación.'},
+  {name:'Two-Way Traffic',es:'Tráfico en doble sentido',image:'senales/two way.png',use:'Advierte circulación en ambos sentidos.',detail:'Mantente en tu carril y extrema precauciones.'},
+  {name:'Weight Limit 10 Tons',es:'Límite de peso: 10 toneladas',image:'senales/weight limit 10 tons.png',use:'Limita el peso permitido.',detail:'No continúes si tu unidad excede el límite.'},
+  {name:'Wrong Way',es:'Sentido contrario',image:'senales/wrong way.png',use:'Indica dirección incorrecta.',detail:'No continúes; corrige la ruta de forma segura.'},
+  {name:'Yield',es:'Ceda el paso',image:'senales/yield.png',use:'Obliga a ceder el paso.',detail:'Reduce la velocidad y detente si es necesario.'}
+];
+
+const SIGN_ANSWERS = {
+  "Railroad Crossing":["It means railroad crossing.","I need to slow down and check for trains."],
+  "Commercial Vehicles Except Buses Prohibited in Left Lane":["It means commercial vehicles cannot use the left lane.","I need to stay out of the left lane."],
+  "Detour":["It means detour.","I need to follow the detour."],
+  "Divided Highway":["It means divided highway.","I need to stay on the correct side."],
+  "Do Not Enter":["It means do not enter.","I cannot enter this road."],
+  "Flagger Station":["It means a flagger is ahead.","I need to slow down and follow the flagger."],
+  "Flood":["It means flood ahead.","I should not drive through deep water."],
+  "Four-Way Intersection":["It means four-way intersection.","I need to slow down and check traffic."],
+  "Hill Ahead":["It means a steep hill is ahead.","I need to control my speed."],
+  "Left Lane Must Turn Left":["It means the left lane must turn left.","I have to turn left from this lane."],
+  "Low Bridge Ahead":["It means low bridge ahead.","I need to check my truck height."],
+  "Low Clearance":["It means low clearance.","I need to check my truck height."],
+  "Merging Traffic Entering From the Right":["It means traffic is merging from the right.","I need to watch for merging traffic."],
+  "No Exit – Entrance Only":["It means entrance only, no exit.","I need to find another exit."],
+  "No Outlet – Dead End":["It means dead end.","I need to use another road."],
+  "No Passing Zone":["It means no passing zone.","I cannot pass here."],
+  "No Trucks Allowed":["It means no trucks allowed.","I cannot enter this road with my truck."],
+  "No Truck Parking":["It means no truck parking.","I cannot park my truck here."],
+  "No Trucks Beyond This Point":["It means no trucks beyond this point.","I cannot continue on this road."],
+  "No Trucks Left Lane Except Left Turns":["It means trucks cannot use the left lane except to turn left.","I need to stay out of the left lane unless I turn left."],
+  "No Right Turn":["It means no right turn.","I cannot turn right here."],
+  "One Way":["It means one way.","I need to follow the direction of traffic."],
+  "Left Turn Only":["It means left turn only.","I have to turn left."],
+  "Pedestrian Crossing Ahead":["It means pedestrians crossing ahead.","I need to slow down and watch for pedestrians."],
+  "Reduced Speed Limit – School Zone Ahead":["It means school zone ahead with a lower speed limit.","I need to slow down to the posted speed."],
+  "Right Curve Ahead – Truck Rollover Warning":["It means a right curve with rollover risk.","I need to slow down before the curve."],
+  "Right Lane Ends Ahead":["It means the right lane ends ahead.","I need to merge safely."],
+  "Right Lane Ends":["It means the right lane ends.","I need to merge safely."],
+  "Road Closed":["It means road closed.","I need to use another road."],
+  "Road Work Ahead":["It means road work ahead.","I need to slow down and drive carefully."],
+  "Road Workers":["It means road workers ahead.","I need to slow down and give them space."],
+  "Speed Limit 50 – Minimum 30":["It means the maximum speed is fifty and the minimum is thirty.","I need to stay between thirty and fifty."],
+  "Stop":["It means stop.","I have to make a complete stop."],
+  "Traffic Signal Ahead":["It means traffic signal ahead.","I need to be ready to stop."],
+  "Truck Speed Limit 40":["It means the truck speed limit is forty.","I have to drive forty or less."],
+  "Trucks Enter Inspection Station When Lights Flashing":["It means trucks must enter the inspection station when the lights are flashing.","I have to enter when the lights are flashing."],
+  "Two-Way Traffic":["It means two-way traffic.","I need to stay in my lane and watch oncoming traffic."],
+  "Weight Limit 10 Tons":["It means the weight limit is ten tons.","I cannot continue if my truck is over ten tons."],
+  "Wrong Way":["It means wrong way.","I cannot continue in this direction."],
+  "Yield":["It means yield.","I need to give the right of way."]
+};
+
+TRAFFIC_SIGNS.forEach(sign=>{
+  const answers=SIGN_ANSWERS[sign.name]||[`It means ${sign.name.toLowerCase()}.`,`I need to follow this sign.`];
+  sign.meaningAnswer=answers[0];
+  sign.actionAnswer=answers[1];
+});
+
+let signMode="learn";
+let signGameIndex=0;
+let signGameOrder=[];
+let signHoverTimer=null;
+let signGameLocked=false;
+
+function resetSignGame(){
+  signGameOrder=shuffled(TRAFFIC_SIGNS.map((_,i)=>i));
+  signGameIndex=0;
+  signGameLocked=false;
+}
+function currentSign(){
+  if(!signGameOrder.length)resetSignGame();
+  return TRAFFIC_SIGNS[signGameOrder[signGameIndex%signGameOrder.length]];
+}
+function signDistractors(correct,count=3){
+  return shuffled(TRAFFIC_SIGNS.filter(s=>s.name!==correct.name)).slice(0,count);
+}
+function speakSign(text,button=null){
+  if(!audioEnabled)return;
+  stopAllAudio();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="en-US";u.rate=.78;
+  if(button)button.classList.add("playing");
+  u.onend=()=>{if(button)button.classList.remove("playing")};
+  speechSynthesis.speak(u);
+}
+function signFeedback(ok,msg){
+  const f=document.getElementById("signFeedback");
+  if(!f)return;
+  f.className="feedback show "+(ok?"good":"retry");
+  f.textContent=msg;
+}
+function nextSignQuestion(){
+  signGameIndex=(signGameIndex+1)%TRAFFIC_SIGNS.length;
+  signGameLocked=false;
+  renderTrafficSigns();
+}
+function renderTrafficSigns(){
+  const stage=document.getElementById("signsStage");
+  const count=document.getElementById("signsCount");
+  if(!stage)return;
+  if(count)count.textContent=`${TRAFFIC_SIGNS.length} señales`;
+  document.querySelectorAll(".sign-mode").forEach(b=>b.classList.toggle("active",b.dataset.signMode===signMode));
+
+  if(signMode==="learn"){
+    stage.innerHTML=`<div class="sign-learning-note">🔊 Toca una tarjeta para escuchar la pronunciación. En computadora también puedes pasar el cursor sobre ella.</div>
+    <div class="signs-grid">${TRAFFIC_SIGNS.map((sign,i)=>`
+      <article class="sign-card interactive" data-sign-card="${i}" tabindex="0">
+        <div class="sign-image-box"><img class="sign-image" src="${encodeURI(sign.image)}" alt="${sign.name}" loading="lazy"></div>
+        <div><p class="eyebrow">SIGN ${i+1}</p><h3>${sign.name}</h3></div>
+        <div class="sign-es">${sign.es}</div>
+        <p class="sign-use">${sign.use}</p>
+        <div class="sign-actions"><button class="sign-hear" data-hear-sign="${i}" aria-label="Escuchar ${sign.name}">🔊</button><button class="secondary-btn sign-more" data-sign="${i}">Respuesta al oficial</button></div>
+        <div class="sign-detail" id="signDetail${i}"><strong>${sign.meaningAnswer}</strong><br>${sign.actionAnswer}</div>
+      </article>`).join("")}</div>`;
+
+    document.querySelectorAll("[data-sign-card]").forEach(card=>{
+      const idx=Number(card.dataset.signCard),sign=TRAFFIC_SIGNS[idx];
+      card.onclick=e=>{if(e.target.closest("button"))return;speakSign(sign.name,card)};
+      card.onmouseenter=()=>{clearTimeout(signHoverTimer);signHoverTimer=setTimeout(()=>speakSign(sign.name,card),250)};
+      card.onmouseleave=()=>clearTimeout(signHoverTimer);
+      card.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();speakSign(sign.name,card)}};
+    });
+    document.querySelectorAll("[data-hear-sign]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();speakSign(TRAFFIC_SIGNS[Number(btn.dataset.hearSign)].name,btn)});
+    document.querySelectorAll(".sign-more").forEach(btn=>btn.onclick=e=>{e.stopPropagation();document.getElementById("signDetail"+btn.dataset.sign)?.classList.toggle("show")});
+    return;
+  }
+
+  const sign=currentSign();
+  const progress=`${signGameIndex+1}/${TRAFFIC_SIGNS.length}`;
+
+  if(signMode==="text-image"){
+    const options=shuffled([sign,...signDistractors(sign)]);
+    stage.innerHTML=`<div class="sign-game-shell"><div class="sign-game-top"><span class="pill">NOMBRE → IMAGEN</span><strong>${progress}</strong></div>
+      <div class="sign-game-question"><p class="eyebrow">TOCA LA SEÑAL CORRECTA</p><h3>${sign.name}</h3><button class="mini-btn" id="signPromptAudio">🔊</button></div>
+      <div class="sign-choice-images">${options.map(o=>`<button class="sign-image-choice" data-answer="${o.name===sign.name}"><img src="${encodeURI(o.image)}" alt="Opción de señal"></button>`).join("")}</div>
+      <div class="feedback" id="signFeedback"></div><div class="sign-game-nav"><span></span><button class="primary-btn" id="nextSignGame">Siguiente →</button></div></div>`;
+  }
+  if(signMode==="audio-image"){
+    const options=shuffled([sign,...signDistractors(sign)]);
+    stage.innerHTML=`<div class="sign-game-shell"><div class="sign-game-top"><span class="pill">AUDIO → IMAGEN</span><strong>${progress}</strong></div>
+      <div class="sign-game-question"><p class="eyebrow">ESCUCHA Y TOCA LA SEÑAL</p><button class="sign-audio-hero" id="signPromptAudio">▶</button><p>Escucha el nombre en inglés. No aparece escrito.</p></div>
+      <div class="sign-choice-images">${options.map(o=>`<button class="sign-image-choice" data-answer="${o.name===sign.name}"><img src="${encodeURI(o.image)}" alt="Opción de señal"></button>`).join("")}</div>
+      <div class="feedback" id="signFeedback"></div><div class="sign-game-nav"><span></span><button class="primary-btn" id="nextSignGame">Siguiente →</button></div></div>`;
+  }
+  if(signMode==="image-name"){
+    const options=shuffled([sign,...signDistractors(sign)]);
+    stage.innerHTML=`<div class="sign-game-shell"><div class="sign-game-top"><span class="pill">IMAGEN → NOMBRE</span><strong>${progress}</strong></div>
+      <div class="sign-game-question"><p class="eyebrow">¿CÓMO SE LLAMA ESTA SEÑAL?</p><div class="sign-focus-image"><img src="${encodeURI(sign.image)}" alt="Señal para identificar"></div></div>
+      <div class="sign-name-options">${options.map(o=>`<button class="sign-name-choice" data-answer="${o.name===sign.name}">${o.name}</button>`).join("")}</div>
+      <div class="feedback" id="signFeedback"></div><div class="sign-game-nav"><button class="secondary-btn" id="signPromptAudio">🔊 Escuchar nombre</button><button class="primary-btn" id="nextSignGame">Siguiente →</button></div></div>`;
+  }
+  if(signMode==="explain"){
+    stage.innerHTML=`<article class="sign-explain-card"><div class="sign-game-top" style="padding:18px 22px 0"><span class="pill">EXPLICAR AL OFICIAL</span><strong>${progress}</strong></div>
+      <div class="sign-explain-head"><img src="${encodeURI(sign.image)}" alt="${sign.name}"><div><p class="eyebrow">ROAD SIGN</p><h2>${sign.name}</h2><p class="translation">${sign.es}</p><button class="secondary-btn" id="signPromptAudio">🔊 Escuchar nombre</button></div></div>
+      <div class="sign-explain-body">
+        <div class="officer-question"><small>OFFICER</small><strong>What does this sign mean?</strong></div>
+        <div class="driver-model"><small>YOUR RESPONSE</small><strong>${sign.meaningAnswer}</strong></div>
+        <div class="sign-practice-row"><button class="mini-btn" id="hearMeaningAnswer">🔊</button><button class="mic-btn" id="micMeaningAnswer">🎙</button><span>Escucha y luego responde.</span></div>
+        <div class="officer-question"><small>OFFICER</small><strong>What should you do?</strong></div>
+        <div class="driver-model"><small>YOUR RESPONSE</small><strong>${sign.actionAnswer}</strong></div>
+        <div class="sign-practice-row"><button class="mini-btn" id="hearActionAnswer">🔊</button><button class="mic-btn" id="micActionAnswer">🎙</button><span>Practica una respuesta corta y clara.</span></div>
+        <div class="feedback" id="signFeedback"></div><div class="sign-game-nav"><span></span><button class="primary-btn" id="nextSignGame">Siguiente señal →</button></div>
+      </div></article>`;
+  }
+
+  const audioBtn=document.getElementById("signPromptAudio");if(audioBtn)audioBtn.onclick=()=>speakSign(sign.name,audioBtn);
+  document.querySelectorAll("[data-answer]").forEach(btn=>btn.onclick=()=>{
+    if(signGameLocked)return;signGameLocked=true;
+    const ok=btn.dataset.answer==="true";btn.classList.add(ok?"correct":"wrong");
+    if(!ok){const correct=[...document.querySelectorAll("[data-answer]")].find(x=>x.dataset.answer==="true");if(correct)correct.classList.add("correct")}
+    signFeedback(ok,ok?"¡Correcto!":"Buen intento. Revisa la respuesta correcta y vuelve a escucharla.");
+    if(!ok)speakSign(sign.name);
+  });
+  const next=document.getElementById("nextSignGame");if(next)next.onclick=nextSignQuestion;
+  const hm=document.getElementById("hearMeaningAnswer");if(hm)hm.onclick=()=>speakSign(sign.meaningAnswer,hm);
+  const ha=document.getElementById("hearActionAnswer");if(ha)ha.onclick=()=>speakSign(sign.actionAnswer,ha);
+  const mm=document.getElementById("micMeaningAnswer");if(mm)mm.onclick=()=>startSignRecognition(sign.meaningAnswer);
+  const ma=document.getElementById("micActionAnswer");if(ma)ma.onclick=()=>startSignRecognition(sign.actionAnswer);
+}
+
+function startSignRecognition(expected){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const f=document.getElementById("signFeedback");
+  if(!SR){if(f){f.className="feedback show retry";f.textContent="Este navegador no permite reconocimiento de voz. Puedes escuchar y repetir libremente."}return}
+  const r=new SR();r.lang="en-US";r.interimResults=false;r.maxAlternatives=3;
+  if(f){f.className="feedback show";f.textContent="Escuchando..."}
+  r.onresult=e=>{
+    const said=e.results[0][0].transcript;
+    const score=Math.round(similarity(said,expected)*100);
+    if(f){f.className="feedback show "+(score>=55?"good":"retry");f.innerHTML=score>=55?`¡Muy bien! Te entendimos.<br><small>Escuchamos: “${said}”</small>`:`Buen intento. Repite el modelo.<br><small>Modelo: “${expected}”</small>`}
+  };
+  r.onerror=()=>{if(f){f.className="feedback show retry";f.textContent="No logramos escuchar con claridad. Inténtalo otra vez."}};
+  r.start();
+}
+
+document.addEventListener("click",e=>{
+  const btn=e.target.closest("[data-sign-mode]");
+  if(!btn)return;
+  signMode=btn.dataset.signMode;
+  resetSignGame();
+  renderTrafficSigns();
+});
 
 const missionVocabulary = {
   1:[
@@ -1973,11 +2301,12 @@ function setView(name){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   document.getElementById("view-"+name).classList.add("active");
   document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
-  const titles={home:["DRIVER TRAINING","Panel del operador"],route:["LEARNING ROUTE","Ruta completa"],practice:["ACTIVE MISSION","Práctica autodidacta"],review:["SPACED PRACTICE","Repaso"],glossary:["VOCABULARY LAB","Glosario de la misión 1"],driver:["DRIVER PERFORMANCE","Driver Card"],teacher:["SCHOOL MONITORING","Panel docente"]};
+  const titles={home:["DRIVER TRAINING","Panel del operador"],route:["LEARNING ROUTE","Ruta completa"],practice:["ACTIVE MISSION","Práctica autodidacta"],review:["SPACED PRACTICE","Repaso"],glossary:["VOCABULARY LAB","Glosario de la misión 1"],signs:["ROAD SIGNS","Señalamientos de tránsito"],driver:["DRIVER PERFORMANCE","Driver Card"],teacher:["SCHOOL MONITORING","Panel docente"]};
   document.getElementById("viewEyebrow").textContent=titles[name][0];
   document.getElementById("viewTitle").textContent=titles[name][1];
   if(name==="practice")renderLesson();
   if(name==="glossary")renderGlossary();
+  if(name==="signs")renderTrafficSigns();
   if(innerWidth<1050)document.getElementById("sidebar").classList.remove("open");
 }
 
