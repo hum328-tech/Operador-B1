@@ -871,6 +871,43 @@ const TRAFFIC_SIGNS = [
   {name:'Yield',es:'Ceda el paso',image:'images/yield.png',use:'Obliga a ceder el paso.',detail:'Reduce la velocidad y detente si es necesario.'}
 ];
 
+
+// MP3 exacto para la sección APRENDER.
+// En esta sección NO se usa speechSynthesis como respaldo.
+TRAFFIC_SIGNS.find(s=>s.name==='Railroad Crossing') && (TRAFFIC_SIGNS.find(s=>s.name==='Railroad Crossing').audio='audio/Railroad crossing.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Commercial Vehicles Except Buses Prohibited in Left Lane') && (TRAFFIC_SIGNS.find(s=>s.name==='Commercial Vehicles Except Buses Prohibited in Left Lane').audio='audio/Commercial vehicles except buses prohibited in left lane.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Divided Highway') && (TRAFFIC_SIGNS.find(s=>s.name==='Divided Highway').audio='audio/Divided highway ahead.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Do Not Enter') && (TRAFFIC_SIGNS.find(s=>s.name==='Do Not Enter').audio='audio/Do not enter.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Flagger Station') && (TRAFFIC_SIGNS.find(s=>s.name==='Flagger Station').audio='audio/Flagged station.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Flood') && (TRAFFIC_SIGNS.find(s=>s.name==='Flood').audio='audio/Flood.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Four-Way Intersection') && (TRAFFIC_SIGNS.find(s=>s.name==='Four-Way Intersection').audio='audio/Four way intersection.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='No Exit – Entrance Only') && (TRAFFIC_SIGNS.find(s=>s.name==='No Exit – Entrance Only').audio='audio/No exit entrance only.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='No Outlet – Dead End') && (TRAFFIC_SIGNS.find(s=>s.name==='No Outlet – Dead End').audio='audio/No outlet dead end.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='No Passing Zone') && (TRAFFIC_SIGNS.find(s=>s.name==='No Passing Zone').audio='audio/No passing zone.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='No Trucks Allowed') && (TRAFFIC_SIGNS.find(s=>s.name==='No Trucks Allowed').audio='audio/No trucks allowed.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='No Truck Parking') && (TRAFFIC_SIGNS.find(s=>s.name==='No Truck Parking').audio='audio/No truck parking.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='No Trucks Beyond This Point') && (TRAFFIC_SIGNS.find(s=>s.name==='No Trucks Beyond This Point').audio='audio/No trucks beyond this point.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='No Trucks Left Lane Except Left Turns') && (TRAFFIC_SIGNS.find(s=>s.name==='No Trucks Left Lane Except Left Turns').audio='audio/No trucks left lane except left turns.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='No Right Turn') && (TRAFFIC_SIGNS.find(s=>s.name==='No Right Turn').audio='audio/No right turn.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='One Way') && (TRAFFIC_SIGNS.find(s=>s.name==='One Way').audio='audio/One way.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Pedestrian Crossing Ahead') && (TRAFFIC_SIGNS.find(s=>s.name==='Pedestrian Crossing Ahead').audio='audio/Pedestrians crossing ahead.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Reduced Speed Limit – School Zone Ahead') && (TRAFFIC_SIGNS.find(s=>s.name==='Reduced Speed Limit – School Zone Ahead').audio='audio/Reduce speed limits school zone ahead.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Right Curve Ahead – Truck Rollover Warning') && (TRAFFIC_SIGNS.find(s=>s.name==='Right Curve Ahead – Truck Rollover Warning').audio='audio/Right curve ahead truck rollover warning.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Right Lane Ends Ahead') && (TRAFFIC_SIGNS.find(s=>s.name==='Right Lane Ends Ahead').audio='audio/Right lane ends ahead.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Right Lane Ends') && (TRAFFIC_SIGNS.find(s=>s.name==='Right Lane Ends').audio='audio/Right lane ends.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Road Closed') && (TRAFFIC_SIGNS.find(s=>s.name==='Road Closed').audio='audio/Road closed.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Road Work Ahead') && (TRAFFIC_SIGNS.find(s=>s.name==='Road Work Ahead').audio='audio/Road work ahead.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Road Workers') && (TRAFFIC_SIGNS.find(s=>s.name==='Road Workers').audio='audio/Road workers are in or near the roadway.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Speed Limit 50 – Minimum 30') && (TRAFFIC_SIGNS.find(s=>s.name==='Speed Limit 50 – Minimum 30').audio='audio/Speed limit 50 minimum 30.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Stop') && (TRAFFIC_SIGNS.find(s=>s.name==='Stop').audio='audio/Stop.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Traffic Signal Ahead') && (TRAFFIC_SIGNS.find(s=>s.name==='Traffic Signal Ahead').audio='audio/Traffic signal light ahead.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Truck Speed Limit 40') && (TRAFFIC_SIGNS.find(s=>s.name==='Truck Speed Limit 40').audio='audio/Trucks 40.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Trucks Enter Inspection Station When Lights Flashing') && (TRAFFIC_SIGNS.find(s=>s.name==='Trucks Enter Inspection Station When Lights Flashing').audio='audio/Trucks enter inspection station when lights flashings.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Two-Way Traffic') && (TRAFFIC_SIGNS.find(s=>s.name==='Two-Way Traffic').audio='audio/Two way traffic ahead.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Weight Limit 10 Tons') && (TRAFFIC_SIGNS.find(s=>s.name==='Weight Limit 10 Tons').audio='audio/Weight limit 10 tons.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Wrong Way') && (TRAFFIC_SIGNS.find(s=>s.name==='Wrong Way').audio='audio/Wrong way.mp3');
+TRAFFIC_SIGNS.find(s=>s.name==='Yield') && (TRAFFIC_SIGNS.find(s=>s.name==='Yield').audio='audio/Yield.mp3');
+
 const SIGN_ANSWERS = {
   "Railroad Crossing":["It means railroad crossing.","I need to slow down and check for trains."],
   "Commercial Vehicles Except Buses Prohibited in Left Lane":["It means commercial vehicles cannot use the left lane.","I need to stay out of the left lane."],
@@ -1093,6 +1130,54 @@ function currentSign(){
 function signDistractors(correct,count=3){
   return shuffled(TRAFFIC_SIGNS.filter(s=>s.name!==correct.name)).slice(0,count);
 }
+
+let currentSignAudio=null;
+
+function playSignNameMp3(sign,button=null){
+  if(!audioEnabled || !sign || !sign.audio)return false;
+
+  // Stop every other source, including browser TTS.
+  speechSynthesis.cancel();
+  if(currentPromptAudio){
+    currentPromptAudio.pause();
+    currentPromptAudio.currentTime=0;
+    currentPromptAudio=null;
+  }
+  if(currentVocabAudio){
+    currentVocabAudio.pause();
+    currentVocabAudio.currentTime=0;
+    currentVocabAudio=null;
+  }
+  if(currentSignAudio){
+    currentSignAudio.pause();
+    currentSignAudio.currentTime=0;
+    currentSignAudio=null;
+  }
+
+  const audio=new Audio(encodeURI(sign.audio));
+  currentSignAudio=audio;
+
+  if(button)button.classList.add("playing");
+
+  const restore=()=>{
+    if(button)button.classList.remove("playing");
+    if(currentSignAudio===audio)currentSignAudio=null;
+  };
+
+  audio.onended=restore;
+  audio.onerror=()=>{
+    restore();
+    console.error("No se encontró el MP3 de la señal:",sign.audio);
+  };
+
+  audio.play().catch(err=>{
+    restore();
+    console.error("No se pudo reproducir el MP3 de la señal:",sign.audio,err);
+  });
+
+  return true;
+}
+
 function speakSign(text,button=null){
   if(!audioEnabled)return;
 
@@ -1127,7 +1212,7 @@ function renderTrafficSigns(){
   document.querySelectorAll(".sign-mode").forEach(b=>b.classList.toggle("active",b.dataset.signMode===signMode));
 
   if(signMode==="learn"){
-    stage.innerHTML=`<div class="sign-learning-note">🔊 Toca una tarjeta para escuchar la pronunciación. En computadora también puedes pasar el cursor sobre ella.</div>
+    stage.innerHTML=`<div class="sign-learning-note">🔊 Toca una tarjeta para escuchar únicamente el MP3 de esa señal. En computadora también puedes pasar el cursor sobre ella.</div>
     <div class="signs-grid">${TRAFFIC_SIGNS.map((sign,i)=>`
       <article class="sign-card interactive" data-sign-card="${i}" tabindex="0">
         <div class="sign-image-box"><img class="sign-image" src="${encodeURI(sign.image)}" alt="${sign.name}" loading="lazy"></div>
@@ -1140,12 +1225,29 @@ function renderTrafficSigns(){
 
     document.querySelectorAll("[data-sign-card]").forEach(card=>{
       const idx=Number(card.dataset.signCard),sign=TRAFFIC_SIGNS[idx];
-      card.onclick=e=>{if(e.target.closest("button"))return;speakSign(sign.name,card)};
-      card.onmouseenter=()=>{clearTimeout(signHoverTimer);signHoverTimer=setTimeout(()=>speakSign(sign.name,card),250)};
+      card.onclick=e=>{
+        if(e.target.closest("button"))return;
+        playSignNameMp3(sign,card);
+      };
+      card.onmouseenter=()=>{
+        // Hover only on devices that actually have a mouse/trackpad.
+        if(window.matchMedia("(hover:hover) and (pointer:fine)").matches){
+          clearTimeout(signHoverTimer);
+          signHoverTimer=setTimeout(()=>playSignNameMp3(sign,card),250);
+        }
+      };
       card.onmouseleave=()=>clearTimeout(signHoverTimer);
-      card.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();speakSign(sign.name,card)}};
+      card.onkeydown=e=>{
+        if(e.key==="Enter"||e.key===" "){
+          e.preventDefault();
+          playSignNameMp3(sign,card);
+        }
+      };
     });
-    document.querySelectorAll("[data-hear-sign]").forEach(btn=>btn.onclick=e=>{e.stopPropagation();speakSign(TRAFFIC_SIGNS[Number(btn.dataset.hearSign)].name,btn)});
+    document.querySelectorAll("[data-hear-sign]").forEach(btn=>btn.onclick=e=>{
+      e.stopPropagation();
+      playSignNameMp3(TRAFFIC_SIGNS[Number(btn.dataset.hearSign)],btn);
+    });
     document.querySelectorAll(".sign-more").forEach(btn=>btn.onclick=e=>{e.stopPropagation();document.getElementById("signDetail"+btn.dataset.sign)?.classList.toggle("show")});
     return;
   }
