@@ -3225,25 +3225,48 @@ function stopAllAudio(){
 }
 
 
+let ttsVoicesCache=[];
+
+function refreshTtsVoices(){
+  if(!("speechSynthesis" in window))return [];
+  const voices=speechSynthesis.getVoices()||[];
+  if(voices.length)ttsVoicesCache=voices;
+  return voices.length?voices:ttsVoicesCache;
+}
+
+if("speechSynthesis" in window){
+  refreshTtsVoices();
+  speechSynthesis.onvoiceschanged=refreshTtsVoices;
+}
+
+function pickEnglishVoice(preferredLang="en-US"){
+  const voices=refreshTtsVoices();
+
+  const exact=voices.find(v=>String(v.lang||"").toLowerCase()===preferredLang.toLowerCase());
+  if(exact)return exact;
+
+  const us=voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en-us"));
+  if(us)return us;
+
+  const english=voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en"));
+  if(english)return english;
+
+  return null;
+}
+
 function speakWithDeviceVoice(text,button=null,lang="en-US"){
   if(!audioEnabled)return false;
   if(!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window))return false;
 
+  const phrase=String(text||"").trim();
+  if(!phrase)return false;
+
   stopAllAudio();
 
-  const utterance=new SpeechSynthesisUtterance(String(text||""));
-  utterance.lang=lang;
-  utterance.rate=.82;
-  utterance.pitch=1;
-
-  const voices=speechSynthesis.getVoices();
-  const exact=voices.find(v=>v.lang===lang);
-  const english=voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en"));
-  if(exact)utterance.voice=exact;
-  else if(english)utterance.voice=english;
+  const originalText=button ? button.textContent : null;
 
   if(button){
-    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
+    if(button.dataset.originalText===undefined)button.dataset.originalText=originalText;
     button.classList.add("playing");
     button.textContent="🔊";
   }
@@ -3255,11 +3278,56 @@ function speakWithDeviceVoice(text,button=null,lang="en-US"){
     }
   };
 
-  utterance.onend=restore;
-  utterance.onerror=restore;
+  const doSpeak=()=>{
+    try{
+      const utterance=new SpeechSynthesisUtterance(phrase);
+      utterance.lang=lang;
+      utterance.rate=.82;
+      utterance.pitch=1;
+      utterance.volume=1;
 
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utterance);
+      const voice=pickEnglishVoice(lang);
+      if(voice)utterance.voice=voice;
+
+      utterance.onend=restore;
+      utterance.onerror=()=>{
+        restore();
+        console.error("TTS error en dispositivo para:",phrase);
+      };
+
+      speechSynthesis.cancel();
+
+      // Safari/iOS a veces necesita que speak() ocurra después de que
+      // la lista de voces haya sido consultada y dentro del mismo gesto.
+      speechSynthesis.speak(utterance);
+
+      // Workaround suave para iOS cuando la cola queda pausada.
+      setTimeout(()=>{
+        if(speechSynthesis.paused){
+          try{speechSynthesis.resume()}catch(e){}
+        }
+      },120);
+
+      return true;
+    }catch(err){
+      restore();
+      console.error("No se pudo iniciar TTS:",err);
+      return false;
+    }
+  };
+
+  const voicesNow=refreshTtsVoices();
+
+  if(voicesNow.length){
+    return doSpeak();
+  }
+
+  // Si iOS aún no cargó voces, intenta una vez más muy rápido.
+  setTimeout(()=>{
+    refreshTtsVoices();
+    doSpeak();
+  },80);
+
   return true;
 }
 
@@ -3296,7 +3364,7 @@ function playVocabAudio(text,button=null,onFail=null){
   const tryNext=()=>{
     if(index>=candidates.length){
       restore();
-      console.warn("No se encontró MP3 para vocabulario; usando voz del dispositivo:",text);
+      console.warn("No se encontró MP3; usando voz del dispositivo:",text);
       if(onFail)onFail();
       return;
     }
@@ -3377,7 +3445,7 @@ function playPromptAudio(itemOrText,button=null){
   const candidates=[...new Set([...explicit,...recorded,...automatic])];
 
   const fallback=()=>{
-    console.warn("No se encontró MP3 para la pregunta; usando voz del dispositivo:",promptText);
+    console.warn("No se encontró MP3 para la pregunta; usando TTS iPhone/Safari:",promptText);
     speakWithDeviceVoice(promptText,button,"en-US");
   };
 
