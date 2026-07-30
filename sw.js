@@ -1,9 +1,11 @@
-const CACHE_NAME = "operador-b1-v2";
+const CACHE_NAME = "operador-b1-v3";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.json"
+  "./manifest.json",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
 
 self.addEventListener("install", event => {
