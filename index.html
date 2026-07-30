@@ -3224,7 +3224,46 @@ function stopAllAudio(){
   speechSynthesis.cancel();
 }
 
-function playVocabAudio(text,button=null){
+
+function speakWithDeviceVoice(text,button=null,lang="en-US"){
+  if(!audioEnabled)return false;
+  if(!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window))return false;
+
+  stopAllAudio();
+
+  const utterance=new SpeechSynthesisUtterance(String(text||""));
+  utterance.lang=lang;
+  utterance.rate=.82;
+  utterance.pitch=1;
+
+  const voices=speechSynthesis.getVoices();
+  const exact=voices.find(v=>v.lang===lang);
+  const english=voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en"));
+  if(exact)utterance.voice=exact;
+  else if(english)utterance.voice=english;
+
+  if(button){
+    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
+    button.classList.add("playing");
+    button.textContent="🔊";
+  }
+
+  const restore=()=>{
+    if(button){
+      button.classList.remove("playing");
+      if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
+    }
+  };
+
+  utterance.onend=restore;
+  utterance.onerror=restore;
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+  return true;
+}
+
+function playVocabAudio(text,button=null,onFail=null){
   if(!audioEnabled)return false;
 
   const key=normalizeAudioKey(text);
@@ -3233,16 +3272,16 @@ function playVocabAudio(text,button=null){
   const automatic=autoAudioCandidates(text);
   const candidates=[...new Set([...explicit,...recorded,...automatic])];
 
-  if(!candidates.length)return false;
+  if(!candidates.length){
+    if(onFail)onFail();
+    return false;
+  }
 
   stopAllAudio();
-
   let index=0;
 
   if(button){
-    if(button.dataset.originalText===undefined){
-      button.dataset.originalText=button.textContent;
-    }
+    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
     button.classList.add("playing");
     button.textContent="🔊";
   }
@@ -3250,16 +3289,15 @@ function playVocabAudio(text,button=null){
   const restore=()=>{
     if(button){
       button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined){
-        button.textContent=button.dataset.originalText;
-      }
+      if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
     }
   };
 
   const tryNext=()=>{
     if(index>=candidates.length){
       restore();
-      console.error("No se encontró MP3 para vocabulario:",text,candidates);
+      console.warn("No se encontró MP3 para vocabulario; usando voz del dispositivo:",text);
+      if(onFail)onFail();
       return;
     }
 
@@ -3295,15 +3333,12 @@ function playVocabAudio(text,button=null){
 function speak(text,button=null){
   if(!audioEnabled)return;
 
-  if(playRecordedAudio(text,button))return;
-  if(playVocabAudio(text,button))return;
+  const fallback=()=>speakWithDeviceVoice(text,button,"en-US");
 
-  stopAllAudio();
+  if(playRecordedAudio(text,button,fallback))return;
+  if(playVocabAudio(text,button,fallback))return;
 
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang="en-US";
-  u.rate=.8;
-  speechSynthesis.speak(u);
+  fallback();
 }
 
 /*
@@ -3341,17 +3376,20 @@ function playPromptAudio(itemOrText,button=null){
   const automatic=autoAudioCandidates(promptText);
   const candidates=[...new Set([...explicit,...recorded,...automatic])];
 
+  const fallback=()=>{
+    console.warn("No se encontró MP3 para la pregunta; usando voz del dispositivo:",promptText);
+    speakWithDeviceVoice(promptText,button,"en-US");
+  };
+
   if(!candidates.length){
-    console.error("No hay MP3 asignado para:",promptText);
-    return false;
+    fallback();
+    return true;
   }
 
   let index=0;
 
   if(button){
-    if(button.dataset.originalText===undefined){
-      button.dataset.originalText=button.textContent;
-    }
+    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
     button.classList.add("playing");
     button.textContent="🔊";
   }
@@ -3359,21 +3397,14 @@ function playPromptAudio(itemOrText,button=null){
   const restore=()=>{
     if(button){
       button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined){
-        button.textContent=button.dataset.originalText;
-      }
+      if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
     }
   };
 
   const tryNext=()=>{
     if(index>=candidates.length){
       restore();
-      console.error("No se encontró MP3 para:",promptText,candidates);
-      const f=document.getElementById("feedback");
-      if(f){
-        f.className="feedback show retry";
-        f.textContent="Este audio todavía no tiene un MP3 disponible.";
-      }
+      fallback();
       return;
     }
 
