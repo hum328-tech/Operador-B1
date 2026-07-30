@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TTS Test</title>
+</head>
+<body>
+
+<button id="test" style="font-size:28px;padding:20px;">
+  TEST VOICE
+</button>
+
+<script>
+let currentUtterance = null;
+
+document.getElementById("test").onclick = () => {
+  currentUtterance =
+    new SpeechSynthesisUtterance("Hello, this is a test.");
+
+  currentUtterance.lang = "en-US";
+  currentUtterance.rate = 0.85;
+
+  currentUtterance.onstart = () =>
+    console.log("TTS START");
+
+  currentUtterance.onend = () =>
+    console.log("TTS END");
+
+  currentUtterance.onerror = e =>
+    console.log("TTS ERROR", e.error);
+
+  speechSynthesis.speak(currentUtterance);
+};
+</script>
+
+</body>
+</html>
