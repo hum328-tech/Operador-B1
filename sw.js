@@ -1,4 +1,4 @@
-const CACHE_NAME = "operador-b1-v1";
+const CACHE_NAME = "operador-b1-v2";
 
 const APP_SHELL = [
   "./",
