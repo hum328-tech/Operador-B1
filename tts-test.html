@@ -14,21 +14,39 @@
 <script>
 let currentUtterance = null;
 
-document.getElementById("test").onclick = () => {
+function getEnglishVoice() {
+  const voices = speechSynthesis.getVoices();
+
+  console.log("VOICES:", voices.map(v => ({
+    name: v.name,
+    lang: v.lang
+  })));
+
+  return (
+    voices.find(v => v.lang === "en-US") ||
+    voices.find(v => v.lang && v.lang.toLowerCase().startsWith("en-us")) ||
+    voices.find(v => v.lang && v.lang.toLowerCase().startsWith("en")) ||
+    null
+  );
+}
+
+function testVoice() {
+  const voice = getEnglishVoice();
+
   currentUtterance =
-    new SpeechSynthesisUtterance("Hello, this is a test.");
+    new SpeechSynthesisUtterance(
+      "Truck driver. Where are you going today?"
+    );
 
   currentUtterance.lang = "en-US";
+  currentUtterance.rate = 0.8;
 
-const voices = speechSynthesis.getVoices();
-const englishVoice = voices.find(v =>
-  v.lang.toLowerCase().startsWith("en")
-);
-
-if (englishVoice) {
-  currentUtterance.voice = englishVoice;
-}
-  currentUtterance.rate = 0.85;
+  if (voice) {
+    currentUtterance.voice = voice;
+    console.log("USING VOICE:", voice.name, voice.lang);
+  } else {
+    console.log("NO ENGLISH VOICE FOUND");
+  }
 
   currentUtterance.onstart = () =>
     console.log("TTS START");
@@ -40,8 +58,14 @@ if (englishVoice) {
     console.log("TTS ERROR", e.error);
 
   speechSynthesis.speak(currentUtterance);
-};
-</script>
+}
 
+speechSynthesis.onvoiceschanged = () => {
+  console.log("VOICES LOADED");
+  getEnglishVoice();
+};
+
+document.getElementById("test").onclick = testVoice;
+</script>
 </body>
 </html>
