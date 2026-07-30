@@ -3332,5 +3332,3325 @@ document.addEventListener("click",e=>{
 });
 
 </script>
+  <style>
+/* ==========================================================
+   NUEVA SECUENCIA · MISIONES 1–6
+========================================================== */
+
+.eor-chunks{
+  display:grid;
+  gap:12px;
+  margin:24px auto;
+  max-width:680px;
+}
+
+.eor-chunk{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:10px;
+  align-items:center;
+  padding:16px 18px;
+  border:1px solid #dfe7ef;
+  border-radius:16px;
+  background:#fff;
+}
+
+.eor-chunk small{
+  display:block;
+  color:#8290a4;
+  font-weight:800;
+  margin-bottom:5px;
+}
+
+.eor-chunk strong{
+  font-size:20px;
+}
+
+.eor-qa{
+  display:grid;
+  gap:16px;
+  max-width:720px;
+  margin:22px auto;
+}
+
+.eor-question,
+.eor-answer{
+  padding:20px;
+  border-radius:18px;
+  text-align:left;
+}
+
+.eor-question{
+  background:#eef3f7;
+}
+
+.eor-answer{
+  background:#fff6dc;
+  border:1px solid #f0d78b;
+}
+
+.eor-question small,
+.eor-answer small{
+  display:block;
+  font-weight:800;
+  letter-spacing:.12em;
+  margin-bottom:7px;
+}
+
+.eor-question strong,
+.eor-answer strong{
+  font-size:23px;
+  line-height:1.45;
+}
+
+.eor-blind{
+  max-width:680px;
+  margin:22px auto;
+  text-align:center;
+  padding:30px;
+  border:1px solid #dfe7ef;
+  border-radius:22px;
+  background:#f8fafc;
+}
+
+.eor-blind-icon{
+  font-size:68px;
+  margin-bottom:12px;
+}
+
+.eor-test{
+  max-width:880px;
+  margin:auto;
+  padding:30px;
+  background:#fff;
+  border:1px solid #dfe7ef;
+  border-radius:26px;
+  box-shadow:var(--shadow);
+}
+
+.eor-test h2{
+  font-size:32px;
+}
+
+.eor-audio-options{
+  display:grid;
+  gap:14px;
+  max-width:650px;
+  margin:26px auto;
+}
+
+.eor-audio-option{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:12px;
+  padding:15px;
+  border:2px solid #dfe7ef;
+  border-radius:17px;
+  transition:.15s;
+}
+
+.eor-audio-option.selected{
+  border-color:#214c79;
+  background:#eef5fb;
+}
+
+.eor-audio-option.correct{
+  border-color:var(--success);
+  background:#eafaf4;
+}
+
+.eor-audio-option.wrong{
+  border-color:#f2c46c;
+  background:#fff8e8;
+}
+
+.eor-choice-play{
+  width:52px;
+  height:52px;
+  border:0;
+  border-radius:14px;
+  background:#0b1c2f;
+  color:#fff;
+  font-size:21px;
+}
+
+.eor-radio{
+  font-size:24px;
+}
+
+.eor-attempts{
+  display:inline-block;
+  margin:12px 0;
+  padding:8px 13px;
+  border-radius:999px;
+  background:#eef2f6;
+  color:#53677c;
+  font-weight:800;
+}
+
+.eor-test-question{
+  width:96px;
+  height:96px;
+  border:0;
+  border-radius:28px;
+  background:#0b1c2f;
+  color:#fff;
+  font-size:38px;
+  margin:20px auto;
+}
+
+.eor-final-score{
+  font-size:72px;
+  font-weight:900;
+  margin:18px 0 4px;
+}
+
+.eor-result-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin:26px 0;
+}
+
+.eor-result-grid div{
+  background:#f3f6f9;
+  padding:18px;
+  border-radius:16px;
+}
+
+.eor-result-grid strong{
+  display:block;
+  font-size:28px;
+}
+
+@media(max-width:700px){
+
+  .eor-chunk{
+    grid-template-columns:1fr auto;
+  }
+
+  .eor-chunk .mini-btn:last-child{
+    grid-column:2;
+  }
+
+  .eor-result-grid{
+    grid-template-columns:1fr;
+  }
+
+  .eor-audio-option{
+    grid-template-columns:auto 1fr;
+  }
+
+  .eor-radio{
+    grid-column:2;
+  }
+
+}
+</style>
+
+
+<script>
+/* ==========================================================
+   PARCHE NUEVA METODOLOGÍA
+   MISIONES 1–6
+========================================================== */
+
+(() => {
+
+const oldRenderLesson =
+  window.renderLesson;
+
+const oldBindLessonEvents =
+  window.bindLessonEvents;
+
+const oldAdvanceItem =
+  window.advanceItem;
+
+const oldStartMission =
+  window.startMission;
+
+const oldDisplayResponse =
+  window.displayResponse;
+
+const oldDisplayResponseMeaning =
+  window.displayResponseMeaning;
+
+
+/* ==========================================================
+   ACTUALIZAR RESPUESTAS DE MISIONES 1–3
+========================================================== */
+
+const m1 = missions.find(m => m.id === 1);
+const m2 = missions.find(m => m.id === 2);
+const m3 = missions.find(m => m.id === 3);
+
+
+if(m1){
+
+  Object.assign(m1.items[0],{
+    response:"My name is …",
+    responseMeaning:"Mi nombre es…",
+    responseAudio:"audio/My name is.mp3",
+    openResponse:"name",
+    requiredPatterns:["my name is"]
+  });
+
+
+  Object.assign(m1.items[1],{
+    response:"I am … years old.",
+    responseMeaning:"Tengo … años.",
+    openResponse:"age",
+    requiredPatterns:["i am","i'm"],
+    requiredEndingPatterns:["years old"]
+  });
+
+
+  Object.assign(m1.items[2],{
+    response:"I am from …",
+    responseMeaning:"Soy de…",
+    responseAudio:"audio/I Am from nuevo Laredo.mp3",
+    openResponse:"city",
+    requiredPatterns:["i am from","i'm from"]
+  });
+
+
+  Object.assign(m1.items[3],{
+    response:"My date of birth is …",
+    responseMeaning:"Mi fecha de nacimiento es…",
+    responseAudio:"audio/My date of birth is.mp3",
+    openResponse:"birthdate",
+    requiredPatterns:["my date of birth is"]
+  });
+
+
+  Object.assign(m1.items[4],{
+    response:"I am a B1 driver at DHR.",
+    responseMeaning:"Soy operador B1 en DHR.",
+    responseAudio:"audio/I am a b1 driver at DHR.mp3"
+  });
+
+
+  Object.assign(m1.items[5],{
+    response:"I have worked at DHR for …",
+    responseMeaning:"He trabajado en DHR durante…",
+    responseAudio:"audio/I have worked at DHR for Years.mp3",
+    openResponse:"worktime",
+    requiredPatterns:[
+      "i have worked at dhr for",
+      "i've worked at dhr for"
+    ]
+  });
+
+}
+
+
+if(m2){
+
+  Object.assign(m2.items[0],{
+    response:"I am coming from DHR yard in Laredo, Texas.",
+    responseMeaning:"Vengo del patio de DHR en Laredo, Texas.",
+    responseAudio:"audio/I am coming from DHR yard in Laredo Texas.mp3"
+  });
+
+
+  Object.assign(m2.items[1],{
+    response:"I am going to Tennessee to drop the trailer.",
+    responseAudio:"audio/I Am going to Tennessee to drop the trailer.mp3"
+  });
+
+
+  Object.assign(m2.items[2],{
+    response:"I am headed to Laredo, Texas.",
+    responseAudio:"audio/I Am headed to Laredo Texas.mp3"
+  });
+
+
+  Object.assign(m2.items[3],{
+    response:"I picked it up at the DHR Nuevo Laredo yard.",
+    responseMeaning:"La recogí en el patio DHR Nuevo Laredo.",
+    responseAudio:"audio/I picked it up at the DHR Nuevo Laredo yard.mp3"
+  });
+
+
+  Object.assign(m2.items[4],{
+    response:"The company is located in Laredo, Texas.",
+    responseAudio:"audio/The company is located in Laredo Texas.mp3"
+  });
+
+
+  Object.assign(m2.items[5],{
+    response:"Yes, the phone number is …",
+    responseMeaning:"Sí, el número telefónico es…",
+    responseAudio:"audio/Yes the phone number is.mp3",
+    openResponse:"phone",
+    requiredPatterns:[
+      "the phone number is",
+      "yes the phone number is"
+    ]
+  });
+
+}
+
+
+if(m3){
+
+  Object.assign(m3.items[0],{
+    response:"Yes, I have my license here.",
+    responseMeaning:"Sí. Aquí tengo mi licencia.",
+    responseAudio:"audio/Yes I have my licenses here.mp3"
+  });
+
+
+  Object.assign(m3.items[1],{
+    response:"Yes, sir. Here you go.",
+    responseAudio:"audio/Yes sir here you go.mp3"
+  });
+
+
+  Object.assign(m3.items[2],{
+    response:"Yes, the insurance is in my permit book.",
+    responseAudio:"audio/Yes the insurance is in my permit book.mp3"
+  });
+
+
+  m3.items[3].audio =
+    "audio/Please show me yours hours of service.mp3";
+
+
+  m3.items[5].audio =
+    "audio/Turn on your electric log device.mp3";
+
+}
+
+
+/* Misión 4: MP3 que ya tienes */
+
+const m4 =
+  missions.find(m => m.id === 4);
+
+if(m4 && m4.items[5]){
+
+  m4.items[5].audio =
+    "audio/Turn on your four ways flashers.mp3";
+
+}
+
+
+/* ==========================================================
+   RESPUESTAS VARIABLES
+========================================================== */
+
+window.displayResponse =
+function(item){
+
+  const p =
+    typeof loadDriverProfile === "function"
+      ? loadDriverProfile()
+      : null;
+
+
+  if(item.openResponse === "name"){
+
+    return p?.name
+      ? `My name is ${p.name}.`
+      : "My name is …";
+
+  }
+
+
+  if(item.openResponse === "age"){
+
+    return p?.age
+      ? `I am ${p.age} years old.`
+      : "I am … years old.";
+
+  }
+
+
+  if(item.openResponse === "city"){
+
+    return p?.city
+      ? `I am from ${p.city}.`
+      : "I am from …";
+
+  }
+
+
+  if(item.openResponse === "birthdate"){
+
+    return "My date of birth is …";
+
+  }
+
+
+  if(item.openResponse === "worktime"){
+
+    return "I have worked at DHR for …";
+
+  }
+
+
+  if(item.openResponse === "phone"){
+
+    return "Yes, the phone number is …";
+
+  }
+
+
+  return oldDisplayResponse(item);
+
+};
+
+
+window.displayResponseMeaning =
+function(item){
+
+  const p =
+    typeof loadDriverProfile === "function"
+      ? loadDriverProfile()
+      : null;
+
+
+  if(item.openResponse === "name"){
+
+    return p?.name
+      ? `Mi nombre es ${p.name}.`
+      : "Di tu nombre real.";
+
+  }
+
+
+  if(item.openResponse === "age"){
+
+    return p?.age
+      ? `Tengo ${p.age} años.`
+      : "Di tu edad real.";
+
+  }
+
+
+  if(item.openResponse === "city"){
+
+    return p?.city
+      ? `Soy de ${p.city}.`
+      : "Di tu ciudad real.";
+
+  }
+
+
+  if(item.openResponse === "birthdate"){
+
+    return "Di tu fecha de nacimiento real.";
+
+  }
+
+
+  if(item.openResponse === "worktime"){
+
+    return "Di cuánto tiempo llevas trabajando en DHR.";
+
+  }
+
+
+  if(item.openResponse === "phone"){
+
+    return "Di el número telefónico real de tu empresa.";
+
+  }
+
+
+  return oldDisplayResponseMeaning(item);
+
+};
+
+
+/* ==========================================================
+   VALIDACIÓN DE RESPUESTAS ABIERTAS
+========================================================== */
+
+window.acceptedOpenResponse =
+function(said,item){
+
+  if(!item.requiredPatterns){
+    return null;
+  }
+
+
+  const clean =
+    String(said || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9' ]/g," ")
+      .replace(/\s+/g," ")
+      .trim();
+
+
+  const startOK =
+    item.requiredPatterns.some(
+      pattern =>
+        clean.includes(pattern)
+    );
+
+
+  if(!startOK){
+    return false;
+  }
+
+
+  if(
+    Array.isArray(item.requiredEndingPatterns)
+    &&
+    item.requiredEndingPatterns.length
+  ){
+
+    return item.requiredEndingPatterns.some(
+      pattern =>
+        clean.includes(pattern)
+    );
+
+  }
+
+
+  return true;
+
+};
+
+
+/* ==========================================================
+   DIVIDIR EN MÍNIMO 2 PARTES
+========================================================== */
+
+function eorSplit(text){
+
+  const original =
+    String(text || "").trim();
+
+
+  const punctuation =
+    /[?.!]$/.test(original)
+      ? original.slice(-1)
+      : "";
+
+
+  const words =
+    original
+      .replace(/[?.!]$/,"")
+      .split(/\s+/)
+      .filter(Boolean);
+
+
+  if(words.length <= 1){
+
+    return [
+      words[0] || original,
+      words[0] || original
+    ];
+
+  }
+
+
+  const middle =
+    Math.ceil(
+      words.length / 2
+    );
+
+
+  return [
+
+    words
+      .slice(0,middle)
+      .join(" "),
+
+    words
+      .slice(middle)
+      .join(" ")
+      +
+      punctuation
+
+  ];
+
+}
+
+
+/* ==========================================================
+   REPRODUCIR RESPUESTA
+========================================================== */
+
+function eorPlayResponse(
+  item,
+  button=null
+){
+
+  if(!audioEnabled || !item){
+    return;
+  }
+
+
+  if(!item.responseAudio){
+
+    speak(
+      displayResponse(item),
+      button
+    );
+
+    return;
+
+  }
+
+
+  stopAllAudio();
+
+
+  const audio =
+    new Audio(
+      encodeURI(
+        item.responseAudio
+      )
+    );
+
+
+  currentVocabAudio =
+    audio;
+
+
+  if(button){
+
+    if(
+      button.dataset.originalText ===
+      undefined
+    ){
+
+      button.dataset.originalText =
+        button.textContent;
+
+    }
+
+
+    button.classList.add(
+      "playing"
+    );
+
+
+    button.textContent =
+      "🔊";
+
+  }
+
+
+  const restore =
+    () => {
+
+      if(button){
+
+        button.classList.remove(
+          "playing"
+        );
+
+
+        if(
+          button.dataset.originalText !==
+          undefined
+        ){
+
+          button.textContent =
+            button.dataset.originalText;
+
+        }
+
+      }
+
+    };
+
+
+  audio.onended =
+    () => {
+
+      restore();
+
+      if(
+        currentVocabAudio === audio
+      ){
+
+        currentVocabAudio =
+          null;
+
+      }
+
+    };
+
+
+  audio.onerror =
+    () => {
+
+      restore();
+
+      speak(
+        displayResponse(item),
+        button
+      );
+
+    };
+
+
+  audio.play()
+    .catch(
+      () => {
+
+        restore();
+
+        speak(
+          displayResponse(item),
+          button
+        );
+
+      }
+    );
+
+}
+
+
+/* ==========================================================
+   ESTADO DE LAS PRUEBAS
+========================================================== */
+
+let eorTestPhase = 0;
+
+let eorTestIndex = 0;
+
+let eorTest1Correct = 0;
+
+let eorTest2Scores = [];
+
+let eorTest2Attempts = 0;
+
+let eorSelectedAnswer = null;
+
+let eorTestOptions = [];
+
+let eorLastCorrectPosition = -1;
+
+let eorMissionId = null;
+
+
+/* ==========================================================
+   RESET AL ABRIR MISIÓN
+========================================================== */
+
+window.startMission =
+function(id){
+
+  eorTestPhase = 0;
+  eorTestIndex = 0;
+  eorTest1Correct = 0;
+  eorTest2Scores = [];
+  eorTest2Attempts = 0;
+  eorSelectedAnswer = null;
+  eorTestOptions = [];
+  eorLastCorrectPosition = -1;
+  eorMissionId = id;
+
+
+  return oldStartMission(id);
+
+};
+
+
+/* ==========================================================
+   RENDER LECCIÓN
+========================================================== */
+
+window.renderLesson =
+function(){
+
+  const m =
+    currentMission();
+
+
+  /*
+    Misiones 7–17 siguen exactamente
+    con la metodología anterior.
+  */
+
+  if(m.id > 6){
+
+    oldRenderLesson();
+
+    return;
+
+  }
+
+
+  if(
+    eorMissionId !== m.id
+  ){
+
+    eorTestPhase = 0;
+    eorTestIndex = 0;
+    eorTest1Correct = 0;
+    eorTest2Scores = [];
+    eorTest2Attempts = 0;
+    eorSelectedAnswer = null;
+    eorTestOptions = [];
+    eorLastCorrectPosition = -1;
+    eorMissionId = m.id;
+
+  }
+
+
+  if(eorTestPhase > 0){
+
+    eorRenderTest();
+
+    return;
+
+  }
+
+
+  const item =
+    currentItem();
+
+
+  const total =
+    m.items.length;
+
+
+  document
+    .getElementById(
+      "lessonProgressBar"
+    )
+    .style.width =
+      (
+        (
+          state.currentItem
+          +
+          (
+            Math.max(
+              lessonStep - 1,
+              0
+            )
+            /
+            7
+          )
+        )
+        /
+        total
+        *
+        100
+      )
+      +
+      "%";
+
+
+  document
+    .getElementById(
+      "lessonStepLabel"
+    )
+    .textContent =
+      lessonStep === 0
+        ?
+        `Misión ${m.id}`
+        :
+        `Situación ${state.currentItem+1} de ${total} · Paso ${lessonStep} de 7`;
+
+
+  const stage =
+    document.getElementById(
+      "lessonStage"
+    );
+
+
+/* INTRO */
+
+if(lessonStep === 0){
+
+stage.innerHTML = `
+
+<article class="lesson-card">
+
+  <div class="lesson-scene">
+
+    <div>
+
+      <p class="eyebrow light">
+        MISIÓN ${m.id} · ${m.items.length} SITUACIONES
+      </p>
+
+      <h2>
+        ${m.title}
+      </h2>
+
+      <p>
+        ${m.situation}
+      </p>
+
+    </div>
+
+    <div class="scene-art">
+      ${m.icon}🚛
+    </div>
+
+  </div>
+
+
+  <div class="lesson-body">
+
+    <div class="learning-guide">
+
+      <strong>
+        Entrenamiento de escucha y respuesta oral
+      </strong>
+
+      <span>
+        1. Escucha
+        → 2. Comprende
+        → 3. Repite la pregunta
+        → 4. Aprende la respuesta
+        → 5. Repite la respuesta
+        → 6. Responde con apoyo
+        → 7. Responde sin texto.
+      </span>
+
+      <span>
+        Después realizarás dos pruebas finales.
+      </span>
+
+    </div>
+
+
+    <button
+      class="secondary-btn full"
+      data-vocab-mission="${m.id}"
+      style="margin-bottom:10px"
+    >
+      📚 Repasar vocabulario de esta misión
+    </button>
+
+
+    <button
+      class="primary-btn full"
+      id="nextLesson"
+    >
+      Comenzar
+    </button>
+
+  </div>
+
+</article>
+
+`;
+
+}
+
+
+/* 1 ESCUCHAR */
+
+if(lessonStep === 1){
+
+stage.innerHTML = `
+
+<article class="lesson-card">
+
+<div class="lesson-body center">
+
+<p class="eyebrow">
+1 · ESCUCHA
+</p>
+
+<h2>
+Escucha al oficial
+</h2>
+
+<p class="lesson-help">
+Primero intenta comprender solamente con el audio.
+</p>
+
+<button
+  class="audio-btn"
+  id="promptAudio"
+>
+▶
+</button>
+
+
+<div style="margin-top:28px">
+
+<button
+  class="primary-btn"
+  id="nextLesson"
+>
+Continuar
+</button>
+
+</div>
+
+</div>
+
+</article>
+
+`;
+
+}
+
+
+/* 2 COMPRENDER */
+
+if(lessonStep === 2){
+
+const opts =
+  distractors(item);
+
+stage.innerHTML = `
+
+<article class="lesson-card">
+
+<div class="lesson-body center">
+
+<p class="eyebrow">
+2 · COMPRENDE
+</p>
+
+<h2>
+¿Qué dijo el oficial?
+</h2>
+
+<button
+  class="audio-btn"
+  id="promptAudio"
+>
+▶
+</button>
+
+
+<div class="options">
+
+${opts.map(
+  option => `
+
+  <button
+    class="option"
+    data-correct="${
+      option === item.meaning
+    }"
+  >
+    ${option}
+  </button>
+
+  `
+).join("")}
+
+</div>
+
+
+<div
+  class="feedback"
+  id="feedback"
+></div>
+
+
+<button
+  class="primary-btn"
+  id="nextLesson"
+  style="display:none"
+>
+Continuar
+</button>
+
+</div>
+
+</article>
+
+`;
+
+}
+
+
+/* 3 REPETIR PREGUNTA */
+
+if(lessonStep === 3){
+
+const chunks =
+  eorSplit(
+    item.prompt
+  );
+
+
+stage.innerHTML = `
+
+<article class="lesson-card">
+
+<div class="lesson-body">
+
+<p class="eyebrow">
+3 · ESCUCHA Y REPITE LA PREGUNTA
+</p>
+
+<h2>
+Practica la pregunta por partes
+</h2>
+
+
+<div class="eor-chunks">
+
+${chunks.map(
+  (chunk,index) => `
+
+  <div class="eor-chunk">
+
+    <div>
+
+      <small>
+        PARTE ${index+1}
+      </small>
+
+      <strong>
+        ${chunk}
+      </strong>
+
+    </div>
+
+
+    <button
+      class="mini-btn eor-question-audio"
+      data-text="${encodeURIComponent(chunk)}"
+    >
+      🔊
+    </button>
+
+
+    <button
+      class="mini-btn eor-question-mic"
+      data-text="${encodeURIComponent(chunk)}"
+    >
+      🎙
+    </button>
+
+  </div>
+
+  `
+).join("")}
+
+</div>
+
+
+<div
+  class="feedback"
+  id="feedback"
+></div>
+
+
+<button
+  class="primary-btn full"
+  id="nextLesson"
+>
+Ver respuesta sugerida
+</button>
+
+</div>
+
+</article>
+
+`;
+
+}
+
+
+/* 4 RESPUESTA SUGERIDA */
+
+if(lessonStep === 4){
+
+stage.innerHTML = `
+
+<article class="lesson-card">
+
+<div class="lesson-body">
+
+<p class="eyebrow">
+4 · RESPUESTA SUGERIDA
+</p>
+
+<h2>
+Aprende qué responder
+</h2>
+
+
+<div class="eor-qa">
+
+<div class="eor-question">
+
+<small>
+OFFICER
+</small>
+
+<strong>
+${item.prompt}
+</strong>
+
+<div style="margin-top:12px">
+
+<button
+  class="mini-btn"
+  id="eorQuestionPlay"
+>
+🔊
+</button>
+
+</div>
+
+</div>
+
+
+<div class="eor-answer">
+
+<small>
+YOUR RESPONSE
+</small>
+
+<strong>
+${displayResponse(item)}
+</strong>
+
+<div
+  style="
+    margin-top:8px;
+    color:#725d1d;
+  "
+>
+${displayResponseMeaning(item)}
+</div>
+
+
+<div style="margin-top:12px">
+
+<button
+  class="mini-btn"
+  id="eorResponsePlay"
+>
+🔊
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<button
+  class="primary-btn full"
+  id="nextLesson"
+>
+Practicar respuesta
+</button>
+
+</div>
+
+</article>
+
+`;
+
+}
+
+
+/* 5 REPETIR RESPUESTA */
+
+if(lessonStep === 5){
+
+const chunks =
+  eorSplit(
+    displayResponse(item)
+  );
+
+
+stage.innerHTML = `
+
+<article class="lesson-card">
+
+<div class="lesson-body">
+
+<p class="eyebrow">
+5 · ESCUCHA Y REPITE LA RESPUESTA
+</p>
+
+<h2>
+Practica tu respuesta por partes
+</h2>
+
+
+<div class="eor-chunks">
+
+${chunks.map(
+  (chunk,index) => `
+
+  <div class="eor-chunk">
+
+    <div>
+
+      <small>
+        PARTE ${index+1}
+      </small>
+
+      <strong>
+        ${chunk}
+      </strong>
+
+    </div>
+
+
+    <button
+      class="mini-btn eor-response-audio"
+      data-text="${encodeURIComponent(chunk)}"
+    >
+      🔊
+    </button>
+
+
+    <button
+      class="mini-btn eor-response-mic"
+      data-text="${encodeURIComponent(chunk)}"
+    >
+      🎙
+    </button>
+
+  </div>
+
+  `
+).join("")}
+
+</div>
+
+
+<div
+  class="feedback"
+  id="feedback"
+></div>
+
+
+<button
+  class="primary-btn full"
+  id="nextLesson"
+>
+Practicar con apoyo
+</button>
+
+</div>
+
+</article>
+
+`;
+
+}
+
+
+/* 6 CON APOYO */
+
+if(lessonStep === 6){
+
+stage.innerHTML = `
+
+<article class="lesson-card">
+
+<div class="lesson-body center">
+
+<p class="eyebrow">
+6 · PREGUNTA Y RESPUESTA CON APOYO
+</p>
+
+<h2>
+Escucha y contesta
+</h2>
+
+
+<div class="eor-qa">
+
+<div class="eor-question">
+
+<small>
+OFFICER
+</small>
+
+<strong>
+${item.prompt}
+</strong>
+
+<div style="margin-top:12px">
+
+<button
+  class="mini-btn"
+  id="eorGuidedQuestion"
+>
+🔊
+</button>
+
+</div>
+
+</div>
+
+
+<div class="eor-answer">
+
+<small>
+YOUR RESPONSE
+</small>
+
+<strong>
+${displayResponse(item)}
+</strong>
+
+</div>
+
+</div>
+
+
+<div class="mic-zone">
+
+<button
+  class="mic-btn"
+  id="eorGuidedMic"
+>
+🎙
+</button>
+
+<div
+  class="listening"
+  id="listening"
+>
+Escuchando...
+</div>
+
+</div>
+
+
+<div
+  class="feedback"
+  id="feedback"
+></div>
+
+
+<button
+  class="primary-btn"
+  id="nextLesson"
+>
+Ahora sin texto
+</button>
+
+</div>
+
+</article>
+
+`;
+
+}
+
+
+/* 7 SIN TEXTO */
+
+if(lessonStep === 7){
+
+stage.innerHTML = `
+
+<article class="lesson-card">
+
+<div class="lesson-body center">
+
+<p class="eyebrow">
+7 · RESPONDE SIN TEXTO
+</p>
+
+<h2>
+Escucha y responde
+</h2>
+
+<p class="lesson-help">
+No hay pregunta ni respuesta escritas.
+</p>
+
+
+<div class="eor-blind">
+
+<div class="eor-blind-icon">
+🎧
+</div>
+
+
+<button
+  class="audio-btn"
+  id="eorBlindQuestion"
+>
+▶
+</button>
+
+
+<div style="margin-top:22px">
+
+<button
+  class="mic-btn"
+  id="eorBlindMic"
+>
+🎙
+</button>
+
+</div>
+
+</div>
+
+
+<div
+  class="feedback"
+  id="feedback"
+></div>
+
+
+<button
+  class="primary-btn"
+  id="finishItem"
+>
+Continuar
+</button>
+
+</div>
+
+</article>
+
+`;
+
+}
+
+
+bindLessonEvents();
+
+};
+
+
+/* ==========================================================
+   EVENTOS
+========================================================== */
+
+window.bindLessonEvents =
+function(){
+
+const m =
+  currentMission();
+
+
+if(m.id > 6){
+
+  oldBindLessonEvents();
+
+  return;
+
+}
+
+
+/* NEXT */
+
+const next =
+  document.getElementById(
+    "nextLesson"
+  );
+
+
+if(next){
+
+  next.onclick =
+    () => {
+
+      lessonStep =
+        Math.min(
+          lessonStep + 1,
+          7
+        );
+
+
+      renderLesson();
+
+    };
+
+}
+
+
+/* PREGUNTA */
+
+const prompt =
+  document.getElementById(
+    "promptAudio"
+  );
+
+
+if(prompt){
+
+  prompt.onclick =
+    () => {
+
+      playPromptAudio(
+        currentItem(),
+        prompt
+      );
+
+    };
+
+}
+
+
+/* OPCIÓN MÚLTIPLE */
+
+document
+  .querySelectorAll(
+    ".option"
+  )
+  .forEach(
+    option => {
+
+      option.onclick =
+        () => {
+
+          const ok =
+            option.dataset.correct ===
+            "true";
+
+
+          const feedback =
+            document.getElementById(
+              "feedback"
+            );
+
+
+          if(!ok){
+
+            option.classList.add(
+              "soft-wrong"
+            );
+
+
+            option.disabled =
+              true;
+
+
+            feedback.className =
+              "feedback show retry";
+
+
+            feedback.textContent =
+              "Casi. Intenta otra vez.";
+
+
+            return;
+
+          }
+
+
+          option.classList.add(
+            "correct"
+          );
+
+
+          document
+            .querySelectorAll(
+              ".option"
+            )
+            .forEach(
+              x =>
+                x.disabled = true
+            );
+
+
+          feedback.className =
+            "feedback show good";
+
+
+          feedback.textContent =
+            "¡Correcto!";
+
+
+          state.listeningScores.push(
+            95
+          );
+
+
+          saveState();
+
+
+          const button =
+            document.getElementById(
+              "nextLesson"
+            );
+
+
+          if(button){
+
+            button.style.display =
+              "inline-block";
+
+          }
+
+        };
+
+    }
+  );
+
+
+/* PARTES PREGUNTA */
+
+document
+  .querySelectorAll(
+    ".eor-question-audio"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () => {
+
+          speak(
+            decodeURIComponent(
+              button.dataset.text
+            ),
+            button
+          );
+
+        };
+
+    }
+  );
+
+
+document
+  .querySelectorAll(
+    ".eor-question-mic"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () => {
+
+          startRecognition(
+            decodeURIComponent(
+              button.dataset.text
+            ),
+            false
+          );
+
+        };
+
+    }
+  );
+
+
+/* RESPUESTA */
+
+const qPlay =
+  document.getElementById(
+    "eorQuestionPlay"
+  );
+
+
+if(qPlay){
+
+  qPlay.onclick =
+    () =>
+      playPromptAudio(
+        currentItem(),
+        qPlay
+      );
+
+}
+
+
+const rPlay =
+  document.getElementById(
+    "eorResponsePlay"
+  );
+
+
+if(rPlay){
+
+  rPlay.onclick =
+    () =>
+      eorPlayResponse(
+        currentItem(),
+        rPlay
+      );
+
+}
+
+
+/* PARTES RESPUESTA */
+
+document
+  .querySelectorAll(
+    ".eor-response-audio"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () => {
+
+          speak(
+            decodeURIComponent(
+              button.dataset.text
+            ),
+            button
+          );
+
+        };
+
+    }
+  );
+
+
+document
+  .querySelectorAll(
+    ".eor-response-mic"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () => {
+
+          startRecognition(
+            decodeURIComponent(
+              button.dataset.text
+            ),
+            false
+          );
+
+        };
+
+    }
+  );
+
+
+/* CON APOYO */
+
+const guidedQ =
+  document.getElementById(
+    "eorGuidedQuestion"
+  );
+
+
+if(guidedQ){
+
+  guidedQ.onclick =
+    () =>
+      playPromptAudio(
+        currentItem(),
+        guidedQ
+      );
+
+}
+
+
+const guidedMic =
+  document.getElementById(
+    "eorGuidedMic"
+  );
+
+
+if(guidedMic){
+
+  guidedMic.onclick =
+    () =>
+      startRecognition(
+        displayResponse(
+          currentItem()
+        ),
+        false,
+        currentItem()
+      );
+
+}
+
+
+/* SIN TEXTO */
+
+const blindQ =
+  document.getElementById(
+    "eorBlindQuestion"
+  );
+
+
+if(blindQ){
+
+  blindQ.onclick =
+    () =>
+      playPromptAudio(
+        currentItem(),
+        blindQ
+      );
+
+}
+
+
+const blindMic =
+  document.getElementById(
+    "eorBlindMic"
+  );
+
+
+if(blindMic){
+
+  blindMic.onclick =
+    () =>
+      startRecognition(
+        displayResponse(
+          currentItem()
+        ),
+        false,
+        currentItem()
+      );
+
+}
+
+
+const finish =
+  document.getElementById(
+    "finishItem"
+  );
+
+
+if(finish){
+
+  finish.onclick =
+    advanceItem;
+
+}
+
+
+/* BOTÓN VOCABULARIO */
+
+document
+  .querySelectorAll(
+    "[data-vocab-mission]"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () => {
+
+          if(
+            typeof openMissionVocabReview ===
+            "function"
+          ){
+
+            openMissionVocabReview(
+              Number(
+                button.dataset.vocabMission
+              )
+            );
+
+          }
+
+        };
+
+    }
+  );
+
+};
+
+
+/* ==========================================================
+   TERMINAR PREGUNTA
+========================================================== */
+
+window.advanceItem =
+function(){
+
+const m =
+  currentMission();
+
+
+if(m.id > 6){
+
+  oldAdvanceItem();
+
+  return;
+
+}
+
+
+const item =
+  currentItem();
+
+
+if(
+  !state.practiced.includes(
+    displayResponse(item)
+  )
+){
+
+  state.practiced.push(
+    displayResponse(item)
+  );
+
+}
+
+
+state.minutes += 3;
+
+state.lastPractice =
+  new Date().toISOString();
+
+
+if(
+  state.currentItem <
+  m.items.length - 1
+){
+
+  state.currentItem++;
+
+  lessonStep = 1;
+
+  saveState();
+
+  renderLesson();
+
+  showToast(
+    "Siguiente situación"
+  );
+
+
+  return;
+
+}
+
+
+/* TERMINÓ ENTRENAMIENTO */
+
+eorTestPhase = 1;
+
+eorTestIndex = 0;
+
+eorTest1Correct = 0;
+
+eorTest2Scores = [];
+
+eorTest2Attempts = 0;
+
+eorSelectedAnswer = null;
+
+eorLastCorrectPosition = -1;
+
+
+saveState();
+
+eorRenderTest();
+
+};
+
+
+/* ==========================================================
+   MEZCLAR PRUEBA 1
+========================================================== */
+
+function eorShuffle(array){
+
+const result =
+  [...array];
+
+
+for(
+  let i=result.length-1;
+  i>0;
+  i--
+){
+
+  const j =
+    Math.floor(
+      Math.random() *
+      (i+1)
+    );
+
+
+  [
+    result[i],
+    result[j]
+  ]
+  =
+  [
+    result[j],
+    result[i]
+  ];
+
+}
+
+
+return result;
+
+}
+
+
+function eorCreateOptions(
+  correct
+){
+
+const m =
+  currentMission();
+
+
+const wrong =
+  eorShuffle(
+    m.items.filter(
+      item =>
+        item !== correct
+    )
+  )
+  .slice(
+    0,
+    2
+  );
+
+
+const options =
+  [...wrong];
+
+
+let position;
+
+
+do{
+
+  position =
+    Math.floor(
+      Math.random() * 3
+    );
+
+}
+while(
+  position ===
+    eorLastCorrectPosition
+  &&
+  m.items.length > 2
+);
+
+
+eorLastCorrectPosition =
+  position;
+
+
+options.splice(
+  position,
+  0,
+  correct
+);
+
+
+return options;
+
+}
+
+
+/* ==========================================================
+   PRUEBAS
+========================================================== */
+
+function eorRenderTest(){
+
+const m =
+  currentMission();
+
+
+const total =
+  m.items.length;
+
+
+const stage =
+  document.getElementById(
+    "lessonStage"
+  );
+
+
+document
+  .getElementById(
+    "lessonProgressBar"
+  )
+  .style.width =
+    "100%";
+
+
+/* ============================
+   PRUEBA 1
+============================ */
+
+if(eorTestPhase === 1){
+
+const item =
+  m.items[
+    eorTestIndex
+  ];
+
+
+eorTestOptions =
+  eorCreateOptions(
+    item
+  );
+
+
+document
+  .getElementById(
+    "lessonStepLabel"
+  )
+  .textContent =
+    `Prueba 1 · ${eorTestIndex+1} de ${total}`;
+
+
+stage.innerHTML = `
+
+<article class="eor-test">
+
+<div class="center">
+
+<p class="eyebrow">
+PRUEBA 1 · COMPRENSIÓN
+</p>
+
+<h2>
+Escucha y elige la mejor respuesta
+</h2>
+
+<p class="lesson-help">
+La pregunta y las respuestas se presentan en audio.
+</p>
+
+
+<button
+  class="audio-btn"
+  id="eorTestQuestion"
+>
+▶
+</button>
+
+</div>
+
+
+<div class="eor-audio-options">
+
+${eorTestOptions.map(
+  (option,index) => `
+
+  <div
+    class="eor-audio-option"
+    data-index="${index}"
+    data-correct="${
+      option === item
+    }"
+  >
+
+    <button
+      class="eor-choice-play"
+      data-play-index="${index}"
+    >
+      ▶
+    </button>
+
+
+    <button
+      class="secondary-btn eor-select"
+      data-select-index="${index}"
+    >
+      Respuesta ${index+1}
+    </button>
+
+
+    <span class="eor-radio">
+      ○
+    </span>
+
+  </div>
+
+  `
+).join("")}
+
+</div>
+
+
+<div
+  class="feedback"
+  id="feedback"
+></div>
+
+
+<div class="center">
+
+<button
+  class="primary-btn"
+  id="eorConfirmTest1"
+  disabled
+>
+Confirmar respuesta
+</button>
+
+</div>
+
+</article>
+
+`;
+
+
+document
+  .getElementById(
+    "eorTestQuestion"
+  )
+  .onclick =
+    () =>
+      playPromptAudio(
+        item,
+        document.getElementById(
+          "eorTestQuestion"
+        )
+      );
+
+
+document
+  .querySelectorAll(
+    "[data-play-index]"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        event => {
+
+          event.stopPropagation();
+
+
+          const option =
+            eorTestOptions[
+              Number(
+                button.dataset.playIndex
+              )
+            ];
+
+
+          eorPlayResponse(
+            option,
+            button
+          );
+
+        };
+
+    }
+  );
+
+
+const select =
+  index => {
+
+    eorSelectedAnswer =
+      index;
+
+
+    document
+      .querySelectorAll(
+        ".eor-audio-option"
+      )
+      .forEach(
+        (option,i) => {
+
+          option
+            .classList
+            .toggle(
+              "selected",
+              i === index
+            );
+
+
+          option
+            .querySelector(
+              ".eor-radio"
+            )
+            .textContent =
+              i === index
+                ?
+                "●"
+                :
+                "○";
+
+        }
+      );
+
+
+    document
+      .getElementById(
+        "eorConfirmTest1"
+      )
+      .disabled =
+        false;
+
+  };
+
+
+document
+  .querySelectorAll(
+    "[data-select-index]"
+  )
+  .forEach(
+    button => {
+
+      button.onclick =
+        () =>
+          select(
+            Number(
+              button.dataset.selectIndex
+            )
+          );
+
+    }
+  );
+
+
+document
+  .querySelectorAll(
+    ".eor-audio-option"
+  )
+  .forEach(
+    (option,index) => {
+
+      option.onclick =
+        event => {
+
+          if(
+            event.target.closest(
+              ".eor-choice-play"
+            )
+          ){
+
+            return;
+
+          }
+
+
+          select(index);
+
+        };
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "eorConfirmTest1"
+  )
+  .onclick =
+    function(){
+
+      if(
+        eorSelectedAnswer ===
+        null
+      ){
+
+        return;
+
+      }
+
+
+      const options =
+        document
+          .querySelectorAll(
+            ".eor-audio-option"
+          );
+
+
+      const selected =
+        options[
+          eorSelectedAnswer
+        ];
+
+
+      const ok =
+        selected.dataset.correct ===
+        "true";
+
+
+      if(ok){
+
+        eorTest1Correct++;
+
+      }
+
+
+      selected.classList.add(
+        ok
+          ?
+          "correct"
+          :
+          "wrong"
+      );
+
+
+      options.forEach(
+        option => {
+
+          if(
+            option.dataset.correct ===
+            "true"
+          ){
+
+            option.classList.add(
+              "correct"
+            );
+
+          }
+
+
+          option.style.pointerEvents =
+            "none";
+
+        }
+      );
+
+
+      const feedback =
+        document.getElementById(
+          "feedback"
+        );
+
+
+      feedback.className =
+        "feedback show "
+        +
+        (
+          ok
+            ?
+            "good"
+            :
+            "retry"
+        );
+
+
+      feedback.textContent =
+        ok
+          ?
+          "Respuesta correcta."
+          :
+          "Respuesta incorrecta.";
+
+
+      this.textContent =
+        eorTestIndex <
+        total - 1
+          ?
+          "Siguiente pregunta"
+          :
+          "Comenzar prueba oral";
+
+
+      this.onclick =
+        () => {
+
+          if(
+            eorTestIndex <
+            total - 1
+          ){
+
+            eorTestIndex++;
+
+            eorSelectedAnswer =
+              null;
+
+
+            eorRenderTest();
+
+          }
+
+          else{
+
+            eorTestPhase =
+              2;
+
+            eorTestIndex =
+              0;
+
+            eorTest2Attempts =
+              0;
+
+
+            eorRenderTest();
+
+          }
+
+        };
+
+    };
+
+
+return;
+
+}
+
+
+/* ============================
+   PRUEBA 2
+============================ */
+
+if(eorTestPhase === 2){
+
+const item =
+  m.items[
+    eorTestIndex
+  ];
+
+
+document
+  .getElementById(
+    "lessonStepLabel"
+  )
+  .textContent =
+    `Prueba 2 · ${eorTestIndex+1} de ${total}`;
+
+
+stage.innerHTML = `
+
+<article class="eor-test">
+
+<div class="center">
+
+<p class="eyebrow">
+PRUEBA 2 · RESPUESTA ORAL
+</p>
+
+<h2>
+Escucha y responde sin apoyo
+</h2>
+
+<p class="lesson-help">
+No hay texto ni opciones. Tienes máximo 2 intentos.
+</p>
+
+
+<div
+  class="eor-attempts"
+  id="eorAttempts"
+>
+Intentos disponibles:
+${2-eorTest2Attempts}
+</div>
+
+
+<div>
+
+<button
+  class="eor-test-question"
+  id="eorOralQuestion"
+>
+▶
+</button>
+
+</div>
+
+
+<button
+  class="mic-btn"
+  id="eorOralMic"
+>
+🎙
+</button>
+
+
+<div
+  class="feedback"
+  id="feedback"
+></div>
+
+
+<div style="margin-top:22px">
+
+<button
+  class="primary-btn"
+  id="eorOralNext"
+  style="display:none"
+>
+${
+  eorTestIndex <
+  total - 1
+    ?
+    "Siguiente pregunta"
+    :
+    "Ver resultado"
+}
+</button>
+
+</div>
+
+</div>
+
+</article>
+
+`;
+
+
+document
+  .getElementById(
+    "eorOralQuestion"
+  )
+  .onclick =
+    () =>
+      playPromptAudio(
+        item,
+        document.getElementById(
+          "eorOralQuestion"
+        )
+      );
+
+
+document
+  .getElementById(
+    "eorOralMic"
+  )
+  .onclick =
+    () =>
+      eorOralRecognition(
+        item
+      );
+
+
+document
+  .getElementById(
+    "eorOralNext"
+  )
+  .onclick =
+    () => {
+
+      if(
+        eorTestIndex <
+        total - 1
+      ){
+
+        eorTestIndex++;
+
+        eorTest2Attempts =
+          0;
+
+
+        eorRenderTest();
+
+      }
+
+      else{
+
+        eorTestPhase =
+          3;
+
+
+        eorRenderTest();
+
+      }
+
+    };
+
+
+return;
+
+}
+
+
+/* ============================
+   RESULTADOS
+============================ */
+
+if(eorTestPhase === 3){
+
+const test1 =
+  Math.round(
+    eorTest1Correct /
+    total *
+    100
+  );
+
+
+const test2 =
+  eorTest2Scores.length
+    ?
+    Math.round(
+      eorTest2Scores
+        .reduce(
+          (sum,value) =>
+            sum + value,
+          0
+        )
+      /
+      eorTest2Scores.length
+    )
+    :
+    0;
+
+
+const final =
+  Math.round(
+    (
+      test1 +
+      test2
+    )
+    /
+    2
+  );
+
+
+document
+  .getElementById(
+    "lessonStepLabel"
+  )
+  .textContent =
+    "Resultados";
+
+
+stage.innerHTML = `
+
+<article class="eor-test">
+
+<div class="center">
+
+<div style="font-size:70px">
+
+${
+  final >= 80
+    ?
+    "🏆"
+    :
+  final >= 60
+    ?
+    "✅"
+    :
+    "📘"
+}
+
+</div>
+
+
+<p class="eyebrow">
+RESULTADO FINAL · MISIÓN ${m.id}
+</p>
+
+
+<h2>
+${m.title}
+</h2>
+
+
+<div class="eor-final-score">
+${final}%
+</div>
+
+
+<div class="eor-result-grid">
+
+<div>
+
+<strong>
+${test1}%
+</strong>
+
+<small>
+Prueba 1 · Comprensión
+</small>
+
+</div>
+
+
+<div>
+
+<strong>
+${test2}%
+</strong>
+
+<small>
+Prueba 2 · Producción oral
+</small>
+
+</div>
+
+
+<div>
+
+<strong>
+${total}
+</strong>
+
+<small>
+Situaciones evaluadas
+</small>
+
+</div>
+
+</div>
+
+
+<button
+  class="primary-btn"
+  id="eorFinishMission"
+>
+Finalizar misión
+</button>
+
+</div>
+
+</article>
+
+`;
+
+
+document
+  .getElementById(
+    "eorFinishMission"
+  )
+  .onclick =
+    () => {
+
+      if(
+        !state.completed.includes(
+          m.id
+        )
+      ){
+
+        state.completed.push(
+          m.id
+        );
+
+
+        state.miles +=
+          150;
+
+      }
+
+
+      state.missionTimes[m.id] =
+        (
+          state.missionTimes[m.id]
+          ||
+          0
+        )
+        +
+        Math.max(
+          10,
+          m.items.length * 3
+        );
+
+
+      state.missionResults[m.id] = {
+
+        listening:test1,
+
+        speaking:test2,
+
+        attempts:
+          state.attempts,
+
+        final
+
+      };
+
+
+      const nextMission =
+        missions.find(
+          mission =>
+            mission.id ===
+            m.id + 1
+        );
+
+
+      if(nextMission){
+
+        state.currentMission =
+          nextMission.id;
+
+      }
+
+      else{
+
+        state.currentMission =
+          1;
+
+      }
+
+
+      state.currentItem =
+        0;
+
+
+      lessonStep =
+        0;
+
+
+      eorTestPhase =
+        0;
+
+
+      saveState();
+
+
+      setView(
+        "route"
+      );
+
+    };
+
+}
+
+}
+
+
+/* ==========================================================
+   RECONOCIMIENTO PRUEBA 2
+========================================================== */
+
+function eorOralRecognition(
+  item
+){
+
+const SR =
+  window.SpeechRecognition
+  ||
+  window.webkitSpeechRecognition;
+
+
+const feedback =
+  document.getElementById(
+    "feedback"
+  );
+
+
+const mic =
+  document.getElementById(
+    "eorOralMic"
+  );
+
+
+if(!SR){
+
+  feedback.className =
+    "feedback show retry";
+
+
+  feedback.textContent =
+    "Este navegador no permite reconocimiento de voz.";
+
+
+  return;
+
+}
+
+
+if(
+  eorTest2Attempts >= 2
+){
+
+  return;
+
+}
+
+
+const recognition =
+  new SR();
+
+
+recognition.lang =
+  "en-US";
+
+
+recognition.interimResults =
+  false;
+
+
+recognition.maxAlternatives =
+  3;
+
+
+mic.disabled =
+  true;
+
+
+feedback.className =
+  "feedback show";
+
+
+feedback.textContent =
+  "Escuchando…";
+
+
+recognition.onresult =
+  event => {
+
+    const said =
+      event.results[0][0]
+        .transcript;
+
+
+    eorTest2Attempts++;
+
+
+    state.attempts++;
+
+
+    const open =
+      acceptedOpenResponse(
+        said,
+        item
+      );
+
+
+    const score =
+      open === true
+        ?
+        95
+        :
+        Math.round(
+          similarity(
+            said,
+            displayResponse(item)
+          )
+          *
+          100
+        );
+
+
+    const passed =
+      score >= 55;
+
+
+    document
+      .getElementById(
+        "eorAttempts"
+      )
+      .textContent =
+        "Intentos disponibles: "
+        +
+        Math.max(
+          0,
+          2-eorTest2Attempts
+        );
+
+
+    feedback.className =
+      "feedback show "
+      +
+      (
+        passed
+          ?
+          "good"
+          :
+          "retry"
+      );
+
+
+    if(passed){
+
+      feedback.innerHTML =
+        `Respuesta comprendida.<br><small>Escuchamos: “${said}”</small>`;
+
+    }
+
+    else if(
+      eorTest2Attempts < 2
+    ){
+
+      feedback.innerHTML =
+        `Intenta una vez más.<br><small>Escuchamos: “${said}”</small>`;
+
+    }
+
+    else{
+
+      feedback.innerHTML =
+        `Se terminaron los 2 intentos.<br><small>Escuchamos: “${said}”</small>`;
+
+    }
+
+
+    if(
+      passed
+      ||
+      eorTest2Attempts >= 2
+    ){
+
+      eorTest2Scores.push(
+        score
+      );
+
+
+      mic.disabled =
+        true;
+
+
+      document
+        .getElementById(
+          "eorOralNext"
+        )
+        .style.display =
+          "inline-block";
+
+    }
+
+    else{
+
+      mic.disabled =
+        false;
+
+    }
+
+  };
+
+
+recognition.onerror =
+  () => {
+
+    mic.disabled =
+      false;
+
+
+    feedback.className =
+      "feedback show retry";
+
+
+    feedback.textContent =
+      "No pudimos escuchar con claridad. Intenta nuevamente.";
+
+  };
+
+
+recognition.onend =
+  () => {
+
+    if(
+      eorTest2Attempts < 2
+      &&
+      document
+        .getElementById(
+          "eorOralNext"
+        )
+        ?.style.display !==
+        "inline-block"
+    ){
+
+      mic.disabled =
+        false;
+
+    }
+
+  };
+
+
+try{
+
+  recognition.start();
+
+}
+catch(error){
+
+  mic.disabled =
+    false;
+
+
+  console.warn(error);
+
+}
+
+}
+
+
+})();
+</script>
 </body>
 </html>
