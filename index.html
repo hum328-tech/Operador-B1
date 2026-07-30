@@ -277,6 +277,7 @@ button{cursor:pointer}
 .practice-complete strong{font-size:21px}
 .practice-complete span{margin-top:6px;color:#b7c7d8;font-size:13px}
 .mic-btn.compact{width:58px;height:58px;font-size:22px}
+.mic-btn.recording,.mini-btn.recording{background:#b42318!important;color:#fff!important;box-shadow:0 0 0 8px rgba(180,35,24,.12)}
 .self-study-reminder{
   max-width:620px;
   margin:18px auto;
@@ -1541,7 +1542,7 @@ function renderVocabReview(){
 function bindVocabReviewEvents(){
  const item=vocabItem();
  const hear=document.getElementById("vocabHear");if(hear)hear.onclick=()=>speak(item.en,hear);
- const mic=document.getElementById("vocabSpeak");if(mic)mic.onclick=()=>startRecognition(item.en,false);
+ const mic=document.getElementById("vocabSpeak");if(mic)mic.onclick=()=>startRecognition(item.en,false,null,mic);
  const prev=document.getElementById("vocabPrev");if(prev)prev.onclick=()=>cycleVocab(-1);
  const next=document.getElementById("vocabNext");if(next)next.onclick=()=>cycleVocab(1);
  const reveal=document.getElementById("vocabReveal");if(reveal)reveal.onclick=()=>document.getElementById("vocabAnswer").classList.toggle("show");
@@ -2919,11 +2920,11 @@ function bindGlossary(){
 
   document.querySelectorAll(".practice-mode").forEach(b=>b.onclick=()=>{glossaryMode=b.dataset.mode;glossaryIndex=0;renderGlossary()});
   document.querySelectorAll(".glossary-listen").forEach(b=>b.onclick=()=>{const t=decodeURIComponent(b.dataset.text);if(b.dataset.type==="prompt")playPromptAudio(findPromptItem(t)||t,b);else speak(t,b)});
-  document.querySelectorAll(".glossary-speak").forEach(b=>b.onclick=()=>startGlossaryRecognition(decodeURIComponent(b.dataset.text)));
+  document.querySelectorAll(".glossary-speak").forEach(b=>b.onclick=()=>startGlossaryRecognition(decodeURIComponent(b.dataset.text),b));
   const prev=document.getElementById("glossaryPrev");if(prev)prev.onclick=()=>{glossaryIndex=(glossaryIndex-1+glossary.length)%glossary.length;renderGlossary()};
   const next=document.getElementById("glossaryNext");if(next)next.onclick=()=>{glossaryIndex=(glossaryIndex+1)%glossary.length;renderGlossary()};
   const listen=document.getElementById("glossaryListen");if(listen)listen.onclick=()=>{const g=glossary[glossaryIndex];if(g.type==="prompt")playPromptAudio(findPromptItem(g.en)||g.en,listen);else speak(g.en,listen)};
-  const mic=document.getElementById("glossaryMic");if(mic)mic.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en);
+  const mic=document.getElementById("glossaryMic");if(mic)mic.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en,mic);
 
   document.querySelectorAll(".glossary-option").forEach(o=>o.onclick=()=>{
     const ok=o.dataset.correct==="true";o.classList.add(ok?"correct":"soft-wrong");
@@ -2936,7 +2937,7 @@ function bindGlossary(){
     glossaryResult(ok,ok?"¡Excelente! Lo escribiste correctamente.":`Casi. Revisa este modelo: ${glossary[glossaryIndex].en}`);
   };
 
-  const tm=document.getElementById("translateMic");if(tm)tm.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en);
+  const tm=document.getElementById("translateMic");if(tm)tm.onclick=()=>startGlossaryRecognition(glossary[glossaryIndex].en,tm);
   const show=document.getElementById("showGlossaryAnswer");if(show)show.onclick=()=>document.getElementById("hiddenGlossaryAnswer").classList.toggle("show");
   const al=document.getElementById("answerListen");if(al)al.onclick=()=>speak(glossary[glossaryIndex].en,al);
 }
@@ -2951,18 +2952,48 @@ function glossaryResult(ok,message){
   const f=document.getElementById("glossaryFeedback");
   if(f){f.className=`feedback show ${ok?"good":"retry"}`;f.textContent=message}
 }
-function startGlossaryRecognition(expected){
+function startGlossaryRecognition(expected,button=null){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   const f=document.getElementById("glossaryFeedback")||document.getElementById("feedback");
-  if(!SR){if(f){f.className="feedback show retry";f.textContent="El navegador no permite reconocimiento de voz. Escucha y repite libremente."}return}
-  const r=new SR();r.lang="en-US";r.interimResults=false;
-  r.onresult=e=>{
+
+  if(recognitionActive){
+    finishRecognitionSession(false);
+    if(f){f.className="feedback show";f.textContent="Grabación detenida."}
+    return;
+  }
+
+  if(!SR){
+    if(f){f.className="feedback show retry";f.textContent="El navegador no permite reconocimiento de voz."}
+    return;
+  }
+
+  recognition=new SR();
+  recognition.lang="en-US";
+  recognition.interimResults=false;
+  recognition.continuous=false;
+
+  recognitionActive=true;
+  setRecognitionButton(button);
+
+  recognitionTimer=setTimeout(()=>{
+    finishRecognitionSession(false);
+    if(f){f.className="feedback show retry";f.textContent="Se terminó el tiempo de grabación. Inténtalo otra vez."}
+  },30000);
+
+  recognition.onresult=e=>{
     const said=e.results[0][0].transcript;
     const ok=similarity(said,expected)>=.55;
+    finishRecognitionSession(false);
     glossaryResult(ok,ok?`¡Muy bien! Escuchamos: “${said}”`:`Buen intento. Escucha el modelo y prueba otra vez: ${expected}`);
   };
-  r.onerror=()=>{if(f){f.className="feedback show retry";f.textContent="No logramos escuchar con claridad. Inténtalo nuevamente."}};
-  r.start();
+
+  recognition.onspeechend=()=>finishRecognitionSession(false);
+  recognition.onerror=()=>{
+    finishRecognitionSession(true);
+    if(f){f.className="feedback show retry";f.textContent="No logramos escuchar con claridad. Inténtalo nuevamente."}
+  };
+
+  try{recognition.start()}catch(e){finishRecognitionSession(true)}
 }
 
 function renderTeacher(){
@@ -3024,12 +3055,12 @@ function bindLessonEvents(){
   const ps=document.querySelector(".prompt-small");if(ps)ps.onclick=()=>playPromptAudio(currentItem(),ps);
   const rs=document.querySelector(".response-small");if(rs)rs.onclick=()=>speak(displayResponse(currentItem()));
   document.querySelectorAll(".frag-audio").forEach(b=>b.onclick=()=>speak(decodeURIComponent(b.dataset.text)));
-  document.querySelectorAll(".frag-mic").forEach(b=>b.onclick=()=>startRecognition(decodeURIComponent(b.dataset.text),false));
+  document.querySelectorAll(".frag-mic").forEach(b=>b.onclick=()=>startRecognition(decodeURIComponent(b.dataset.text),false,null,b));
   const ra=document.getElementById("responseAudio");if(ra)ra.onclick=()=>speak(displayResponse(currentItem()));
-  const rm=document.getElementById("responseMic");if(rm)rm.onclick=()=>startRecognition(displayResponse(currentItem()),false,currentItem());
+  const rm=document.getElementById("responseMic");if(rm)rm.onclick=()=>startRecognition(displayResponse(currentItem()),false,currentItem(),rm);
   const sp=document.getElementById("simPrompt");if(sp)sp.onclick=()=>playPromptAudio(currentItem(),sp);
   const ha=document.getElementById("hearAgain");if(ha)ha.onclick=()=>speak(displayResponse(currentItem()));
-  const sm=document.getElementById("simMic");if(sm)sm.onclick=()=>startRecognition(displayResponse(currentItem()),true,currentItem());
+  const sm=document.getElementById("simMic");if(sm)sm.onclick=()=>startRecognition(displayResponse(currentItem()),true,currentItem(),sm);
   const fi=document.getElementById("finishItem");if(fi)fi.onclick=advanceItem;
 }
 function advanceItem(){
@@ -3225,6 +3256,9 @@ function stopAllAudio(){
 }
 
 
+const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
 let ttsVoicesCache=[];
 
 function refreshTtsVoices(){
@@ -3239,19 +3273,14 @@ if("speechSynthesis" in window){
   speechSynthesis.onvoiceschanged=refreshTtsVoices;
 }
 
-function pickEnglishVoice(preferredLang="en-US"){
+function pickEnglishVoice(){
   const voices=refreshTtsVoices();
-
-  const exact=voices.find(v=>String(v.lang||"").toLowerCase()===preferredLang.toLowerCase());
-  if(exact)return exact;
-
-  const us=voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en-us"));
-  if(us)return us;
-
-  const english=voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en"));
-  if(english)return english;
-
-  return null;
+  return (
+    voices.find(v=>String(v.lang||"").toLowerCase()==="en-us") ||
+    voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en-us")) ||
+    voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en")) ||
+    null
+  );
 }
 
 function speakWithDeviceVoice(text,button=null,lang="en-US"){
@@ -3263,10 +3292,8 @@ function speakWithDeviceVoice(text,button=null,lang="en-US"){
 
   stopAllAudio();
 
-  const originalText=button ? button.textContent : null;
-
   if(button){
-    if(button.dataset.originalText===undefined)button.dataset.originalText=originalText;
+    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
     button.classList.add("playing");
     button.textContent="🔊";
   }
@@ -3278,67 +3305,56 @@ function speakWithDeviceVoice(text,button=null,lang="en-US"){
     }
   };
 
-  const doSpeak=()=>{
-    try{
-      const utterance=new SpeechSynthesisUtterance(phrase);
-      utterance.lang=lang;
-      utterance.rate=.82;
-      utterance.pitch=1;
-      utterance.volume=1;
+  try{
+    const u=new SpeechSynthesisUtterance(phrase);
+    u.lang=lang;
+    u.rate=.82;
+    u.pitch=1;
+    u.volume=1;
 
-      const voice=pickEnglishVoice(lang);
-      if(voice)utterance.voice=voice;
+    const voice=pickEnglishVoice();
+    if(voice)u.voice=voice;
 
-      utterance.onend=restore;
-      utterance.onerror=()=>{
-        restore();
-        console.error("TTS error en dispositivo para:",phrase);
-      };
+    u.onend=restore;
+    u.onerror=restore;
 
-      speechSynthesis.cancel();
+    // IMPORTANTE EN iPHONE:
+    // speak() se ejecuta inmediatamente dentro del toque del usuario.
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
 
-      // Safari/iOS a veces necesita que speak() ocurra después de que
-      // la lista de voces haya sido consultada y dentro del mismo gesto.
-      speechSynthesis.speak(utterance);
-
-      // Workaround suave para iOS cuando la cola queda pausada.
-      setTimeout(()=>{
-        if(speechSynthesis.paused){
-          try{speechSynthesis.resume()}catch(e){}
-        }
-      },120);
-
-      return true;
-    }catch(err){
-      restore();
-      console.error("No se pudo iniciar TTS:",err);
-      return false;
+    if(speechSynthesis.paused){
+      try{speechSynthesis.resume()}catch(e){}
     }
-  };
 
-  const voicesNow=refreshTtsVoices();
-
-  if(voicesNow.length){
-    return doSpeak();
+    return true;
+  }catch(err){
+    restore();
+    console.error("TTS no disponible:",err);
+    return false;
   }
+}
 
-  // Si iOS aún no cargó voces, intenta una vez más muy rápido.
-  setTimeout(()=>{
-    refreshTtsVoices();
-    doSpeak();
-  },80);
-
-  return true;
+function knownMp3Candidates(text){
+  const key=normalizeAudioKey(text);
+  const explicit=VOCAB_AUDIO[key]?[VOCAB_AUDIO[key]]:[];
+  const recorded=recordedAudioCandidates(text);
+  return [...new Set([...explicit,...recorded])];
 }
 
 function playVocabAudio(text,button=null,onFail=null){
   if(!audioEnabled)return false;
 
-  const key=normalizeAudioKey(text);
-  const explicit=VOCAB_AUDIO[key]?[VOCAB_AUDIO[key]]:[];
-  const recorded=recordedAudioCandidates(text);
-  const automatic=autoAudioCandidates(text);
-  const candidates=[...new Set([...explicit,...recorded,...automatic])];
+  const known=knownMp3Candidates(text);
+
+  // En iPhone no intentamos nombres "adivinados" antes del TTS:
+  // si no sabemos que existe un MP3, hablamos de inmediato dentro del toque.
+  if(IS_IOS && !known.length){
+    return false;
+  }
+
+  const automatic=IS_IOS ? [] : autoAudioCandidates(text);
+  const candidates=[...new Set([...known,...automatic])];
 
   if(!candidates.length){
     if(onFail)onFail();
@@ -3364,7 +3380,6 @@ function playVocabAudio(text,button=null,onFail=null){
   const tryNext=()=>{
     if(index>=candidates.length){
       restore();
-      console.warn("No se encontró MP3; usando voz del dispositivo:",text);
       if(onFail)onFail();
       return;
     }
@@ -3377,12 +3392,10 @@ function playVocabAudio(text,button=null,onFail=null){
       restore();
       if(currentVocabAudio===audio)currentVocabAudio=null;
     };
-
     audio.onerror=()=>{
       if(currentVocabAudio===audio)currentVocabAudio=null;
       tryNext();
     };
-
     audio.play().catch(()=>{
       if(currentVocabAudio===audio)currentVocabAudio=null;
       tryNext();
@@ -3400,6 +3413,14 @@ function playVocabAudio(text,button=null,onFail=null){
 */
 function speak(text,button=null){
   if(!audioEnabled)return;
+
+  const known=knownMp3Candidates(text);
+
+  // iPhone: si no hay MP3 conocido, TTS inmediato para conservar el gesto.
+  if(IS_IOS && !known.length){
+    speakWithDeviceVoice(text,button,"en-US");
+    return;
+  }
 
   const fallback=()=>speakWithDeviceVoice(text,button,"en-US");
 
@@ -3434,26 +3455,26 @@ function findPromptItem(promptText){
 function playPromptAudio(itemOrText,button=null){
   if(!audioEnabled)return false;
 
-  stopAllAudio();
-
   const item=typeof itemOrText==="object" && itemOrText ? itemOrText : null;
   const promptText=item ? item.prompt : String(itemOrText||"");
 
   const explicit=item && item.audio ? [item.audio] : [];
   const recorded=recordedAudioCandidates(promptText);
-  const automatic=autoAudioCandidates(promptText);
-  const candidates=[...new Set([...explicit,...recorded,...automatic])];
+  const known=[...new Set([...explicit,...recorded])];
 
-  const fallback=()=>{
-    console.warn("No se encontró MP3 para la pregunta; usando TTS iPhone/Safari:",promptText);
-    speakWithDeviceVoice(promptText,button,"en-US");
-  };
-
-  if(!candidates.length){
-    fallback();
-    return true;
+  // iPhone: si la pregunta no tiene un MP3 conocido, TTS inmediato.
+  if(IS_IOS && !known.length){
+    return speakWithDeviceVoice(promptText,button,"en-US");
   }
 
+  const automatic=IS_IOS ? [] : autoAudioCandidates(promptText);
+  const candidates=[...new Set([...known,...automatic])];
+
+  if(!candidates.length){
+    return speakWithDeviceVoice(promptText,button,"en-US");
+  }
+
+  stopAllAudio();
   let index=0;
 
   if(button){
@@ -3472,7 +3493,8 @@ function playPromptAudio(itemOrText,button=null){
   const tryNext=()=>{
     if(index>=candidates.length){
       restore();
-      fallback();
+      // En otros navegadores sí puede caer al TTS después del fallo.
+      if(!IS_IOS)speakWithDeviceVoice(promptText,button,"en-US");
       return;
     }
 
@@ -3484,12 +3506,10 @@ function playPromptAudio(itemOrText,button=null){
       restore();
       if(currentPromptAudio===audio)currentPromptAudio=null;
     };
-
     audio.onerror=()=>{
       if(currentPromptAudio===audio)currentPromptAudio=null;
       tryNext();
     };
-
     audio.play().catch(()=>{
       if(currentPromptAudio===audio)currentPromptAudio=null;
       tryNext();
@@ -3500,28 +3520,139 @@ function playPromptAudio(itemOrText,button=null){
   return true;
 }
 
+
+let recognitionTimer=null;
+let recognitionActive=false;
+let recognitionButton=null;
+
+function finishRecognitionSession(useAbort=false){
+  if(recognitionTimer){
+    clearTimeout(recognitionTimer);
+    recognitionTimer=null;
+  }
+
+  const r=recognition;
+  recognition=null;
+  recognitionActive=false;
+
+  if(recognitionButton){
+    recognitionButton.classList.remove("recording");
+    recognitionButton.textContent="🎙";
+    recognitionButton=null;
+  }
+
+  if(r){
+    try{
+      if(useAbort && typeof r.abort==="function")r.abort();
+      else if(typeof r.stop==="function")r.stop();
+    }catch(e){}
+  }
+
+  const listening=document.getElementById("listening");
+  if(listening)listening.classList.remove("active");
+}
+
+function setRecognitionButton(button){
+  recognitionButton=button||null;
+  if(recognitionButton){
+    recognitionButton.classList.add("recording");
+    recognitionButton.textContent="⏹";
+  }
+}
+
 function similarity(a,b){
   const clean=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g,"").split(/\s+/).filter(Boolean);
   const A=clean(a),B=clean(b);return A.filter(w=>B.includes(w)).length/Math.max(B.length,1);
 }
-function startRecognition(expected,simulation,itemOverride=null){
+function startRecognition(expected,simulation,itemOverride=null,button=null){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  const f=document.getElementById("feedback"),listening=document.getElementById("listening");
-  if(!SR){f.className="feedback show retry";f.textContent="Tu navegador no permite reconocimiento de voz. Escucha y repite libremente.";return}
-  recognition=new SR();recognition.lang="en-US";recognition.interimResults=false;recognition.maxAlternatives=3;
+  const f=document.getElementById("feedback");
+  const listening=document.getElementById("listening");
+
+  // El mismo botón funciona como detener.
+  if(recognitionActive){
+    finishRecognitionSession(false);
+    if(f){
+      f.className="feedback show";
+      f.textContent="Grabación detenida.";
+    }
+    return;
+  }
+
+  if(!SR){
+    if(f){
+      f.className="feedback show retry";
+      f.textContent="Tu navegador no permite reconocimiento de voz.";
+    }
+    return;
+  }
+
+  recognition=new SR();
+  recognition.lang="en-US";
+  recognition.interimResults=false;
+  recognition.continuous=false;
+  recognition.maxAlternatives=3;
+
+  recognitionActive=true;
+  setRecognitionButton(button);
+
   if(listening)listening.classList.add("active");
+
+  // Corte máximo de seguridad: 30 segundos.
+  recognitionTimer=setTimeout(()=>{
+    finishRecognitionSession(false);
+    if(f){
+      f.className="feedback show retry";
+      f.textContent="Se terminó el tiempo de grabación. Toca el micrófono para intentar otra vez.";
+    }
+  },30000);
+
   recognition.onresult=e=>{
     const said=e.results[0][0].transcript;
     const openOk=itemOverride?acceptedOpenResponse(said,itemOverride):null;
     const score=openOk===true?95:Math.round(similarity(said,expected)*100);
-    state.attempts++;state.speakingScores.push(Math.max(score,55));
+
+    state.attempts++;
+    state.speakingScores.push(Math.max(score,55));
     if(!state.practiced.includes(expected))state.practiced.push(expected);
-    saveState();f.className="feedback show "+(score>=55?"good":"retry");
-    f.innerHTML=score>=55?`¡Muy bien! Tu respuesta fue comprendida.<br><small>Escuchamos: “${said}”</small>`:`Buen intento. Escucha de nuevo y prueba otra vez.<br><small>Esperábamos: “${expected}”</small>`;
+    saveState();
+
+    if(f){
+      f.className="feedback show "+(score>=55?"good":"retry");
+      f.innerHTML=score>=55
+        ? `¡Muy bien! Tu respuesta fue comprendida.<br><small>Escuchamos: “${said}”</small>`
+        : `Buen intento. Escucha de nuevo y prueba otra vez.<br><small>Esperábamos: “${expected}”</small>`;
+    }
+
+    // Cerrar el micrófono inmediatamente después de obtener una respuesta.
+    finishRecognitionSession(false);
   };
-  recognition.onerror=()=>{f.className="feedback show retry";f.textContent="No pudimos escuchar con claridad. Puedes intentarlo nuevamente."};
-  recognition.onend=()=>{if(listening)listening.classList.remove("active")};
-  recognition.start();
+
+  recognition.onspeechend=()=>finishRecognitionSession(false);
+
+  recognition.onerror=e=>{
+    finishRecognitionSession(true);
+    if(f){
+      f.className="feedback show retry";
+      f.textContent=e.error==="no-speech"
+        ?"No escuchamos una respuesta. Toca el micrófono e inténtalo otra vez."
+        :"No pudimos escuchar con claridad. Inténtalo nuevamente.";
+    }
+  };
+
+  recognition.onend=()=>{
+    if(recognitionActive)finishRecognitionSession(false);
+  };
+
+  try{
+    recognition.start();
+  }catch(err){
+    finishRecognitionSession(true);
+    if(f){
+      f.className="feedback show retry";
+      f.textContent="No se pudo iniciar el micrófono. Inténtalo de nuevo.";
+    }
+  }
 }
 function exportCSV(){
   const rows=[["Misión","Estado","Listening","Speaking","Intentos","Tiempo","Calificación"]];
