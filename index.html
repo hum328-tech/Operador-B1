@@ -3075,7 +3075,84 @@ const VOCAB_AUDIO = {
   "work":"audio/Work.mp3",
   "yard":"audio/Yard.mp3",
   "years old":"audio/Years old.mp3"
+  "right":"audio/Right.mp3",
+  "left":"audio/Left.mp3",
+  "lane":"audio/Lane.mp3",
+  "merge":"audio/Merge.mp3",
+  "ahead":"audio/Ahead.mp3",
+  "route":"audio/Route.mp3",
+  "stop":"audio/Stop.mp3",
+  "yield":"audio/Yield.mp3",
+  "do not enter":"audio/Do not enter.mp3",
+  "wrong way":"audio/Wrong way.mp3",
+  "one way":"audio/One way.mp3",
+  "speed limit":"audio/Speed limit.mp3",
+  "weight limit":"audio/Weight limit.mp3",
+  "right lane ends":"audio/Right lane ends.mp3",
+  "left lane":"audio/Left lane.mp3",
+  "no trucks":"audio/No trucks.mp3",
+  "rollover":"audio/Rollover.mp3",
+  "curve":"audio/Curve.mp3",
+  "traffic signal":"audio/Traffic signal.mp3",
+  "pedestrians":"audio/Pedestrians.mp3",
+  "road work":"audio/Road work.mp3",
+  "road workers":"audio/Road workers.mp3",
+  "detour":"audio/Detour.mp3",
+  "low clearance":"audio/Low clearance.mp3",
+  "bridge":"audio/Bridge.mp3",
+  "shoulder":"audio/Shoulder.mp3",
+  "road closed":"audio/Road closed.mp3",
+  "inspection station":"audio/Inspection station.mp3",
+  "flood":"audio/Flood.mp3",
+  "snow":"audio/Snow.mp3",
+  "rain":"audio/Rain.mp3",
+  "storm":"audio/Storm.mp3",
+  "ice":"audio/Ice.mp3",
+  "weather":"audio/Weather.mp3",
+  "three points of contact":"audio/Three points of contact.mp3",
+  "seat":"audio/Seat.mp3",
+  "mirrors":"audio/Mirrors.mp3",
+  "control":"audio/Control.mp3",
+  "complete stop":"audio/Complete stop.mp3",
+  "turn signals":"audio/Turn signals.mp3",
+  "change lanes":"audio/Change lanes.mp3",
+  "get out and look":"audio/Get out and look.mp3",
+  "backing area":"audio/Backing area.mp3",
+  "reposition":"audio/Reposition.mp3",
+  "boundary":"audio/Boundary.mp3",
+  "cone":"audio/Cone.mp3",
+  "parking area":"audio/Parking area.mp3",
 };
+
+
+function autoAudioCandidates(text){
+  const original=String(text||"").trim();
+  if(!original)return [];
+
+  const clean=original
+    .replace(/[’']/g,"")
+    .replace(/[?.!,;:]/g,"")
+    .replace(/[–—]/g,"-")
+    .replace(/\s+/g," ")
+    .trim();
+
+  const noHyphen=clean.replace(/-/g," ").replace(/\s+/g," ").trim();
+
+  const title=s=>s.replace(/\b\w/g,c=>c.toUpperCase());
+
+  const bases=[
+    original,
+    clean,
+    noHyphen,
+    original.toLowerCase(),
+    clean.toLowerCase(),
+    noHyphen.toLowerCase(),
+    title(clean.toLowerCase()),
+    title(noHyphen.toLowerCase())
+  ].filter(Boolean);
+
+  return [...new Set(bases.map(name=>`audio/${name}.mp3`))];
+}
 
 function normalizeAudioKey(text){
   return String(text||"")
@@ -3104,13 +3181,16 @@ function playVocabAudio(text,button=null){
   if(!audioEnabled)return false;
 
   const key=normalizeAudioKey(text);
-  const src=VOCAB_AUDIO[key];
-  if(!src)return false;
+  const explicit=VOCAB_AUDIO[key]?[VOCAB_AUDIO[key]]:[];
+  const recorded=recordedAudioCandidates(text);
+  const automatic=autoAudioCandidates(text);
+  const candidates=[...new Set([...explicit,...recorded,...automatic])];
+
+  if(!candidates.length)return false;
 
   stopAllAudio();
 
-  const audio=new Audio(encodeURI(src));
-  currentVocabAudio=audio;
+  let index=0;
 
   if(button){
     if(button.dataset.originalText===undefined){
@@ -3129,23 +3209,34 @@ function playVocabAudio(text,button=null){
     }
   };
 
-  audio.onended=()=>{
-    restore();
-    if(currentVocabAudio===audio)currentVocabAudio=null;
+  const tryNext=()=>{
+    if(index>=candidates.length){
+      restore();
+      console.error("No se encontró MP3 para vocabulario:",text,candidates);
+      return;
+    }
+
+    const src=candidates[index++];
+    const audio=new Audio(encodeURI(src));
+    currentVocabAudio=audio;
+
+    audio.onended=()=>{
+      restore();
+      if(currentVocabAudio===audio)currentVocabAudio=null;
+    };
+
+    audio.onerror=()=>{
+      if(currentVocabAudio===audio)currentVocabAudio=null;
+      tryNext();
+    };
+
+    audio.play().catch(()=>{
+      if(currentVocabAudio===audio)currentVocabAudio=null;
+      tryNext();
+    });
   };
 
-  audio.onerror=()=>{
-    restore();
-    if(currentVocabAudio===audio)currentVocabAudio=null;
-    console.error("No se pudo cargar el audio de vocabulario:",src);
-  };
-
-  audio.play().catch(err=>{
-    restore();
-    if(currentVocabAudio===audio)currentVocabAudio=null;
-    console.error("No se pudo reproducir el audio de vocabulario:",src,err);
-  });
-
+  tryNext();
   return true;
 }
 
@@ -3191,35 +3282,24 @@ function findPromptItem(promptText){
 }
 
 function playPromptAudio(itemOrText,button=null){
-  if(!audioEnabled)return;
+  if(!audioEnabled)return false;
 
-  speechSynthesis.cancel();
+  stopAllAudio();
 
-  if(currentPromptAudio){
-    currentPromptAudio.pause();
-    currentPromptAudio.currentTime=0;
-    currentPromptAudio=null;
+  const item=typeof itemOrText==="object" && itemOrText ? itemOrText : null;
+  const promptText=item ? item.prompt : String(itemOrText||"");
+
+  const explicit=item && item.audio ? [item.audio] : [];
+  const recorded=recordedAudioCandidates(promptText);
+  const automatic=autoAudioCandidates(promptText);
+  const candidates=[...new Set([...explicit,...recorded,...automatic])];
+
+  if(!candidates.length){
+    console.error("No hay MP3 asignado para:",promptText);
+    return false;
   }
 
-  const item = typeof itemOrText==="object" && itemOrText ? itemOrText : null;
-  const src = item && item.audio ? item.audio : "";
-
-  if(!src){
-    console.error("No hay MP3 asignado para:", item ? item.prompt : itemOrText);
-    if(button){
-      button.classList.remove("playing");
-      button.textContent="⚠️";
-    }
-    const f=document.getElementById("feedback");
-    if(f){
-      f.className="feedback show retry";
-      f.textContent="Este audio todavía no tiene un MP3 asignado.";
-    }
-    return;
-  }
-
-  const audio=new Audio(encodeURI(src));
-  currentPromptAudio=audio;
+  let index=0;
 
   if(button){
     if(button.dataset.originalText===undefined){
@@ -3238,27 +3318,40 @@ function playPromptAudio(itemOrText,button=null){
     }
   };
 
-  audio.onended=()=>{
-    restore();
-    if(currentPromptAudio===audio)currentPromptAudio=null;
-  };
-
-  audio.onerror=()=>{
-    restore();
-    if(currentPromptAudio===audio)currentPromptAudio=null;
-    console.error("No se pudo cargar:", src);
-    const f=document.getElementById("feedback");
-    if(f){
-      f.className="feedback show retry";
-      f.textContent="No se encontró el MP3: "+src;
+  const tryNext=()=>{
+    if(index>=candidates.length){
+      restore();
+      console.error("No se encontró MP3 para:",promptText,candidates);
+      const f=document.getElementById("feedback");
+      if(f){
+        f.className="feedback show retry";
+        f.textContent="Este audio todavía no tiene un MP3 disponible.";
+      }
+      return;
     }
+
+    const src=candidates[index++];
+    const audio=new Audio(encodeURI(src));
+    currentPromptAudio=audio;
+
+    audio.onended=()=>{
+      restore();
+      if(currentPromptAudio===audio)currentPromptAudio=null;
+    };
+
+    audio.onerror=()=>{
+      if(currentPromptAudio===audio)currentPromptAudio=null;
+      tryNext();
+    };
+
+    audio.play().catch(()=>{
+      if(currentPromptAudio===audio)currentPromptAudio=null;
+      tryNext();
+    });
   };
 
-  audio.play().catch(err=>{
-    restore();
-    if(currentPromptAudio===audio)currentPromptAudio=null;
-    console.error("No se pudo reproducir:", src, err);
-  });
+  tryNext();
+  return true;
 }
 
 function similarity(a,b){
