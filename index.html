@@ -1068,51 +1068,7 @@ function recordedAudioCandidates(text){
 }
 
 function playRecordedAudio(text,button=null,onFail=null){
-  if(!audioEnabled)return false;
-  const candidates=recordedAudioCandidates(text);
-  if(!candidates.length)return false;
-
-  stopAllAudio();
-  let index=0;
-
-  const restore=()=>{
-    if(button){
-      button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
-    }
-  };
-
-  if(button){
-    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
-    button.classList.add("playing");
-    button.textContent="🔊";
-  }
-
-  const tryNext=()=>{
-    if(index>=candidates.length){
-      restore();
-      if(onFail)onFail();
-      return;
-    }
-    const src=candidates[index++];
-    const audio=new Audio(encodeURI(src));
-    currentVocabAudio=audio;
-    audio.onended=()=>{
-      restore();
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-    };
-    audio.onerror=()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    };
-    audio.play().catch(()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    });
-  };
-
-  tryNext();
-  return true;
+  return false;
 }
 
 let signMode="learn";
@@ -3342,68 +3298,77 @@ function knownMp3Candidates(text){
   return [...new Set([...explicit,...recorded])];
 }
 
-function playVocabAudio(text,button=null,onFail=null){
+
+let TEST_TTS_VOICES=[];
+
+function testLoadVoices(){
+  if(!("speechSynthesis" in window))return [];
+  const voices=speechSynthesis.getVoices()||[];
+  if(voices.length)TEST_TTS_VOICES=voices;
+  return voices.length?voices:TEST_TTS_VOICES;
+}
+
+if("speechSynthesis" in window){
+  testLoadVoices();
+  speechSynthesis.onvoiceschanged=testLoadVoices;
+}
+
+function testChooseEnglishVoice(){
+  const voices=testLoadVoices();
+  return voices.find(v=>String(v.lang||"").toLowerCase()==="en-us")
+      || voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en-us"))
+      || voices.find(v=>String(v.lang||"").toLowerCase().startsWith("en"))
+      || null;
+}
+
+function ttsOnlySpeak(text,button=null){
   if(!audioEnabled)return false;
+  if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window))return false;
 
-  const known=knownMp3Candidates(text);
+  const phrase=String(text||"").trim();
+  if(!phrase)return false;
 
-  // En iPhone no intentamos nombres "adivinados" antes del TTS:
-  // si no sabemos que existe un MP3, hablamos de inmediato dentro del toque.
-  if(IS_IOS && !known.length){
-    return false;
-  }
+  try{
+    speechSynthesis.cancel();
 
-  const automatic=IS_IOS ? [] : autoAudioCandidates(text);
-  const candidates=[...new Set([...known,...automatic])];
+    const u=new SpeechSynthesisUtterance(phrase);
+    u.lang="en-US";
+    u.rate=.82;
+    u.pitch=1;
+    u.volume=1;
 
-  if(!candidates.length){
-    if(onFail)onFail();
-    return false;
-  }
+    const voice=testChooseEnglishVoice();
+    if(voice)u.voice=voice;
 
-  stopAllAudio();
-  let index=0;
-
-  if(button){
-    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
-    button.classList.add("playing");
-    button.textContent="🔊";
-  }
-
-  const restore=()=>{
     if(button){
-      button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
-    }
-  };
-
-  const tryNext=()=>{
-    if(index>=candidates.length){
-      restore();
-      if(onFail)onFail();
-      return;
+      if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
+      button.classList.add("playing");
+      button.textContent="🔊";
     }
 
-    const src=candidates[index++];
-    const audio=new Audio(encodeURI(src));
-    currentVocabAudio=audio;
-
-    audio.onended=()=>{
-      restore();
-      if(currentVocabAudio===audio)currentVocabAudio=null;
+    const restore=()=>{
+      if(button){
+        button.classList.remove("playing");
+        if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
+      }
     };
-    audio.onerror=()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    };
-    audio.play().catch(()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    });
-  };
 
-  tryNext();
-  return true;
+    u.onend=restore;
+    u.onerror=restore;
+
+    speechSynthesis.speak(u);
+    if(speechSynthesis.paused){
+      try{speechSynthesis.resume()}catch(e){}
+    }
+    return true;
+  }catch(e){
+    console.error("TTS test error:",e);
+    return false;
+  }
+}
+
+function playVocabAudio(text,button=null,onFail=null){
+  return ttsOnlySpeak(text,button);
 }
 
 /*
@@ -3413,21 +3378,7 @@ function playVocabAudio(text,button=null,onFail=null){
 */
 function speak(text,button=null){
   if(!audioEnabled)return;
-
-  const known=knownMp3Candidates(text);
-
-  // iPhone: si no hay MP3 conocido, TTS inmediato para conservar el gesto.
-  if(IS_IOS && !known.length){
-    speakWithDeviceVoice(text,button,"en-US");
-    return;
-  }
-
-  const fallback=()=>speakWithDeviceVoice(text,button,"en-US");
-
-  if(playRecordedAudio(text,button,fallback))return;
-  if(playVocabAudio(text,button,fallback))return;
-
-  fallback();
+  ttsOnlySpeak(text,button);
 }
 
 /*
@@ -3454,70 +3405,9 @@ function findPromptItem(promptText){
 
 function playPromptAudio(itemOrText,button=null){
   if(!audioEnabled)return false;
-
   const item=typeof itemOrText==="object" && itemOrText ? itemOrText : null;
   const promptText=item ? item.prompt : String(itemOrText||"");
-
-  const explicit=item && item.audio ? [item.audio] : [];
-  const recorded=recordedAudioCandidates(promptText);
-  const known=[...new Set([...explicit,...recorded])];
-
-  // iPhone: si la pregunta no tiene un MP3 conocido, TTS inmediato.
-  if(IS_IOS && !known.length){
-    return speakWithDeviceVoice(promptText,button,"en-US");
-  }
-
-  const automatic=IS_IOS ? [] : autoAudioCandidates(promptText);
-  const candidates=[...new Set([...known,...automatic])];
-
-  if(!candidates.length){
-    return speakWithDeviceVoice(promptText,button,"en-US");
-  }
-
-  stopAllAudio();
-  let index=0;
-
-  if(button){
-    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
-    button.classList.add("playing");
-    button.textContent="🔊";
-  }
-
-  const restore=()=>{
-    if(button){
-      button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
-    }
-  };
-
-  const tryNext=()=>{
-    if(index>=candidates.length){
-      restore();
-      // En otros navegadores sí puede caer al TTS después del fallo.
-      if(!IS_IOS)speakWithDeviceVoice(promptText,button,"en-US");
-      return;
-    }
-
-    const src=candidates[index++];
-    const audio=new Audio(encodeURI(src));
-    currentPromptAudio=audio;
-
-    audio.onended=()=>{
-      restore();
-      if(currentPromptAudio===audio)currentPromptAudio=null;
-    };
-    audio.onerror=()=>{
-      if(currentPromptAudio===audio)currentPromptAudio=null;
-      tryNext();
-    };
-    audio.play().catch(()=>{
-      if(currentPromptAudio===audio)currentPromptAudio=null;
-      tryNext();
-    });
-  };
-
-  tryNext();
-  return true;
+  return ttsOnlySpeak(promptText,button);
 }
 
 
