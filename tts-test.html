@@ -19,6 +19,15 @@ document.getElementById("test").onclick = () => {
     new SpeechSynthesisUtterance("Hello, this is a test.");
 
   currentUtterance.lang = "en-US";
+
+const voices = speechSynthesis.getVoices();
+const englishVoice = voices.find(v =>
+  v.lang.toLowerCase().startsWith("en")
+);
+
+if (englishVoice) {
+  currentUtterance.voice = englishVoice;
+}
   currentUtterance.rate = 0.85;
 
   currentUtterance.onstart = () =>
