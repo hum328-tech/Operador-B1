@@ -1576,16 +1576,61 @@ function applyDriverProfile(p){
  i=q("Where are you from?");if(i){i.response=`I am from ${p.city}.`;i.responseMeaning=`Soy de ${p.city}.`}
  i=q("Where do you work?");if(i){i.response=`I am a B1 driver at ${p.company}.`;i.responseMeaning=`Trabajo como operador B1 en ${p.company}.`}
 }
-function setupOnboarding(){
- const o=document.getElementById("onboardingOverlay"),f=document.getElementById("onboardingForm"),s=loadDriverProfile();
- if(s&&s.name&&s.age&&s.company&&s.city){o.classList.add("hidden");applyDriverProfile(s)}
- f.addEventListener("submit",e=>{
-  e.preventDefault();
-  const p={name:profileName.value.trim(),age:Number(profileAge.value),company:profileCompany.value.trim(),city:profileCity.value.trim()};
-  if(!p.name||!p.company||!p.city||!Number.isFinite(p.age)||p.age<18){onboardingError.textContent="Completa los cuatro datos para comenzar.";return}
-  saveDriverProfile(p);applyDriverProfile(p);o.classList.add("hidden");
-  if(typeof renderAll==="function")renderAll();
- });
+function setupOnboarding() {
+  const o = document.getElementById("onboardingOverlay");
+  const f = document.getElementById("onboardingForm");
+
+  const nameInput = document.getElementById("profileName");
+  const ageInput = document.getElementById("profileAge");
+  const companyInput = document.getElementById("profileCompany");
+  const cityInput = document.getElementById("profileCity");
+  const errorBox = document.getElementById("onboardingError");
+
+  const saved = loadDriverProfile();
+
+  if (
+    saved &&
+    saved.name &&
+    saved.age &&
+    saved.company &&
+    saved.city
+  ) {
+    applyDriverProfile(saved);
+    o.classList.add("hidden");
+  }
+
+  f.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const p = {
+      name: nameInput.value.trim(),
+      age: Number(ageInput.value),
+      company: companyInput.value.trim(),
+      city: cityInput.value.trim()
+    };
+
+    if (
+      !p.name ||
+      !p.company ||
+      !p.city ||
+      !Number.isFinite(p.age) ||
+      p.age < 18
+    ) {
+      errorBox.textContent = "Completa los cuatro datos para comenzar.";
+      return;
+    }
+
+    errorBox.textContent = "";
+
+    saveDriverProfile(p);
+    applyDriverProfile(p);
+
+    o.classList.add("hidden");
+
+    if (typeof renderAll === "function") {
+      renderAll();
+    }
+  });
 }
 
 const missions = [
