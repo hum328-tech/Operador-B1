@@ -911,6 +911,20 @@ TRAFFIC_SIGNS.find(s=>s.name==='Weight Limit 10 Tons') && (TRAFFIC_SIGNS.find(s=
 TRAFFIC_SIGNS.find(s=>s.name==='Wrong Way') && (TRAFFIC_SIGNS.find(s=>s.name==='Wrong Way').audio='audio/Wrong way.mp3');
 TRAFFIC_SIGNS.find(s=>s.name==='Yield') && (TRAFFIC_SIGNS.find(s=>s.name==='Yield').audio='audio/Yield.mp3');
 
+
+// Enlaces adicionales encontrados en la carpeta real /audio.
+[
+  ["Detour","audio/Detour to the right.mp3"],
+  ["Left Lane Must Turn Left","audio/Left lane must turn left.mp3"],
+  ["Low Bridge Ahead","audio/Low bridge ahead.mp3"],
+  ["Low Clearance","audio/Low clearance ahead.mp3"],
+  ["Merging Traffic Entering From the Right","audio/Merging traffic entering from the right.mp3"],
+  ["Left Turn Only","audio/Left turn only.mp3"]
+].forEach(([name,audio])=>{
+  const sign=TRAFFIC_SIGNS.find(s=>s.name===name);
+  if(sign)sign.audio=audio;
+});
+
 const SIGN_ANSWERS = {
   "Railroad Crossing":["It means railroad crossing.","I need to slow down and check for trains."],
   "Commercial Vehicles Except Buses Prohibited in Left Lane":["It means commercial vehicles cannot use the left lane.","I need to stay out of the left lane."],
@@ -1068,63 +1082,10 @@ function recordedAudioCandidates(text){
 }
 
 function playRecordedAudio(text,button=null,onFail=null){
-  if(!audioEnabled)return false;
-
-  const candidates=recordedAudioCandidates(text);
-  if(!candidates.length){
-    if(onFail)onFail();
-    return false;
-  }
-
-  stopAllAudio();
-  let index=0;
-
-  if(button){
-    if(button.dataset.originalText===undefined){
-      button.dataset.originalText=button.textContent;
-    }
-    button.classList.add("playing");
-    button.textContent="🔊";
-  }
-
-  const restore=()=>{
-    if(button){
-      button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined){
-        button.textContent=button.dataset.originalText;
-      }
-    }
-  };
-
-  const tryNext=()=>{
-    if(index>=candidates.length){
-      restore();
-      if(onFail)onFail();
-      return;
-    }
-
-    const src=candidates[index++];
-    const audio=new Audio(encodeURI(src));
-    currentVocabAudio=audio;
-
-    audio.onended=()=>{
-      restore();
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-    };
-
-    audio.onerror=()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    };
-
-    audio.play().catch(()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    });
-  };
-
-  tryNext();
-  return true;
+  const candidates=resolvedAudioCandidates(text);
+  const played=playMp3Candidates(candidates,button,"vocab",text);
+  if(!played && onFail)onFail();
+  return played;
 }
 
 let signMode="learn";
@@ -1149,48 +1110,23 @@ function signDistractors(correct,count=3){
 let currentSignAudio=null;
 
 function playSignNameMp3(sign,button=null){
-  if(!audioEnabled || !sign || !sign.audio)return false;
+  if(!audioEnabled || !sign)return false;
 
-  // Stop every other source, including browser TTS.
-  speechSynthesis.cancel();
-  if(currentPromptAudio){
-    currentPromptAudio.pause();
-    currentPromptAudio.currentTime=0;
-    currentPromptAudio=null;
-  }
-  if(currentVocabAudio){
-    currentVocabAudio.pause();
-    currentVocabAudio.currentTime=0;
-    currentVocabAudio=null;
-  }
-  if(currentSignAudio){
-    currentSignAudio.pause();
-    currentSignAudio.currentTime=0;
-    currentSignAudio=null;
-  }
-
-  const audio=new Audio(encodeURI(sign.audio));
-  currentSignAudio=audio;
-
-  if(button)button.classList.add("playing");
-
-  const restore=()=>{
-    if(button)button.classList.remove("playing");
-    if(currentSignAudio===audio)currentSignAudio=null;
+  const candidates=[];
+  const add=path=>{
+    const valid=existingAudioPath(path);
+    if(valid && !candidates.includes(valid))candidates.push(valid);
   };
 
-  audio.onended=restore;
-  audio.onerror=()=>{
-    restore();
-    console.error("No se encontró el MP3 de la señal:",sign.audio);
-  };
+  if(sign.audio)add(sign.audio);
+  resolvedAudioCandidates(sign.name).forEach(add);
 
-  audio.play().catch(err=>{
-    restore();
-    console.error("No se pudo reproducir el MP3 de la señal:",sign.audio,err);
-  });
+  if(!candidates.length){
+    console.warn("Esta señal no tiene MP3 disponible:",sign.name);
+    return false;
+  }
 
-  return true;
+  return playMp3Candidates(candidates,button,"vocab",sign.name);
 }
 
 function speakSign(text,button=null){
@@ -3210,6 +3146,340 @@ const VOCAB_AUDIO = {
 };
 
 
+
+/*
+  INVENTARIO REAL DE MP3
+  Generado a partir de la carpeta /audio del repositorio.
+  Solo devuelve rutas que existen físicamente, evitando intentos 404.
+*/
+const AUDIO_FILE_INVENTORY = {
+  "Accident": "Accident.mp3",
+  "Adjust you seat and mirrors": "Adjust you seat and mirrors.mp3",
+  "Alcohol": "Alcohol.mp3",
+  "Allergic": "Allergic.mp3",
+  "are you allergic to any medicine or medication": "are you allergic to any medicine or medication.mp3",
+  "are you carrying hazardous material": "are you carrying hazardous material.mp3",
+  "assistence": "assistence.mp3",
+  "can i see you permit book": "can i see you permit book.mp3",
+  "can you please step into the truck": "can you please step into the truck.mp3",
+  "can you please step out of your truck": "can you please step out of your truck.mp3",
+  "can you please turn off you four way flashers": "can you please turn off you four way flashers.mp3",
+  "can you please turn off you truck": "can you please turn off you truck.mp3",
+  "can you please turn on your truck": "can you please turn on your truck.mp3",
+  "Change lanes safely": "Change lanes safely.mp3",
+  "Coming from": "Coming from.mp3",
+  "Commercial vehicles except buses prohibited in left lane": "Commercial vehicles except buses prohibited in left lane.mp3",
+  "Company": "Company.mp3",
+  "Crossing": "Crossing.mp3",
+  "Date of birth": "Date of birth.mp3",
+  "Delivery": "Delivery.mp3",
+  "Detour to the left": "Detour to the left.mp3",
+  "Detour to the right": "Detour to the right.mp3",
+  "did you already contact road service to fix your tire": "did you already contact road service to fix your tire.mp3",
+  "did you check the railroad crossing sign": "did you check the railroad crossing sign.mp3",
+  "did you check the traffic light before crossing": "did you check the traffic light before crossing.mp3",
+  "did you check the traffic sign": "did you check the traffic sign.mp3",
+  "did you check the weather": "did you check the weather.mp3",
+  "did you do your pre trip before rolling": "did you do your pre trip before rolling.mp3",
+  "Did you do your pre trip inspection today": "Did you do your pre trip inspection today.mp3",
+  "Diesel": "Diesel.mp3",
+  "Divided highway ahead": "Divided highway ahead.mp3",
+  "Do not cross the exercise boundary": "Do not cross the exercise boundary.mp3",
+  "Do not enter": "Do not enter.mp3",
+  "Do not touch a cone": "Do not touch a cone.mp3",
+  "do you feel fatigued": "do you feel fatigued.mp3",
+  "do you feel okay to roll": "do you feel okay to roll.mp3",
+  "do you feel tired": "do you feel tired.mp3",
+  "do you have a flat tire": "do you have a flat tire.mp3",
+  "do you have a license": "do you have a license.mp3",
+  "do you have any medical conditions": "do you have any medical conditions.mp3",
+  "do you have insurance": "do you have insurance.mp3",
+  "do you know your companys phone number": "do you know your companys phone number.mp3",
+  "do you need glasses": "do you need glasses.mp3",
+  "dook": "dook.mp3",
+  "Driver": "Driver.mp3",
+  "Driving": "Driving.mp3",
+  "drop": "drop.mp3",
+  "Electronic log device": "Electronic log device.mp3",
+  "Enter the truck using three points of contact": "Enter the truck using three points of contact.mp3",
+  "Fatigued": "Fatigued.mp3",
+  "Fix": "Fix.mp3",
+  "Flagged station": "Flagged station.mp3",
+  "Flagger ahead": "Flagger ahead.mp3",
+  "Flat tire": "Flat tire.mp3",
+  "Flood": "Flood.mp3",
+  "Floor is flooded": "Floor is flooded.mp3",
+  "Four way flashers": "Four way flashers.mp3",
+  "Four way intersection": "Four way intersection.mp3",
+  "From": "From.mp3",
+  "Get out and look": "Get out and look.mp3",
+  "Glasses": "Glasses.mp3",
+  "Going to": "Going to.mp3",
+  "have you been in an accident": "have you been in an accident.mp3",
+  "have you had any alcohol today": "have you had any alcohol today.mp3",
+  "hazardous material": "hazardous material.mp3",
+  "Headed": "Headed.mp3",
+  "Here is you pick up number": "Here is you pick up number.mp3",
+  "Here is your delivery number": "Here is your delivery number.mp3",
+  "Hook": "Hook.mp3",
+  "Hours of service": "Hours of service.mp3",
+  "how fast were you going": "how fast were you going.mp3",
+  "how long have you worked there": "how long have you worked there.mp3",
+  "How long": "How long.mp3",
+  "how many hours have you been driving today": "how many hours have you been driving today.mp3",
+  "how old are you": "how old are you.mp3",
+  "I am a b1 driver at DHR": "I am a b1 driver at DHR.mp3",
+  "I am coming from DHR yard in Laredo Texas": "I am coming from DHR yard in Laredo Texas.mp3",
+  "I Am from nuevo Laredo": "I Am from nuevo Laredo.mp3",
+  "I Am going to Tennessee to drop the trailer": "I Am going to Tennessee to drop the trailer.mp3",
+  "I Am headed to Laredo Texas": "I Am headed to Laredo Texas.mp3",
+  "I Am years old": "I Am years old.mp3",
+  "I have worked at DHR for Years": "I have worked at DHR for Years.mp3",
+  "I picked it up at the DHR Nuevo Laredo yard": "I picked it up at the DHR Nuevo Laredo yard.mp3",
+  "Inspect the backing area before you start": "Inspect the backing area before you start.mp3",
+  "Insurance": "Insurance.mp3",
+  "Left lane must turn left": "Left lane must turn left.mp3",
+  "Left turn only": "Left turn only.mp3",
+  "license": "license.mp3",
+  "Located": "Located.mp3",
+  "Low bridge ahead": "Low bridge ahead.mp3",
+  "Low clearance ahead": "Low clearance ahead.mp3",
+  "Maintain control of the truck": "Maintain control of the truck.mp3",
+  "Make 3 right turn and 3 left turns": "Make 3 right turn and 3 left turns.mp3",
+  "Make a complete stop of three seconds": "Make a complete stop of three seconds.mp3",
+  "Medical condition": "Medical condition.mp3",
+  "Medication": "Medication.mp3",
+  "Merging traffic entering from the right": "Merging traffic entering from the right.mp3",
+  "Miles per hour": "Miles per hour.mp3",
+  "My date of birth is": "My date of birth is.mp3",
+  "My name is": "My name is.mp3",
+  "My truck needs road service": "My truck needs road service.mp3",
+  "Name": "Name.mp3",
+  "No exit entrance only": "No exit entrance only.mp3",
+  "No outlet dead end": "No outlet dead end.mp3",
+  "No parking": "No parking.mp3",
+  "No passing zone": "No passing zone.mp3",
+  "No right turn": "No right turn.mp3",
+  "No truck parking": "No truck parking.mp3",
+  "No trucks allowed": "No trucks allowed.mp3",
+  "No trucks beyond this point": "No trucks beyond this point.mp3",
+  "No trucks left lane except left turns": "No trucks left lane except left turns.mp3",
+  "Paperwork": "Paperwork.mp3",
+  "Pedestrians crossing ahead": "Pedestrians crossing ahead.mp3",
+  "Permit book": "Permit book.mp3",
+  "Phone Numbers": "Phone Numbers.mp3",
+  "Pick up": "Pick up.mp3",
+  "Please drop the trailer at dock 17": "Please drop the trailer at dock 17.mp3",
+  "Please hook the trailer from dock 17": "Please hook the trailer from dock 17.mp3",
+  "Please show me yours hours of service": "Please show me yours hours of service.mp3",
+  "Position the trailer safely in the parking area": "Position the trailer safely in the parking area.mp3",
+  "Pre trip inspection": "Pre trip inspection.mp3",
+  "Railroad crossing": "Railroad crossing.mp3",
+  "Reduce speed limits school zone ahead": "Reduce speed limits school zone ahead.mp3",
+  "Right curve ahead truck rollover warning": "Right curve ahead truck rollover warning.mp3",
+  "Right lane ends ahead": "Right lane ends ahead.mp3",
+  "Right lane ends": "Right lane ends.mp3",
+  "Road closed": "Road closed.mp3",
+  "Road service": "Road service.mp3",
+  "Road work ahead": "Road work ahead.mp3",
+  "Road workers are in or near the roadway": "Road workers are in or near the roadway.mp3",
+  "Road workers are near to the road way": "Road workers are near to the road way.mp3",
+  "Roll": "Roll.mp3",
+  "Shoulder closed ahead": "Shoulder closed ahead.mp3",
+  "Speed limit 50 minimum 30": "Speed limit 50 minimum 30.mp3",
+  "Speed": "Speed.mp3",
+  "Step into": "Step into.mp3",
+  "Step out": "Step out.mp3",
+  "The company is located in Laredo Texas": "The company is located in Laredo Texas.mp3",
+  "The storm is very strong": "The storm is very strong.mp3",
+  "The streets are covered with snow": "The streets are covered with snow.mp3",
+  "The streets are wet because of the rain": "The streets are wet because of the rain.mp3",
+  "Tire": "Tire.mp3",
+  "Tired": "Tired.mp3",
+  "Traffic light": "Traffic light.mp3",
+  "Traffic sign": "Traffic sign.mp3",
+  "Traffic signal lights ahead": "Traffic signal lights ahead.mp3",
+  "Trailer": "Trailer.mp3",
+  "Truck parking": "Truck parking.mp3",
+  "Truck": "Truck.mp3",
+  "Trucks 40": "Trucks 40.mp3",
+  "Trucks enter inspection station when lights flashings": "Trucks enter inspection station when lights flashings.mp3",
+  "Trucks enter inspection station": "Trucks enter inspection station.mp3",
+  "Turn off": "Turn off.mp3",
+  "Turn on your electric log device": "Turn on your electric log device.mp3",
+  "Turn on your four ways flashers": "Turn on your four ways flashers.mp3",
+  "Turn on": "Turn on.mp3",
+  "Two way traffic ahead": "Two way traffic ahead.mp3",
+  "Use three points of contact every time you exit": "Use three points of contact every time you exit.mp3",
+  "Watch for ice on the bridge": "Watch for ice on the bridge.mp3",
+  "Weight limit 10 tons": "Weight limit 10 tons.mp3",
+  "what is your date of birth": "what is your date of birth.mp3",
+  "what is your name": "what is your name.mp3",
+  "when was the last time you put diesel": "when was the last time you put diesel.mp3",
+  "where are you from": "where are you from.mp3",
+  "where are you going": "where are you going.mp3",
+  "where are you headed": "where are you headed.mp3",
+  "where did you pick up your trailer": "where did you pick up your trailer.mp3",
+  "where do you work": "where do you work.mp3",
+  "where is your company located": "where is your company located.mp3",
+  "whete are you coming from": "whete are you coming from.mp3",
+  "Work": "Work.mp3",
+  "Wrong way": "Wrong way.mp3",
+  "Yard": "Yard.mp3",
+  "Years old": "Years old.mp3",
+  "Yes I have my licenses here": "Yes I have my licenses here.mp3",
+  "Yes sir here you go": "Yes sir here you go.mp3",
+  "Yes the insurance is in my permit book": "Yes the insurance is in my permit book.mp3",
+  "Yes the phone number is": "Yes the phone number is.mp3",
+  "Yield": "Yield.mp3",
+  "You may pull forward and reposition": "You may pull forward and reposition.mp3"
+};
+
+const AUDIO_ALIASES = {
+  "please show me your hours of service": "Please show me yours hours of service.mp3",
+  "turn on your electronic log device": "Turn on your electric log device.mp3",
+  "turn on your four-way flashers": "Turn on your four ways flashers.mp3",
+  "here is your pickup number": "Here is you pick up number.mp3",
+  "please drop the trailer at dock seventeen": "Please drop the trailer at dock 17.mp3",
+  "please hook the trailer from dock seventeen": "Please hook the trailer from dock 17.mp3",
+  "speed limit fifty minimum thirty": "Speed limit 50 minimum 30.mp3",
+  "trucks forty": "Trucks 40.mp3",
+  "weight limit ten tons": "Weight limit 10 tons.mp3",
+  "truck rollover warning right curve ahead": "Right curve ahead truck rollover warning.mp3",
+  "road workers are near the roadway": "Road workers are near to the road way.mp3",
+  "trucks enter inspection station when lights are flashing": "Trucks enter inspection station when lights flashings.mp3",
+  "make a complete stop for three seconds": "Make a complete stop of three seconds.mp3",
+  "make three right turns and three left turns": "Make 3 right turn and 3 left turns.mp3",
+  "did you contact road service to fix your tire": "did you already contact road service to fix your tire.mp3",
+  "have you ever been in an accident": "have you been in an accident.mp3",
+  "when was the last time you got diesel": "when was the last time you put diesel.mp3",
+  "adjust your seat and mirrors": "Adjust you seat and mirrors.mp3",
+  "can i see your permit book": "can i see you permit book.mp3",
+  "can you please turn off your truck": "can you please turn off you truck.mp3",
+  "can you please step out of the truck": "can you please step out of your truck.mp3",
+  "can you please turn off your four-way flashers": "can you please turn off you four way flashers.mp3",
+  "where are you coming from": "whete are you coming from.mp3",
+  "traffic signal ahead": "Traffic signal lights ahead.mp3",
+  "traffic signal lights ahead": "Traffic signal lights ahead.mp3",
+  "low clearance": "Low clearance ahead.mp3",
+  "low clearance ahead": "Low clearance ahead.mp3",
+  "low bridge ahead": "Low bridge ahead.mp3",
+  "left lane must turn left": "Left lane must turn left.mp3",
+  "left turn only": "Left turn only.mp3",
+  "merging traffic entering from the right": "Merging traffic entering from the right.mp3",
+  "detour": "Detour to the right.mp3",
+  "pedestrian crossing ahead": "Pedestrians crossing ahead.mp3",
+  "road workers": "Road workers are in or near the roadway.mp3",
+  "two-way traffic": "Two way traffic ahead.mp3",
+  "two way traffic": "Two way traffic ahead.mp3",
+  "truck speed limit 40": "Trucks 40.mp3"
+};
+
+function audioLookupKey(text){
+  return String(text||"")
+    .toLowerCase()
+    .replace(/\.mp3$/i,"")
+    .replace(/[’']/g,"")
+    .replace(/[?.!,;:]/g,"")
+    .replace(/[–—-]/g," ")
+    .replace(/\bseventeen\b/g,"17")
+    .replace(/\bfifty\b/g,"50")
+    .replace(/\bforty\b/g,"40")
+    .replace(/\bthirty\b/g,"30")
+    .replace(/\bten\b/g,"10")
+    .replace(/\bthree\b/g,"3")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+const AUDIO_PATH_BY_KEY = (()=>{
+  const map={};
+  Object.values(AUDIO_FILE_INVENTORY).forEach(filename=>{
+    map[audioLookupKey(filename)]="audio/"+filename;
+  });
+  return map;
+})();
+
+function existingAudioPath(path){
+  if(!path)return null;
+  const filename=decodeURIComponent(String(path)).replace(/^\.\//,"").replace(/^audio\//i,"");
+  const exact=Object.values(AUDIO_FILE_INVENTORY).find(f=>f===filename);
+  if(exact)return "audio/"+exact;
+
+  const insensitive=Object.values(AUDIO_FILE_INVENTORY).find(
+    f=>f.toLowerCase()===filename.toLowerCase()
+  );
+  return insensitive ? "audio/"+insensitive : null;
+}
+
+function resolvedAudioCandidates(text){
+  const key=normalizeAudioKey(text);
+  const lookup=audioLookupKey(text);
+  const results=[];
+
+  const add=path=>{
+    const valid=existingAudioPath(path);
+    if(valid && !results.includes(valid))results.push(valid);
+  };
+
+  const alias=AUDIO_ALIASES[key]||AUDIO_ALIASES[lookup];
+  if(alias)add("audio/"+alias);
+
+  (recordedAudioCandidates(text)||[]).forEach(add);
+
+  if(VOCAB_AUDIO[key])add(VOCAB_AUDIO[key]);
+
+  if(AUDIO_PATH_BY_KEY[lookup])add(AUDIO_PATH_BY_KEY[lookup]);
+
+  return results;
+}
+
+function playMp3Candidates(candidates,button=null,channel="vocab",missingText=""){
+  if(!audioEnabled || !candidates.length)return false;
+
+  stopAllAudio();
+  let index=0;
+
+  if(button){
+    if(button.dataset.originalText===undefined)button.dataset.originalText=button.textContent;
+    button.classList.add("playing");
+    button.textContent="🔊";
+  }
+
+  const restore=()=>{
+    if(button){
+      button.classList.remove("playing");
+      if(button.dataset.originalText!==undefined)button.textContent=button.dataset.originalText;
+    }
+  };
+
+  const tryNext=()=>{
+    if(index>=candidates.length){
+      restore();
+      console.warn("No se pudo reproducir un MP3 válido para:",missingText);
+      return;
+    }
+
+    const src=candidates[index++];
+    const audio=new Audio(encodeURI(src));
+
+    if(channel==="prompt")currentPromptAudio=audio;
+    else currentVocabAudio=audio;
+
+    audio.onended=()=>{
+      restore();
+      if(channel==="prompt" && currentPromptAudio===audio)currentPromptAudio=null;
+      if(channel!=="prompt" && currentVocabAudio===audio)currentVocabAudio=null;
+    };
+
+    audio.onerror=tryNext;
+    audio.play().catch(tryNext);
+  };
+
+  tryNext();
+  return true;
+}
+
 function autoAudioCandidates(text){
   const original=String(text||"").trim();
   if(!original)return [];
@@ -3419,69 +3689,10 @@ function ttsOnlySpeak(text,button=null){
 }
 
 function playVocabAudio(text,button=null,onFail=null){
-  if(!audioEnabled)return false;
-
-  const key=normalizeAudioKey(text);
-  const explicit=VOCAB_AUDIO[key]?[VOCAB_AUDIO[key]]:[];
-  const recorded=recordedAudioCandidates(text);
-  const automatic=autoAudioCandidates(text);
-  const candidates=[...new Set([...explicit,...recorded,...automatic])];
-
-  if(!candidates.length){
-    if(onFail)onFail();
-    return false;
-  }
-
-  stopAllAudio();
-  let index=0;
-
-  if(button){
-    if(button.dataset.originalText===undefined){
-      button.dataset.originalText=button.textContent;
-    }
-    button.classList.add("playing");
-    button.textContent="🔊";
-  }
-
-  const restore=()=>{
-    if(button){
-      button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined){
-        button.textContent=button.dataset.originalText;
-      }
-    }
-  };
-
-  const tryNext=()=>{
-    if(index>=candidates.length){
-      restore();
-      console.warn("No se encontró MP3 para:",text);
-      if(onFail)onFail();
-      return;
-    }
-
-    const src=candidates[index++];
-    const audio=new Audio(encodeURI(src));
-    currentVocabAudio=audio;
-
-    audio.onended=()=>{
-      restore();
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-    };
-
-    audio.onerror=()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    };
-
-    audio.play().catch(()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    });
-  };
-
-  tryNext();
-  return true;
+  const candidates=resolvedAudioCandidates(text);
+  const played=playMp3Candidates(candidates,button,"vocab",text);
+  if(!played && onFail)onFail();
+  return played;
 }
 
 /*
@@ -3491,67 +3702,12 @@ function playVocabAudio(text,button=null,onFail=null){
 */
 function speak(text,button=null){
   if(!audioEnabled)return false;
-
-  const key=normalizeAudioKey(text);
-  const explicit=VOCAB_AUDIO[key]?[VOCAB_AUDIO[key]]:[];
-  const recorded=recordedAudioCandidates(text);
-  const automatic=autoAudioCandidates(text);
-  const candidates=[...new Set([...recorded,...explicit,...automatic])];
-
+  const candidates=resolvedAudioCandidates(text);
   if(!candidates.length){
-    console.warn("Este texto no tiene MP3 disponible:",text);
+    console.warn("Este texto no tiene un MP3 disponible:",text);
     return false;
   }
-
-  stopAllAudio();
-  let index=0;
-
-  if(button){
-    if(button.dataset.originalText===undefined){
-      button.dataset.originalText=button.textContent;
-    }
-    button.classList.add("playing");
-    button.textContent="🔊";
-  }
-
-  const restore=()=>{
-    if(button){
-      button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined){
-        button.textContent=button.dataset.originalText;
-      }
-    }
-  };
-
-  const tryNext=()=>{
-    if(index>=candidates.length){
-      restore();
-      console.warn("No se encontró un MP3 válido para:",text);
-      return;
-    }
-
-    const src=candidates[index++];
-    const audio=new Audio(encodeURI(src));
-    currentVocabAudio=audio;
-
-    audio.onended=()=>{
-      restore();
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-    };
-
-    audio.onerror=()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    };
-
-    audio.play().catch(()=>{
-      if(currentVocabAudio===audio)currentVocabAudio=null;
-      tryNext();
-    });
-  };
-
-  tryNext();
-  return true;
+  return playMp3Candidates(candidates,button,"vocab",text);
 }
 
 /*
@@ -3581,66 +3737,22 @@ function playPromptAudio(itemOrText,button=null){
 
   const item=typeof itemOrText==="object" && itemOrText ? itemOrText : null;
   const promptText=item ? item.prompt : String(itemOrText||"");
+  const candidates=[];
 
-  const explicit=item && item.audio ? [item.audio] : [];
-  const recorded=recordedAudioCandidates(promptText);
-  const automatic=autoAudioCandidates(promptText);
-  const candidates=[...new Set([...explicit,...recorded,...automatic])];
+  const add=path=>{
+    const valid=existingAudioPath(path);
+    if(valid && !candidates.includes(valid))candidates.push(valid);
+  };
+
+  if(item && item.audio)add(item.audio);
+  resolvedAudioCandidates(promptText).forEach(add);
 
   if(!candidates.length){
-    console.warn("Esta pregunta no tiene MP3 disponible:",promptText);
+    console.warn("Esta pregunta no tiene un MP3 disponible:",promptText);
     return false;
   }
 
-  stopAllAudio();
-  let index=0;
-
-  if(button){
-    if(button.dataset.originalText===undefined){
-      button.dataset.originalText=button.textContent;
-    }
-    button.classList.add("playing");
-    button.textContent="🔊";
-  }
-
-  const restore=()=>{
-    if(button){
-      button.classList.remove("playing");
-      if(button.dataset.originalText!==undefined){
-        button.textContent=button.dataset.originalText;
-      }
-    }
-  };
-
-  const tryNext=()=>{
-    if(index>=candidates.length){
-      restore();
-      console.warn("No se encontró un MP3 válido para la pregunta:",promptText);
-      return;
-    }
-
-    const src=candidates[index++];
-    const audio=new Audio(encodeURI(src));
-    currentPromptAudio=audio;
-
-    audio.onended=()=>{
-      restore();
-      if(currentPromptAudio===audio)currentPromptAudio=null;
-    };
-
-    audio.onerror=()=>{
-      if(currentPromptAudio===audio)currentPromptAudio=null;
-      tryNext();
-    };
-
-    audio.play().catch(()=>{
-      if(currentPromptAudio===audio)currentPromptAudio=null;
-      tryNext();
-    });
-  };
-
-  tryNext();
-  return true;
+  return playMp3Candidates(candidates,button,"prompt",promptText);
 }
 
 
