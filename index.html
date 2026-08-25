@@ -3399,22 +3399,24 @@ const AUDIO_ALIASES = {
 
   "the last time i got diesel was in natalia texas": "The last time i got diesel was in Natalia Texas.mp3",
   "the last time i got": "The last time i got.mp3",
-  "diesel was in natalia texas": "Díselo esa un Natalia Texas.mp3"
+  "diesel was in natalia texas": "Díselo esa un Natalia Texas.mp3",
+  "i was driving at sixty four miles per hour": "I was driving at sixty-four miles per hour.mp3"
 };
 
 function audioLookupKey(text){
   return String(text||"")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
     .toLowerCase()
     .replace(/\.mp3$/i,"")
-    .replace(/[’']/g,"")
-    .replace(/[?.!,;:]/g,"")
-    .replace(/[–—-]/g," ")
+    .replace(/&/g," and ")
     .replace(/\bseventeen\b/g,"17")
     .replace(/\bfifty\b/g,"50")
     .replace(/\bforty\b/g,"40")
     .replace(/\bthirty\b/g,"30")
     .replace(/\bten\b/g,"10")
     .replace(/\bthree\b/g,"3")
+    .replace(/[^a-z0-9]+/g," ")
     .replace(/\s+/g," ")
     .trim();
 }
@@ -3429,14 +3431,28 @@ const AUDIO_PATH_BY_KEY = (()=>{
 
 function existingAudioPath(path){
   if(!path)return null;
-  const filename=decodeURIComponent(String(path)).replace(/^\.\//,"").replace(/^audio\//i,"");
-  const exact=Object.values(AUDIO_FILE_INVENTORY).find(f=>f===filename);
+
+  const filename=decodeURIComponent(String(path))
+    .replace(/^\.\//,"")
+    .replace(/^audio\//i,"");
+
+  const files=Object.values(AUDIO_FILE_INVENTORY);
+
+  const exact=files.find(f=>f===filename);
   if(exact)return "audio/"+exact;
 
-  const insensitive=Object.values(AUDIO_FILE_INVENTORY).find(
+  const insensitive=files.find(
     f=>f.toLowerCase()===filename.toLowerCase()
   );
-  return insensitive ? "audio/"+insensitive : null;
+  if(insensitive)return "audio/"+insensitive;
+
+  // Comparación flexible: ignora coma, punto, guiones, acentos, etc.
+  const wantedKey=audioLookupKey(filename);
+  const flexible=files.find(
+    f=>audioLookupKey(f)===wantedKey
+  );
+
+  return flexible ? "audio/"+flexible : null;
 }
 
 function resolvedAudioCandidates(text){
@@ -3449,7 +3465,15 @@ function resolvedAudioCandidates(text){
     if(valid && !results.includes(valid))results.push(valid);
   };
 
-  const alias=AUDIO_ALIASES[key]||AUDIO_ALIASES[lookup];
+  let alias=AUDIO_ALIASES[key]||AUDIO_ALIASES[lookup];
+
+  if(!alias){
+    const aliasKey=Object.keys(AUDIO_ALIASES).find(
+      k=>audioLookupKey(k)===lookup
+    );
+    if(aliasKey)alias=AUDIO_ALIASES[aliasKey];
+  }
+
   if(alias)add("audio/"+alias);
 
   (recordedAudioCandidates(text)||[]).forEach(add);
@@ -3986,7 +4010,7 @@ document.addEventListener("click",e=>{
 </script>
   <style>
 /* ==========================================================
-   NUEVA SECUENCIA · MISIONES 1–6
+   NUEVA SECUENCIA · MISIONES 1–17
 ========================================================== */
 
 .eor-chunks{
@@ -4628,136 +4652,54 @@ function eorSplit(text){
    REPRODUCIR RESPUESTA
 ========================================================== */
 
-function eorPlayResponse(
-  item,
-  button=null
-){
+function eorPlayResponse(item,button=null){
+  if(!audioEnabled || !item)return false;
 
-  if(!audioEnabled || !item){
-    return;
+  const candidates=[];
+
+  const add=path=>{
+    const valid=existingAudioPath(path);
+    if(valid && !candidates.includes(valid))candidates.push(valid);
+  };
+
+  // 1. Ruta explícita de la respuesta, si existe.
+  if(item.responseAudio)add(item.responseAudio);
+
+  // 2. Coincidencia flexible por el texto visible.
+  resolvedAudioCandidates(displayResponse(item)).forEach(add);
+
+  if(!candidates.length){
+    console.warn("No se encontró MP3 para la respuesta:",displayResponse(item));
+    return false;
   }
 
+  return playMp3Candidates(
+    candidates,
+    button,
+    "vocab",
+    displayResponse(item)
+  );
+}
 
-  if(!item.responseAudio){
 
-    speak(
-      displayResponse(item),
-      button
-    );
 
-    return;
+function eorPlayFlexibleChunk(text,item,type,button=null){
+  const candidates=resolvedAudioCandidates(text);
 
+  if(candidates.length){
+    return playMp3Candidates(candidates,button,"vocab",text);
   }
 
+  console.warn(
+    "No hay MP3 específico para el fragmento; se usa el audio completo:",
+    text
+  );
 
-  stopAllAudio();
-
-
-  const audio =
-    new Audio(
-      encodeURI(
-        item.responseAudio
-      )
-    );
-
-
-  currentVocabAudio =
-    audio;
-
-
-  if(button){
-
-    if(
-      button.dataset.originalText ===
-      undefined
-    ){
-
-      button.dataset.originalText =
-        button.textContent;
-
-    }
-
-
-    button.classList.add(
-      "playing"
-    );
-
-
-    button.textContent =
-      "🔊";
-
+  if(type==="prompt"){
+    return playPromptAudio(item,button);
   }
 
-
-  const restore =
-    () => {
-
-      if(button){
-
-        button.classList.remove(
-          "playing"
-        );
-
-
-        if(
-          button.dataset.originalText !==
-          undefined
-        ){
-
-          button.textContent =
-            button.dataset.originalText;
-
-        }
-
-      }
-
-    };
-
-
-  audio.onended =
-    () => {
-
-      restore();
-
-      if(
-        currentVocabAudio === audio
-      ){
-
-        currentVocabAudio =
-          null;
-
-      }
-
-    };
-
-
-  audio.onerror =
-    () => {
-
-      restore();
-
-      speak(
-        displayResponse(item),
-        button
-      );
-
-    };
-
-
-  audio.play()
-    .catch(
-      () => {
-
-        restore();
-
-        speak(
-          displayResponse(item),
-          button
-        );
-
-      }
-    );
-
+  return eorPlayResponse(item,button);
 }
 
 
@@ -4819,17 +4761,9 @@ function(){
 
 
   /*
-    Misiones 7–17 siguen exactamente
-    con la metodología anterior.
+    La misma secuencia de 7 pasos y las dos pruebas finales
+    se aplica ahora a TODAS las misiones 1–17.
   */
-
-  if(m.id > 6){
-
-    oldRenderLesson();
-
-    return;
-
-  }
 
 
   if(
@@ -5584,13 +5518,7 @@ const m =
   currentMission();
 
 
-if(m.id > 6){
-
-  oldBindLessonEvents();
-
-  return;
-
-}
+/* La secuencia nueva y sus eventos aplican a todas las misiones 1–17. */
 
 
 /* NEXT */
@@ -5752,10 +5680,12 @@ document
       button.onclick =
         () => {
 
-          speak(
+          eorPlayFlexibleChunk(
             decodeURIComponent(
               button.dataset.text
             ),
+            currentItem(),
+            "prompt",
             button
           );
 
@@ -5838,10 +5768,12 @@ document
       button.onclick =
         () => {
 
-          speak(
+          eorPlayFlexibleChunk(
             decodeURIComponent(
               button.dataset.text
             ),
+            currentItem(),
+            "response",
             button
           );
 
@@ -6014,13 +5946,7 @@ const m =
   currentMission();
 
 
-if(m.id > 6){
-
-  oldAdvanceItem();
-
-  return;
-
-}
+/* Al terminar la última situación, todas las misiones pasan a las dos pruebas finales. */
 
 
 const item =
