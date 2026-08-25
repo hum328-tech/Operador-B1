@@ -1901,6 +1901,7 @@ const missions = [
         "audio": "audio/have you been in an accident.mp3",
         "meaning": "¿Alguna vez ha estado involucrado en un accidente?",
         "response": "No, I have not been in an accident.",
+        "responseAudio": "audio/No, I have not been in an accident.mp3",
         "responseMeaning": "No, no he estado involucrado en un accidente."
       },
       {
@@ -1908,6 +1909,7 @@ const missions = [
         "audio": "audio/how fast were you going.mp3",
         "meaning": "¿A qué velocidad iba?",
         "response": "I was driving at sixty-four miles per hour.",
+        "responseAudio": "audio/I was driving at sixty-four miles per hour.mp3",
         "responseMeaning": "Iba manejando a 64 millas por hora."
       },
       {
@@ -1915,6 +1917,7 @@ const missions = [
         "audio": "audio/when was the last time you put diesel.mp3",
         "meaning": "¿Cuándo fue la última vez que cargó diésel?",
         "response": "The last time I got diesel was in Natalia, Texas.",
+        "responseAudio": "audio/The last time i got diesel was in Natalia Texas.mp3",
         "responseMeaning": "La última vez que cargué diésel fue en Natalia, Texas."
       }
     ]
@@ -3332,7 +3335,16 @@ const AUDIO_FILE_INVENTORY = {
   "Yes the insurance is in my permit book": "Yes the insurance is in my permit book.mp3",
   "Yes the phone number is": "Yes the phone number is.mp3",
   "Yield": "Yield.mp3",
-  "You may pull forward and reposition": "You may pull forward and reposition.mp3"
+  "You may pull forward and reposition": "You may pull forward and reposition.mp3",
+  "Been in an accident": "Been in an accident.mp3",
+  "Díselo esa un Natalia Texas": "Díselo esa un Natalia Texas.mp3",
+  "I was driving at sixty-four miles per hour": "I was driving at sixty-four miles per hour.mp3",
+  "I was driving at": "I was driving at.mp3",
+  "No, I have not been in an accident": "No, I have not been in an accident.mp3",
+  "No, I have not": "No, I have not.mp3",
+  "Sixty-four miles per hour": "Sixty-four miles per hour.mp3",
+  "The last time i got diesel was in Natalia Texas": "The last time i got diesel was in Natalia Texas.mp3",
+  "The last time i got": "The last time i got.mp3"
 };
 
 const AUDIO_ALIASES = {
@@ -3372,7 +3384,22 @@ const AUDIO_ALIASES = {
   "road workers": "Road workers are in or near the roadway.mp3",
   "two-way traffic": "Two way traffic ahead.mp3",
   "two way traffic": "Two way traffic ahead.mp3",
-  "truck speed limit 40": "Trucks 40.mp3"
+  "truck speed limit 40": "Trucks 40.mp3",
+
+  /* MISIÓN 7 · ACCIDENTES Y VELOCIDAD
+     Audios completos + fragmentos usados por los botones de pronunciación guiada. */
+  "no i have not been in an accident": "No, I have not been in an accident.mp3",
+  "no i have not": "No, I have not.mp3",
+  "been in an accident": "Been in an accident.mp3",
+
+  "i was driving at sixty-four miles per hour": "I was driving at sixty-four miles per hour.mp3",
+  "i was driving at": "I was driving at.mp3",
+  "sixty-four miles per hour": "Sixty-four miles per hour.mp3",
+  "sixty four miles per hour": "Sixty-four miles per hour.mp3",
+
+  "the last time i got diesel was in natalia texas": "The last time i got diesel was in Natalia Texas.mp3",
+  "the last time i got": "The last time i got.mp3",
+  "diesel was in natalia texas": "Díselo esa un Natalia Texas.mp3"
 };
 
 function audioLookupKey(text){
@@ -3702,11 +3729,31 @@ function playVocabAudio(text,button=null,onFail=null){
 */
 function speak(text,button=null){
   if(!audioEnabled)return false;
-  const candidates=resolvedAudioCandidates(text);
+
+  const candidates=[];
+
+  const add=path=>{
+    const valid=existingAudioPath(path);
+    if(valid && !candidates.includes(valid))candidates.push(valid);
+  };
+
+  // Si el texto es una respuesta completa de una misión, prioriza su MP3 explícito.
+  for(const mission of missions){
+    const item=mission.items.find(x=>normalizeAudioKey(displayResponse(x))===normalizeAudioKey(text));
+    if(item && item.responseAudio){
+      add(item.responseAudio);
+      break;
+    }
+  }
+
+  // Después usa el mapa normal para vocabulario, fragmentos y demás respuestas.
+  resolvedAudioCandidates(text).forEach(add);
+
   if(!candidates.length){
     console.warn("Este texto no tiene un MP3 disponible:",text);
     return false;
   }
+
   return playMp3Candidates(candidates,button,"vocab",text);
 }
 
