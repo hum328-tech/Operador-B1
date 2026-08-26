@@ -3754,30 +3754,15 @@ function playVocabAudio(text,button=null,onFail=null){
 function speak(text,button=null){
   if(!audioEnabled)return false;
 
-  const candidates=[];
-
-  const add=path=>{
-    const valid=existingAudioPath(path);
-    if(valid && !candidates.includes(valid))candidates.push(valid);
-  };
-
-  // Si el texto es una respuesta completa de una misión, prioriza su MP3 explícito.
-  for(const mission of missions){
-    const item=mission.items.find(x=>normalizeAudioKey(displayResponse(x))===normalizeAudioKey(text));
-    if(item && item.responseAudio){
-      add(item.responseAudio);
-      break;
-    }
+  if(currentMission().id===7 && playMission7Direct(text,button)){
+    return true;
   }
 
-  // Después usa el mapa normal para vocabulario, fragmentos y demás respuestas.
-  resolvedAudioCandidates(text).forEach(add);
-
+  const candidates=resolvedAudioCandidates(text);
   if(!candidates.length){
     console.warn("Este texto no tiene un MP3 disponible:",text);
     return false;
   }
-
   return playMp3Candidates(candidates,button,"vocab",text);
 }
 
@@ -4652,8 +4637,102 @@ function eorSplit(text){
    REPRODUCIR RESPUESTA
 ========================================================== */
 
+
+/* ==========================================================
+   MISIÓN 7 · MAPA DIRECTO DE AUDIO
+   Estas rutas NO se adivinan. Se usan exactamente como existen
+   en /audio de GitHub Pages.
+========================================================== */
+const MISSION7_DIRECT_AUDIO = {
+  "no i have not": "audio/No, I have not.mp3",
+  "been in an accident": "audio/Been in an accident.mp3",
+  "no i have not been in an accident": "audio/No, I have not been in an accident.mp3",
+
+  "i was driving at": "audio/I was driving at.mp3",
+  "sixty four miles per hour": "audio/Sixty-four miles per hour.mp3",
+  "i was driving at sixty four miles per hour": "audio/I was driving at sixty-four miles per hour.mp3",
+
+  "the last time i got": "audio/The last time i got.mp3",
+  "diesel was in natalia texas": "audio/Díselo esa un Natalia Texas.mp3",
+  "the last time i got diesel was in natalia texas": "audio/The last time i got diesel was in Natalia Texas.mp3"
+};
+
+function mission7AudioKey(text){
+  return String(text||"")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function playDirectMp3(path,button=null,label=""){
+  if(!audioEnabled || !path)return false;
+
+  stopAllAudio();
+
+  if(button){
+    if(button.dataset.originalText===undefined){
+      button.dataset.originalText=button.textContent;
+    }
+    button.classList.add("playing");
+    button.textContent="🔊";
+  }
+
+  const restore=()=>{
+    if(button){
+      button.classList.remove("playing");
+      if(button.dataset.originalText!==undefined){
+        button.textContent=button.dataset.originalText;
+      }
+    }
+  };
+
+  // URL absoluta + versión para evitar caché viejo del navegador/PWA.
+  const absolute = new URL(path, window.location.href);
+  absolute.searchParams.set("audio_v","20260826_1");
+
+  const audio = new Audio(absolute.href);
+  currentVocabAudio = audio;
+
+  audio.onended=()=>{
+    restore();
+    if(currentVocabAudio===audio)currentVocabAudio=null;
+  };
+
+  audio.onerror=()=>{
+    restore();
+    console.error("Error cargando MP3 directo:",absolute.href,label);
+    if(currentVocabAudio===audio)currentVocabAudio=null;
+  };
+
+  audio.play().catch(err=>{
+    restore();
+    console.error("El navegador bloqueó o falló al reproducir:",absolute.href,err);
+    if(currentVocabAudio===audio)currentVocabAudio=null;
+  });
+
+  return true;
+}
+
+function playMission7Direct(text,button=null){
+  const key=mission7AudioKey(text);
+  const path=MISSION7_DIRECT_AUDIO[key];
+  if(!path)return false;
+  return playDirectMp3(path,button,text);
+}
+
+
 function eorPlayResponse(item,button=null){
   if(!audioEnabled || !item)return false;
+
+  const responseText=displayResponse(item);
+
+  // Misión 7: ruta directa exacta primero.
+  if(currentMission().id===7 && playMission7Direct(responseText,button)){
+    return true;
+  }
 
   const candidates=[];
 
@@ -4662,14 +4741,11 @@ function eorPlayResponse(item,button=null){
     if(valid && !candidates.includes(valid))candidates.push(valid);
   };
 
-  // 1. Ruta explícita de la respuesta, si existe.
   if(item.responseAudio)add(item.responseAudio);
-
-  // 2. Coincidencia flexible por el texto visible.
-  resolvedAudioCandidates(displayResponse(item)).forEach(add);
+  resolvedAudioCandidates(responseText).forEach(add);
 
   if(!candidates.length){
-    console.warn("No se encontró MP3 para la respuesta:",displayResponse(item));
+    console.warn("No se encontró MP3 para la respuesta:",responseText);
     return false;
   }
 
@@ -4677,13 +4753,18 @@ function eorPlayResponse(item,button=null){
     candidates,
     button,
     "vocab",
-    displayResponse(item)
+    responseText
   );
 }
 
 
 
 function eorPlayFlexibleChunk(text,item,type,button=null){
+  // En Misión 7, los nueve MP3 nuevos se reproducen por ruta directa.
+  if(currentMission().id===7 && playMission7Direct(text,button)){
+    return true;
+  }
+
   const candidates=resolvedAudioCandidates(text);
 
   if(candidates.length){
@@ -7239,5 +7320,6 @@ if ("serviceWorker" in navigator) {
   });
 }
 </script>
+<script>console.info("Operador B1 · audio M7 directo · 2026-08-26-1");</script>
 </body>
 </html>
